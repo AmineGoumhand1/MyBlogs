@@ -122,10 +122,15 @@ First but not least, Forensically. Which is an online forensic analysis tool tha
 
     Error Level Analysis (ELA): It can identifies areas of an image that have different levels of compression, often indicating 
     manipulation.
+  
     Clone Detection: it detects duplicated areas within an image.
+  
     Noise Analysis: It highlights areas with different noise patterns, which can indicate tampering.
+  
     Meta Data Viewer: It displays metadata ( seen at exiftool ) embedded in image files.
+  
     Magnifier and Zoom: It allows for detailed examination of image areas.
+  
     Pixel and Color Analysis: Also it can analyzes the colors and pixels in an image to detect anomalies.
 
 Go discover it, it's a usefull tool full of automated functionalities. [Forensically](https://29a.ch/photo-forensics/#forensic-magnifier) .
@@ -144,7 +149,7 @@ These two are also intresting, Steg 1 and Steg 2 are online tools that provide e
 
 ```Aperi'Solve```
 
-You should absolutely put this tool in you mind, because it gather about 9 or 10 from previous tools at the same time ( strigs, file, zsteg, binwalk, foremost, ....... ) .
+You should absolutely put this tool in you mind, because it gather about 9 or 10 from previous tools at the same time ( ```strings```, ```file```, ```zsteg```, ```binwalk```, ```foremost```, ....... ) .
 
 It called Aperi'Solve, it is an advanced online forensic tool that offers static analysis and integrates tools such as the above ones for comprehensive file inspection and data extraction. Go check it [Aperi'Solve](https://www.aperisolve.com/) .
 
@@ -152,7 +157,7 @@ It called Aperi'Solve, it is an advanced online forensic tool that offers static
 
 Stegseek is a lightning-fast steghide cracker designed to extract hidden data quickly from files.
 
-These tools cover a wide range of capabilities from steganography detection and data extraction to forensic file recovery and online analysis, essential for tackling DFIR challenges in CTF competitions.
+##These tools cover a wide range of capabilities from steganography detection and data extraction to forensic file recovery and online analysis, essential for tackling DFIR challenges in CTF competitions.
 
 ### Audio Files (WAV, MP3, etc.)
 
