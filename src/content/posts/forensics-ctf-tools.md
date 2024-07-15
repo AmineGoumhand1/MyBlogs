@@ -7,7 +7,7 @@ tags: ['CTF', 'DFIR', 'Forensics' ]
 category: 'CTF'
 draft: false 
 ---
-![Image source](https://www.pxfuel.com/en/query?q=digital+forensics)
+[Image source](https://www.pxfuel.com/en/query?q=digital+forensics)
 ![Image Cover](/favicon/Intro2.jpg)
 
 Hey Everyone, I'm happy to introduce you this blog about some interesting tools used in CTF-based challenges and also real cases DFIR analysis, So lets get this
@@ -35,13 +35,13 @@ It can be useful for identifying the type of certain suspicious files, like iles
 
 Here is an example :
 
-![](favicon/file.png) 
+![image](/favicon/file.png) 
 
 - **How to use it**  : ```file file_name```
 
 ```pngcheck```
 
-This tool simply check if a given image is png or not.
+This one is pretty similar to the previous but it support only png images, it simply check if a given image is png or not.
 
 - **How to use it**  : ```pngcheck image_name.png```
 
