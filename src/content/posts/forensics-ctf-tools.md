@@ -34,7 +34,6 @@ Beginnig with my precious one, file tool. This one used to verify the type of a 
 It can be useful for identifying the type of certain suspicious files, like iles without an extension.
 
 Here is an example :
-
 ![image](/favicon/file.png) 
 
 - **How to use it**  : ```file file_name```
@@ -49,9 +48,13 @@ This one is pretty similar to the previous but it support only png images, it si
 
 exiftool is a platform-independent Perl library plus a command-line application for reading, writing, and editing metadata in a wide variety of files.
 
-- **Features** : Extract metadata from images, modify metadata, and support for various image formats.
+- **Features** : It can extract metadata from images, modify metadata, and support for various image formats.
 - **How to use it**  : ```exiftool file_name```
 - **For more Info** : ```exiftool --help```
+
+Lets take a simple example, suppose we want to extract an image metadata like time capture, location, dimension ....
+The output should contain these informations as shown below:
+![image](/favicon/exif.png)
 
 ```stegsolve```
 
