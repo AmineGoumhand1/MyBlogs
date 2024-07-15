@@ -33,6 +33,7 @@ File tool used to verify the type of a file.
 - **How to use it**  : ```file file_name```
 
 ```pngcheck```
+
 This tool simply check if a given image is png or not.
 
 - **How to use it**  : ```pngcheck image_name.png```
