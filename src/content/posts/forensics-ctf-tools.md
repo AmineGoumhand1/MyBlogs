@@ -26,18 +26,18 @@ So lets start discovering the most tools needed as beginning before we delve in 
 
 ### Generale Files
 
-### ```File tool```
+```File tool```
 
 File tool used to verify the type of a file.
 
 - **How to use it**  : ```file file_name```
 
-### ```pngcheck```
+```pngcheck```
 This tool simply check if a given image is png or not.
 
 - **How to use it**  : ```pngcheck image_name.png```
 
-### ```exiftool```
+```exiftool```
 
 exiftool is a platform-independent Perl library plus a command-line application for reading, writing, and editing metadata in a wide variety of files.
 
@@ -45,14 +45,14 @@ exiftool is a platform-independent Perl library plus a command-line application 
 - **How to use it**  : ```exiftool file_name```
 - **For more Info** : ```exiftool --help```
 
-### ```stegsolve```
+```stegsolve```
 
 stegsolve is a tool that allows you to analyze images for steganography, often used to hide messages within images.
 
 - **Features**  : Provides multiple analysis tools, such as color filters, LSB steganalysis, and more.
 - **How to use it**  : First ensure that you have java sdk installed (.jar) then locate the file ```/stegsolve/bin/stegsolve.jar``` and execute it.
 
-### ```zsteg```
+```zsteg```
 
 zsteg is a tool used to detect hidden data in PNG (LSB steg) and BMP files.
 
@@ -60,35 +60,35 @@ zsteg is a tool used to detect hidden data in PNG (LSB steg) and BMP files.
 - **How to use it**  : ```zsteg [options] filename.png [param_string]```
 
 
-### ```binwalk```
+```binwalk```
 
 binwalk is a tool for analyzing, reverse engineering, and extracting firmware images. It helps in identifying embedded files and executable code within firmware images.
 
 - **Features**  : Signature scanning, entropy analysis, and file extraction.
 - **How to use it**  : ```binwalk --extract file_name``` to extract hidden files or ```binwalk --help``` to discover all its benefits.
 
-### ```hexedit```
+```hexedit```
 
 hexedit is a hexadecimal editor that allows users to view and edit binary files.
 
 - **Features** : Navigate and edit files at the binary level, useful for forensic analysis and debugging.
 - **How to use it** : ```hexedit file_name```
 
-### ```xxd```
+```xxd```
 
 xxd is a utility that creates a hex dump of a given file or standard input.
 
 - **Features** : Convert binary files to hexadecimal format and reverse.
 - **How to use it** : ```xxd file_name``` to create a hex dump or ```xxd -r hex_dump_file``` to reverse the process.
 
-### ```Steghide```
+```Steghide```
 
 Steghide is a steganography tool that can hide data in various types of image and audio files.
 
 - **Features** : Embedding and extracting data from cover files using robust encryption.
 - **How to use it** : ```steghide embed -cf cover_file -ef embed_file``` to embed data and ```steghide --extract -sf stego_file``` to extract hidden data.
 
-### ```Foremost```
+```Foremost```
 
 Foremost is a file recovery tool that scans a disk image, searching for specific file types based on their magic bytes and headers.
 
@@ -96,27 +96,27 @@ Foremost is a file recovery tool that scans a disk image, searching for specific
 
 ### Online Tools
 
-### ```Forensically```
+```Forensically```
 
 Forensically is an online forensic analysis tool that allows users to extract hidden data from images using various techniques.
 
-### ```StegOnline```
+```StegOnline```
 
 StegOnline is a comprehensive steganography tool that enables users to upload images, modify them, and extract hidden data.
 
-### ```Steg 1 and Steg 2```
+```Steg 1 and Steg 2```
 
 Steg 1 and Steg 2 are online tools that provide encoding and decoding of files within images, offering powerful steganography capabilities.
 
-### ```Images Color Picker```
+```Images Color Picker```
 
 Images Color Picker allows users to extract colors from websites or images and displays them in Hex or RGB format.
 
-### ```Aperi'Solve```
+```Aperi'Solve```
 
 Aperi'Solve is an advanced online forensic tool that offers static analysis and integrates tools like zsteg, steghide, exiftool, binwalk, and foremost for comprehensive file inspection and data extraction.
 
-### ```Stegseek```
+```Stegseek```
 
 Stegseek is a lightning-fast steghide cracker designed to extract hidden data quickly from files.
 
@@ -124,13 +124,13 @@ These tools cover a wide range of capabilities from steganography detection and 
 
 ### Audio Files (WAV, MP3, etc.)
 
-### ```Audacity```
+```Audacity```
 
 Audacity is a free, open-source, cross-platform audio software for multi-track recording and editing.
 
 - **Features**  : Audio editing, noise reduction, format conversion, and spectrogram analysis.
 
-### ```Sonic Visualiser```
+```Sonic Visualiser```
 
 Sonic Visualiser is an application for viewing and analyzing the contents of music audio files.
 
