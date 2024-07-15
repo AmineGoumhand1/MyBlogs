@@ -157,7 +157,7 @@ It called Aperi'Solve, it is an advanced online forensic tool that offers static
 
 Stegseek is a lightning-fast steghide cracker designed to extract hidden data quickly from files.
 
-##These tools cover a wide range of capabilities from steganography detection and data extraction to forensic file recovery and online analysis, essential for tackling DFIR challenges in CTF competitions.
+## These tools cover a wide range of capabilities from steganography detection and data extraction to forensic file recovery and online analysis, essential for tackling DFIR challenges in CTF competitions.
 
 ### Audio Files (WAV, MP3, etc.)
 
@@ -169,9 +169,11 @@ Audacity is a free, open-source, cross-platform audio software for multi-track r
 
 ```Sonic Visualiser```
 
+For me, I use this instead of Audacity, ( it's not personal Audacity, Sorry ).
+
 Sonic Visualiser is an application for viewing and analyzing the contents of music audio files.
 
-- **Features**  : Detailed visual analysis, annotation layers, and time-domain views.
+- **Features**  : It can acheive detailed visual analysis, Spectograms viewing, annotation layers, time-domain views and much more.
 - **How to use it**  : Locate SonicVisualizer and execute it, it should be something like this ```/SonicVisualizer/SonicVisualiser-4.5.2-x86_64.AppImage```
 
 
