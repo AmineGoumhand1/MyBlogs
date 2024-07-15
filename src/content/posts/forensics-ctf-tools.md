@@ -65,6 +65,9 @@ stegsolve is a tool that allows you to analyze images for steganography, often u
 - **Features**  : Provides multiple analysis tools, such as color filters, LSB steganalysis, and more.
 - **How to use it**  : First ensure that you have java sdk installed (.jar) then locate the file ```/stegsolve/bin/stegsolve.jar``` and execute it.
 
+As a live demo, here is how : ![stegsolve](/favicon/stegsolve.png)
+
+
 ```zsteg```
 
 zsteg is a tool used to detect hidden data in PNG (LSB steg) and BMP files.
