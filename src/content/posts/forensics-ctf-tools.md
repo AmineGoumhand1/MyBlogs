@@ -124,8 +124,8 @@ First but not least, Forensically. Which is an online forensic analysis tool tha
     manipulation.
     Clone Detection: it detects duplicated areas within an image.
     Noise Analysis: It highlights areas with different noise patterns, which can indicate tampering.
-    Meta Data Viewer: it displays metadata ( seen at exiftool ) embedded in image files.
-    Magnifier and Zoom: It llows for detailed examination of image areas.
+    Meta Data Viewer: It displays metadata ( seen at exiftool ) embedded in image files.
+    Magnifier and Zoom: It allows for detailed examination of image areas.
     Pixel and Color Analysis: Also it can analyzes the colors and pixels in an image to detect anomalies.
 
 Go discover it, it's a usefull tool full of automated functionalities. [Forensically](https://29a.ch/photo-forensics/#forensic-magnifier) .
@@ -134,18 +134,17 @@ Go discover it, it's a usefull tool full of automated functionalities. [Forensic
 ```StegOnline```
 
 StegOnline is a comprehensive steganography tool that enables users to upload images, modify them, and extract hidden data.
+I did solve many challenges with this one, it has several benefits like color inversing, bitplanes browsing and much more.
 
 ```Steg 1 and Steg 2```
 
-Steg 1 and Steg 2 are online tools that provide encoding and decoding of files within images, offering powerful steganography capabilities.
-
-```Images Color Picker```
-
-Images Color Picker allows users to extract colors from websites or images and displays them in Hex or RGB format.
+These two are also intresting, Steg 1 and Steg 2 are online tools that provide encoding and decoding of files within images, offering powerful steganography capabilities.
 
 ```Aperi'Solve```
 
-Aperi'Solve is an advanced online forensic tool that offers static analysis and integrates tools like zsteg, steghide, exiftool, binwalk, and foremost for comprehensive file inspection and data extraction.
+You should absolutely put this tool in you mind, because it gather about 9 or 10 from previous tools at the same time ( strigs, file, zsteg, binwalk, foremost, ....... ) .
+
+It called Aperi'Solve, it is an advanced online forensic tool that offers static analysis and integrates tools such as the above ones for comprehensive file inspection and data extraction. Go check it [Aperi'Solve](https://www.aperisolve.com/) .
 
 ```Stegseek```
 
