@@ -87,12 +87,18 @@ hexedit is a hexadecimal editor that allows users to view and edit binary files.
 - **Features** : Navigate and edit files at the binary level, useful for forensic analysis and debugging.
 - **How to use it** : ```hexedit file_name```
 
+Lets take it on an example : ![hexedit](/favicon/hexedit.png)
+Note that the file is a png so we should see the chunks PNG or the hex values corresponding to it.
+
 ```xxd```
 
 xxd is a utility that creates a hex dump of a given file or standard input.
 
 - **Features** : Convert binary files to hexadecimal format and reverse.
 - **How to use it** : ```xxd file_name``` to create a hex dump or ```xxd -r hex_dump_file``` to reverse the process.
+
+Lets take it on an example : ![hexedit](/favicon/xxd1.png)
+Same output as ```hexedit``` but as a reminder ```xxd``` is not a hex editor.
 
 ```Steghide```
 
@@ -179,8 +185,9 @@ Sonic Visualiser is an application for viewing and analyzing the contents of mus
 
 ## Advanced DFIR Techniques and Tools
 
-Now we are on the way to discover more powerfull tools that will help us on our analysis tasks and difficulties
-To structre the contents very well, i'll devide DFIR Techniques to 3 parts, from Timeline Analysis to Registry Analysis.
+Now we are on the way to discover more powerfull tools that will help us on our analysis tasks and difficulties.
+
+To structre the contents very well, i'll devide DFIR Techniques to 3 parts. From Timeline Analysis to Registry Analysis.
 
 Don't worry, we'll see other more advanced techniques in comming blogs.
 
