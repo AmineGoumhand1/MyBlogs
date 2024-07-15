@@ -1,7 +1,7 @@
 ---
 title: 'Forensics CTF Tools'
 published: 2024-07-14
-description: 'Some Tools Needed In DFIR Analysis'
+description: 'Some Needed Tools In DFIR Analysis For Beginners And Advanced Level'
 image: ''
 tags: ['CTF', 'DFIR', 'Forensics' ]
 category: 'CTF'
