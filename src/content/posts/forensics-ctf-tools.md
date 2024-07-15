@@ -118,7 +118,7 @@ Note that you should discover these tools by your self, dont be lazy Freak, I'll
 
 First but not least, Forensically. Which is an online forensic analysis tool that allows you and me to extract hidden data from images using various techniques.
 
-Services and Features:
+<span style=color:blue>Services and Features</span>
 
     Error Level Analysis (ELA): Identifies areas of an image that have different levels of compression, often indicating 
     manipulation.
