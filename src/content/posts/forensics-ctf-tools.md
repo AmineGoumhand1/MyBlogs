@@ -117,7 +117,18 @@ Note that you should discover these tools by your self, dont be lazy Freak, I'll
 ```Forensically```
 
 First but not least, Forensically. Which is an online forensic analysis tool that allows you and me to extract hidden data from images using various techniques.
+
+Services and Features:
+
+    Error Level Analysis (ELA): Identifies areas of an image that have different levels of compression, often indicating 
+    manipulation.
+    Clone Detection: Detects duplicated areas within an image.
+    Noise Analysis: Highlights areas with different noise patterns, which can indicate tampering.
+    Meta Data Viewer: Displays metadata embedded in image files.
+    Magnifier and Zoom: Allows for detailed examination of image areas.
+    Pixel and Color Analysis: Analyzes the colors and pixels in an image to detect anomalies.
 Go discover it, it's a usefull tool. [Forensically](https://29a.ch/photo-forensics/#forensic-magnifier) .
+
 
 ```StegOnline```
 
