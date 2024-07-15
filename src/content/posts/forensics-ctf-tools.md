@@ -107,11 +107,17 @@ Foremost is a file recovery tool that scans a disk image, searching for specific
 
 - **How to use it**  : ```formost file_name```
 
+So until now, i think that's enough as a beginning, note that you should search and do some OSINT for other tools depending on the situation of the challenge. 
+
+Lets move now to other tools but this time we'll discover the online ones.
+
 ### Online Tools
+Note that you should discover these tools by your self, dont be lazy Freak, I'll just describe them. ( I'm being Lazy right now, Shit ) Whatever.
 
 ```Forensically```
 
-Forensically is an online forensic analysis tool that allows users to extract hidden data from images using various techniques.
+First but not least, Forensically. Which is an online forensic analysis tool that allows you and me to extract hidden data from images using various techniques.
+Go discover it, it's a usefull tool. ![Forensically](https://29a.ch/photo-forensics/#forensic-magnifier)
 
 ```StegOnline```
 
