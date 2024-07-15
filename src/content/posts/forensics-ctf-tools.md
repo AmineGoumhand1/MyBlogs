@@ -127,6 +127,7 @@ Services and Features:
     Meta Data Viewer: Displays metadata embedded in image files.
     Magnifier and Zoom: Allows for detailed examination of image areas.
     Pixel and Color Analysis: Analyzes the colors and pixels in an image to detect anomalies.
+
 Go discover it, it's a usefull tool. [Forensically](https://29a.ch/photo-forensics/#forensic-magnifier) .
 
 
