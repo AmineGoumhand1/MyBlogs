@@ -157,7 +157,7 @@ It called Aperi'Solve, it is an advanced online forensic tool that offers static
 
 Stegseek is a lightning-fast steghide cracker designed to extract hidden data quickly from files.
 
-## These tools cover a wide range of capabilities from steganography detection and data extraction to forensic file recovery and online analysis, essential for tackling DFIR challenges in CTF competitions.
+### These tools cover a wide range of capabilities from steganography detection and data extraction to forensic file recovery and online analysis, essential for tackling DFIR challenges in CTF competitions.
 
 ### Audio Files (WAV, MP3, etc.)
 
@@ -179,9 +179,14 @@ Sonic Visualiser is an application for viewing and analyzing the contents of mus
 
 ## Advanced DFIR Techniques and Tools
 
+Now we are on the way to discover more powerfull tools that will help us on our analysis tasks and difficulties
+To structre the contents very well, i'll devide DFIR Techniques to 3 parts, from Timeline Analysis to Registry Analysis.
+
+Don't worry, we'll see other more advanced techniques in comming blogs.
+
 ### Timeline Analysis
 
-Timeline analysis involves creating a chronological sequence of events from forensic data. Here are some of the top tools for this process:
+So Timeline analysis involves creating a chronological sequence of events from forensic data. Here are some of the top tools for this process:
 
  ```Autopsy```
 
