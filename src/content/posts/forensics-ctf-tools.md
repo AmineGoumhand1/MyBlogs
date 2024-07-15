@@ -35,7 +35,7 @@ It can be useful for identifying the type of certain suspicious files, like iles
 
 Here is an example :
 
-![image]('favicon/file.png) 
+![image](favicon/file.png) 
 
 - **How to use it**  : ```file file_name```
 
