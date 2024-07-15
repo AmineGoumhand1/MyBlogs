@@ -53,8 +53,10 @@ exiftool is a platform-independent Perl library plus a command-line application 
 - **For more Info** : ```exiftool --help```
 
 Lets take a simple example, suppose we want to extract an image metadata like time capture, location, dimension ....
+
 The output should contain these informations as shown below:
 ![image](/favicon/exif.png)
+Some times you should be carefull about a section named ```Comments``` ( Not presented here ) where can be the flag or a hint to the flag.
 
 ```stegsolve```
 
