@@ -10,7 +10,7 @@ draft: false
 [Image source](https://www.pxfuel.com/en/query?q=digital+forensics)
 ![Image Cover](/favicon/Intro2.jpg)
 
-Hey Everyone, I'm happy to introduce you this blog about some interesting tools used in CTF-based challenges and also real cases DFIR analysis, So lets get this
+Hey Everyone, I'm happy to introduce you this blog about some interesting tools used in CTF-based challenges and also real cases DFIR analysis, So lets get this.
 
 ## Introduction to DFIR
 
@@ -24,7 +24,7 @@ So in today's post, we will explore some of the most effective tools used in DFI
 
 ## Basic Tools Every CTF Player Should Know
 
-So the tools that we'll be seeing now are some shiiity and important ones that a CTF player should use first ( if needed ) at the beginnig of a challenge solving
+So the tools that we'll be seeing now are some shiiity and important ones that a CTF player should use first ( if needed ) at the beginnig of a challenge.
 
 ### Different files tools
 
