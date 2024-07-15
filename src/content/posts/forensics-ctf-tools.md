@@ -12,28 +12,30 @@ draft: false
 
 Hey Everyone, I'm happy to introduce you this blog about some interesting tools used in CTF-based challenges and also real cases DFIR analysis, So lets get this
 
+## Introduction to DFIR
+
 First, lets take an overview about DFIR, which is an abreviation of Digital Forensics and Incident Response, it plays a crucial role in identifying, analyzing, and mitigating cyber threats ( This is the best definition btw HHHH ). Capture The Flag (CTF) competitions often include challenges that simulate real-world forensic scenarios, requiring participants to use a variety of tools to solve complex puzzles.
 
 So in today's post, we will explore some of the most effective tools used in DFIR for CTF challenges.
 
 ### What are you waiting, lets get this shiiit done.  
 
-
-## Introduction to DFIR
-
-Digital Forensics involves the recovery and investigation of material found in digital devices, often in relation to computer crime. Incident Response is the approach to handling and managing the aftermath of a security breach or attack. Together, DFIR is vital for understanding cyber incidents, responding effectively, and strengthening security measures.
-
-So lets start discovering the most tools needed as beginning before we delve in important ones.
-
 ```Note``` : The installation of each tool will be provided at the end of the blog.
 
 ## Basic Tools Every CTF Player Should Know
 
-### Generale Files
+So the tools that we'll be seeing now are some shiiity and important ones that a CTF player should use first ( if needed ) at the beginnig of a challenge solving
+
+### Different files tools
 
 ```File tool```
 
-File tool used to verify the type of a file.
+Beginnig with my precious one, file tool. This one used to verify the type of a file.
+It can be useful for identifying the type of certain suspicious files, like iles without an extension.
+
+Here is an example :
+
+![image]('favicon/file.png) 
 
 - **How to use it**  : ```file file_name```
 
