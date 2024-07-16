@@ -13,15 +13,15 @@ Hello people, In this series of blogs, I will introduce you to malwares dev and 
 
 ### Introduction
 
-Malware development involves the creation of malicious software designed to infiltrate, disrupt, or gain unauthorized access to computer systems and networks. It encompasses the process of designing, coding, testing, and deploying software with malicious intent. This blog explores the intricate world of malware development, shedding light on its methods, motivations, and implications in cybersecurity.
+Lets take a definition, Malware development involves the creation of malicious software designed to infiltrate, disrupt, or gain unauthorized access to computer systems and networks. It encompasses the process of designing, coding, testing, and deploying software with malicious intent. This blog explores the intricate world of malware development, shedding light on its methods, motivations, and implications in cybersecurity.
 
 So lets define a work plan for our journey.
 
 ## Phase 1: Malware Injection Techniques
 
 ### Process Injection
-- **Description:** Injecting malicious code into legitimate processes to evade detection and execute malicious actions.
-- **Examples:**
+Understand how to inject malicious code into legitimate processes to evade detection and execute malicious actions.
+In this category, I'll cover the following techniques 
   - **DLL Injection:** Injecting a dynamic-link library (DLL) into a process to execute malicious code.
   - **Process Hollowing:** Replacing the memory of a legitimate process with malicious code.
 - **Tools and Techniques:**
