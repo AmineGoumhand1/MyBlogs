@@ -11,6 +11,8 @@ draft: false
 
 Hello people, In this series of blogs, I will introduce you to malwares dev and some known techniques that will let you familiarized with maldev, So welcome to you Whatever your level is, a beginner or an advanced dude.
 
+Note : I will stop at each new term to explain it.
+
 ### Introduction
 
 Lets take a definition, Malware development involves the creation of malicious software designed to infiltrate, disrupt, or gain unauthorized access to computer systems and networks. It encompasses the process of designing, coding, testing, and deploying software with malicious intent. This blog explores the intricate world of malware development, shedding light on its methods, motivations, and practical implementations.
