@@ -200,24 +200,38 @@ So Timeline analysis involves creating a chronological sequence of events from f
 
  ```Autopsy```
 
-   - This Tool saves you a lot of time in order to analyse a raw or a disk partition, It provides you with a Graphical interface
-     for The Sleuth Kit (TSK). 
+This Tool saves you a lot of time in order to analyse a raw or a disk partition, It provides you with a Graphical interface for The Sleuth Kit (TSK). 
+We'll encounter it in several challenges later.
 
  ```X-Ways Forensics```
 
-   - **Features** : Disk imaging, file recovery, and timeline analysis.
+This one provides features like Disk imaging, file recovery, and timeline analysis.
 
  ```Forensic ToolKit (FTK)```
+ 
+This one is important asf, FTK. It is a comprehensive forensic analysis tool developed by AccessData. It offers us extensive capabilities for digital forensics and incident response, particularly in the area of timeline analysis.
 
-   - **Features** : Comprehensive forensic analysis tool, includes timeline creation.
+- **Features:**
+  - **Comprehensive Forensic Analysis:** FTK provides tools for analyzing disk images, file systems, and memory dumps, enabling comprehensive forensic investigations.
+  - **Timeline Creation:** It includes robust features for timeline analysis, allowing investigators to reconstruct sequences of events based on forensic data.
+  - **Keyword Searching:** From it's benefits, a powerful search capabilities for identifying relevant evidence within large datasets.
+  - **Integration:** It supports integration with other forensic tools and databases, enhancing workflow efficiency.
+  - **Reporting:** It also generates detailed reports and timelines that are crucial for presenting findings in legal proceedings.
+
+FTK is widely used by forensic professionals and law enforcement agencies due to its reliability and extensive feature set, making it a cornerstone tool in digital investigations.
 
  ```Forensic Explorer```
 
-   - **Features** : Disk analysis and forensic tool with timeline capabilities.
+Forensic Explorer is a robust forensic tool designed for in-depth disk analysis and investigations, featuring comprehensive capabilities including timeline analysis.
 
- ```Cyber Triage```
+- **Features:**
+  - **Disk Analysis:** Powerful tools for examining disk images and file systems, recovering deleted data, and analyzing file metadata.
+  - **Forensic Capabilities:** Supports forensic analysis of various file formats and data types, aiding in digital investigations.
+  - **Timeline Capabilities:** Includes features for creating timelines of events based on forensic data, crucial for reconstructing sequences of activities.
+  - **User-Friendly Interface:** Intuitive interface designed for ease of use in forensic examinations.
+  - **Reporting:** Generates detailed reports to document findings and support legal proceedings.
 
-   - **Features** : Automated forensic analysis, includes timeline generation.
+Forensic Explorer is widely utilized by forensic professionals and organizations requiring advanced tools for detailed disk and timeline analysis in digital investigations.
 
 ### Malware Analysis
 
