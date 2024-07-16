@@ -296,15 +296,11 @@ These tools provides us with such a comprehensive capabilities for timeline anal
 | Tool Name                | Installation Steps                                                                                                       |
 |--------------------------|---------------------------------------------------------------------------------------------------------------------------|
 | Autopsy                  | 1. Download Autopsy installer from [official website](https://www.sleuthkit.org/autopsy/).<br>2. Follow installation instructions for your operating system (Windows, Linux, macOS). |
-| Plaso (log2timeline)     | 1. Install dependencies (Python, pip).<br>2. Install via pip: `pip install plaso`.<br>3. Verify installation: `log2timeline --version`. |
-| SIFT Workstation         | 1. Download SIFT Workstation ISO from [official website](https://digital-forensics.sans.org/community/downloads).<br>2. Create bootable USB or VM.<br>3. Boot and follow setup instructions.               |
 | X-Ways Forensics         | 1. Download X-Ways Forensics installer from [official website](https://www.x-ways.net/winhex/forensics.html).<br>2. Run installer and follow on-screen prompts.                             |
-| Mandiant Redline         | 1. Download Mandiant Redline from [official website](https://www.fireeye.com/products/redline.html).<br>2. Install and follow setup wizard instructions.                                     |
 | Forensic ToolKit (FTK)   | 1. Download FTK installer from [official website](https://accessdata.com/products-services/forensic-toolkit-ftk).<br>2. Install and configure as per instructions.                               |
 | Volatility               | 1. Install dependencies (Python, pip).<br>2. Install via pip: `pip install volatility`.<br>3. Verify installation: `vol.py --info`. |
-| Cuckoo Sandbox           | 1. Set up a virtual environment (VirtualBox, VMware).<br>2. Download and configure Cuckoo Sandbox from [official website](https://cuckoosandbox.org/).<br>3. Start Cuckoo services. |
 | REMnux                   | 1. Download REMnux ISO from [official website](https://remnux.org/).<br>2. Create bootable USB or VM.<br>3. Boot and follow setup instructions.                           |
-| IDA Pro                  | 1. Download IDA Pro installer from [official website](https://www.hex-rays.com/products/ida/).<br>2. Install and follow setup wizard instructions.                             |
+| Ghidra                 | 1. Download Ghidra installer from [official website](https://github.com/NationalSecurityAgency/ghidra/releases).<br>2. Install and follow setup wizard instructions.                             |
 | RegRipper                | 1. Download RegRipper from [GitHub repository](https://github.com/keydet89/RegRipper3.0).<br>2. Extract files to a directory.<br>3. Use scripts as per documentation.               |
 | Wireshark                | 1. Install Wireshark package via package manager (apt, yum, brew).<br>2. Follow system-specific installation instructions from [official website](https://www.wireshark.org/).     |
 | FTK Imager               | 1. Download FTK Imager installer from [official website](https://accessdata.com/product-download/ftk-imager-version-4.3.0).<br>2. Install and follow setup wizard instructions.                             |
