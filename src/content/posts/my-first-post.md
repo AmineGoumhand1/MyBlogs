@@ -3,17 +3,17 @@ title: 'Malwares Devlopement Series | Part 1 : Introduction'
 published: 2024-07-14
 description: ''
 image: ''
-tags: ['Malwares', 'CTF', 'Forensics', 'DFIR', 'RedTeam', 'BlueTeam']
+tags: ['Malwares', 'CTF', 'Forensics', 'DFIR', 'RedTeam', 'BlueTeam', 'APT', 'Threat Hunting']
 category: 'Malwares'
 draft: false 
 ---
 ![malwares](/favicon/virus.jpg)
 
-Hello people, In this series of blogs, I will introduce you to malwares dev and some known techniques that will let you familiarized with maldev, So welcome tp you Whatever your level is, a beginner or an advanced dude.
+Hello people, In this series of blogs, I will introduce you to malwares dev and some known techniques that will let you familiarized with maldev, So welcome to you Whatever your level is, a beginner or an advanced dude.
 
 ### Introduction
 
-Lets take a definition, Malware development involves the creation of malicious software designed to infiltrate, disrupt, or gain unauthorized access to computer systems and networks. It encompasses the process of designing, coding, testing, and deploying software with malicious intent. This blog explores the intricate world of malware development, shedding light on its methods, motivations, and implications in cybersecurity.
+Lets take a definition, Malware development involves the creation of malicious software designed to infiltrate, disrupt, or gain unauthorized access to computer systems and networks. It encompasses the process of designing, coding, testing, and deploying software with malicious intent. This blog explores the intricate world of malware development, shedding light on its methods, motivations, and practical implementations.
 
 So lets define a work plan for our journey.
 
@@ -23,7 +23,7 @@ So lets define a work plan for our journey.
 
 You will be able to understand how to inject malicious code into legitimate processes to evade detection and execute malicious actions.
 
-In this category, I'll cover the following techniques 
+In this category, I'll cover the following techniques :
 
   - **DLL Injection** 
   - **Process Hollowing**
