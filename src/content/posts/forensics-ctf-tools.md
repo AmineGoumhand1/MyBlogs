@@ -260,6 +260,7 @@ It simplifies the setup of malware analysis workflows by providing pre-configure
 So as i said, dont risk your data and you hardware, try to install it and use it during your analysis. 
 
  ```Ghidra```
+ 
 Lets take a scenario,suppose that we have a malware and we want to reverse it or do some reverse engineering on it in order to reveal it's powerful capabilities, So here where reverse engineering programs, debuggers and desassemblers comes to work. 
 
 One of known one is Ghidra, which is a powerful software reverse-engineering suite developed by the National Security Agency (NSA). It offers a comprehensive set of tools for analyzing binary executables and malware samples. Ghidra includes a disassembler, decompiler, and powerful scripting capabilities, allowing analysts to explore and understand the behavior of compiled code.
