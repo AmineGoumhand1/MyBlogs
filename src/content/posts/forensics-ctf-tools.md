@@ -253,6 +253,7 @@ The last version of volatility is volatility 3, you can find differences between
  ```REMnux```
  
 When we will encounter some malwares analysis challenges, we dont want to analyse it in our local machine, I'm sure you know why, because if something's wrong happen during the analysis like executing malicious files accidently can damage your locale machine or compromise your data.
+
 So in order to avoid such things like that, we should use a virtual machine. Here it comes REMnux, which is a specialized Linux distribution tailored for malware analysis, reverse-engineering, and threat intelligence. Developed by Lenny Zeltser, REMnux includes a curated collection of tools and scripts focused on analyzing malicious software and exploring suspicious files in a controlled environment. 
 
 It simplifies the setup of malware analysis workflows by providing pre-configured tools like debuggers, disassemblers, network traffic analyzers, and sandbox environments. It is particularly valuable for examining file artifacts, deobfuscating scripts, and extracting embedded executables from malicious documents.
