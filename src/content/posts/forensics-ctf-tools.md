@@ -200,23 +200,12 @@ So Timeline analysis involves creating a chronological sequence of events from f
 
  ```Autopsy```
 
-   - **Features** : Graphical interface for The Sleuth Kit (TSK), timeline analysis.
-
- ```Plaso (log2timeline)```
-
-   - **Features** : Command-line tool for timeline creation, supports multiple data sources.
-
- ```SIFT Workstation```
-
-   - **Features** : Ubuntu-based Linux distribution with forensic tools, including timeline analysis.
+   - This Tool saves you a lot of time in order to analyse a raw or a disk partition, It provides you with a Graphical interface
+     for The Sleuth Kit (TSK). 
 
  ```X-Ways Forensics```
 
    - **Features** : Disk imaging, file recovery, and timeline analysis.
-
- ```Mandiant Redline```
-
-   - **Features** : Endpoint detection and response (EDR), includes timeline analysis.
 
  ```Forensic ToolKit (FTK)```
 
@@ -229,14 +218,6 @@ So Timeline analysis involves creating a chronological sequence of events from f
  ```Cyber Triage```
 
    - **Features** : Automated forensic analysis, includes timeline generation.
-
- ```TZWorks Timeline Explorer```
-
-   - **Features** : Timeline analysis tool for forensic investigations.
-
- ```Evimetry```
-
-   - **Features** : Disk imaging and forensic analysis platform with timeline capabilities.
 
 ### Malware Analysis
 
