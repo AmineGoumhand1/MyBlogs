@@ -236,13 +236,18 @@ Passing now to my favorite tools related to malwares, these type of challenges a
 
 ### Malware Analysis
 
-Analyzing malware involves understanding its behavior, impact, and origin. Here are some top tools for malware analysis:
+Analyzing malware involves understanding its behavior, impact, and origin. Here are some of the tools that i use for malware analysis and CTF challenges :
 
  ```Volatility```
 
-Volatility is a prominent open-source framework designed for memory forensics, particularly useful in malware analysis. It allows forensic analysts to extract and analyze volatile memory (RAM) from memory dumps of Windows, Linux, macOS, and other operating systems. 
+First, I should thank the creators of this tool because it has several functionalities that aims to help us on malware and memory analysis.
 
-Volatility's capabilities include examining running processes, network connections, open files, and registry hives stored in memory. This tool is crucial for identifying malicious processes, analyzing rootkits, and uncovering malware artifacts present in volatile memory. Its flexibility and extensive plugin support make it a versatile choice for memory forensics in cybersecurity investigations.
+Volatility and who doesnt know it, is a prominent open-source framework designed for memory forensics, particularly useful in malware analysis. It allows us to extract and analyze volatile memory (RAM) from memory dumps of Windows, Linux, macOS.
+
+Volatility's capabilities include examining running processes, network connections, open files, dump files, and registry hives stored in memory. This tool is crucial for identifying malicious processes, analyzing rootkits, and uncovering malware artifacts present in volatile memory. Its flexibility and extensive plugin support make it a versatile choice for memory forensics in cybersecurity investigations.
+
+So if you aren't patient about discovering it in other blog, here is a small tutorial to start with [Volatility 2.6](https://medium.com/@zemelusa/first-steps-to-volatile-memory-analysis-dcbd4d2d56a1)
+The last version of volatility is volatility 3, you can find differences between the two version on this awsome blog [Volatility 3](https://blog.onfvp.com/post/volatility-cheatsheet/)
 
  ```REMnux```
 
