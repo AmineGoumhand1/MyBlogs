@@ -7,7 +7,7 @@ tags: ['Malwares', 'CTF', 'Forensics', 'DFIR', 'RedTeam', 'BlueTeam']
 category: 'Malwares'
 draft: false 
 ---
-![malwares](/favicon/malwares.jpg)
+![malwares](/favicon/virus.jpg)
 
 Hello people, In this series of blogs, I will introduce you to malwares dev and some known techniques that will let you familiarized with maldev, So welcome tp you Whatever your level is, a beginner or an advanced dude.
 
