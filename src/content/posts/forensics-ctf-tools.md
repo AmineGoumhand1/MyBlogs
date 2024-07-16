@@ -272,7 +272,7 @@ Security analysts, As well as we, rely on Ghidra for deep-dive analysis, vulnera
 
 ### Registry Analysis
 
-The Windows Registry contains information about the system's configuration and users. Here are top tools for analyzing the Windows Registry:
+The Windows Registry contains information about the system's configuration and users. Here are top tools for analyzing the Windows Registry :
 
  ```RegRipper```
 
