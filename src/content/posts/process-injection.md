@@ -22,11 +22,11 @@ You didn't understand huh, I'll give you an example, Imagine a process like note
 
 Notepad, as a simple text editor, relies on several standard Windows DLLs. Here are some of the common ones you might see:
 
-kernel32.dll: Provides core operating system functionalities, such as memory management, input/output operations, and process and thread creation.
+```kernel32.dll```: It's an important one that we will encounter many times, It provides core operating system functionalities, such as memory management, input/output operations, and process and thread creation.
 
-user32.dll: Contains functions for handling user interface components like windows, menus, and user input.
+```user32.dll```: It contains functions for handling user interface components like windows, menus, and user input.
 
-gdi32.dll: Handles graphics device interface (GDI) functions for drawing graphics and text.
+```gdi32.dll```: This one handles graphics device interface (GDI) functions for drawing graphics and text.
 
 
 
