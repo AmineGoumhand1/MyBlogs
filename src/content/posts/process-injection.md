@@ -13,7 +13,7 @@ Hello guys, Lets begin with the first malware technique which isss DLL Injection
 So if it's the first time that you encounter the term DLL, here is a small definition. 
 
 
-# what is a DLL ?
+## what is a DLL ?
 
 A DLL or Dynamic Link Libraries is a modules that contain functions and data that can be used by another module (process or DLL).
 
@@ -32,7 +32,7 @@ There is a lot of DLLs that Notepad uses.
 
 Note that multiple applications can share the same DLL in memory, reducing the overall memory footprint. This is especially beneficial for common libraries like the Windows API.
 
-# What is DLL Injection ?
+## What is DLL Injection ?
 
 Here is a simple definition:
 
@@ -42,13 +42,21 @@ DLL injection is a technique used to execute code within the address space of an
 
 DLL injection typically involves 4 important steps:
 
-Attaching to the Target Process: The injector program attaches to the target process. This can be done using functions like OpenProcess, which opens a handle to the target process.
+- **Attaching to the Target Process**
 
-Allocating Memory in the Target Process: The injector allocates memory within the target process’s address space to store the path of the DLL to be injected. This is often done using the VirtualAllocEx function.
+The injector program attaches to the target process. This can be done using functions like OpenProcess, which opens a handle to the target process.
 
-Writing the DLL Path into the Allocated Memory: The path of the DLL to be injected is written into the allocated memory in the target process using the WriteProcessMemory function.
+- **Allocating Memory in the Target Process**
 
-Loading the DLL into the Target Process: The injector creates a remote thread in the target process that executes the LoadLibrary function, which loads the DLL into the process. This can be done using the CreateRemoteThread function or other similar functions like NtCreateThreadEx.
+The injector allocates memory within the target process’s address space to store the path of the DLL to be injected. This is often done using the VirtualAllocEx function.
+
+- **Writing the DLL Path into the Allocated Memory**
+
+The path of the DLL to be injected is written into the allocated memory in the target process using the WriteProcessMemory function.
+
+- **Loading the DLL into the Target Process** 
+
+The injector creates a remote thread in the target process that executes the LoadLibrary function, which loads the DLL into the process. This can be done using the CreateRemoteThread function or other similar functions like NtCreateThreadEx.
 
 
 
