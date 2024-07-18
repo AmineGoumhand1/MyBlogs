@@ -28,6 +28,10 @@ Notepad, as a simple text editor, relies on several standard Windows DLLs. Here 
 
 ```gdi32.dll```: This one handles graphics device interface (GDI) functions for drawing graphics and text.
 
+There is a lot of DLLs that Notepad uses.     
+
+Note that multiple applications can share the same DLL in memory, reducing the overall memory footprint. This is especially beneficial for common libraries like the Windows API.
+
 
 
 
