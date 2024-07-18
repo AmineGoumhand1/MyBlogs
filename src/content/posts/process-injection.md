@@ -83,6 +83,7 @@ So the logic of DLL injection begins to appear clearly, when we will inject our 
 
 
 After we create our DLL structure, now we should compile the DLL code to DLL file.
+We can do this by executing this code
 
 ```bash
 cl /LD InjectedDLL.cpp /link /out:InjectedDLL.dll
