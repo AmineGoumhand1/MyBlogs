@@ -61,7 +61,6 @@ Let's break these steps to c++ code with clarifying the Windows APIs that we'll 
 
 So as we said we start by attaching the target process and the way to do that is to open a handle to it
 
-```markdown
 ```cpp
 #include <iostream>
 
