@@ -77,6 +77,11 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 }
 ```
 
+It's time to take some notes, The DllMain function is the entry point for a DLL (Dynamic-Link Library) in Windows. It is called by the operating system when the DLL is loaded or unloaded, or when certain events occur.
+
+So the logic of DLL injection begins to appear clearly, when we will inject our DLL into the legitimate process ( ex:notepad ), our DLL will automatically load the DLLmain to execute what's inside it (malicious things).
+
+
 After we create our DLL structure, now we should compile the DLL code to DLL file.
 
 ```bash
