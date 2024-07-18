@@ -12,7 +12,6 @@ Hello guys, Lets begin with the first malware technique which isss DLL Injection
 
 So if it's the first time that you encounter the term DLL, here is a small definition. 
 
-
 ## what is a DLL ?
 
 A DLL or Dynamic Link Libraries is a modules that contain functions and data that can be used by another module (process or DLL).
@@ -57,6 +56,11 @@ The path of the DLL to be injected is written into the allocated memory in the t
 - **Loading the DLL into the Target Process** 
 
 The injector creates a remote thread in the target process that executes the LoadLibrary function, which loads the DLL into the process. This can be done using the CreateRemoteThread function or other similar functions like NtCreateThreadEx.
+
+Let's break these steps to c++ code with clarifying the Windows APIs that we'll use.
+
+So as we said we start by attaching the target process and the way to do that is to open a handle to it
+
 
 
 
