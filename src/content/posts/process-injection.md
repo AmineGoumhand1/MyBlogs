@@ -59,7 +59,31 @@ The injector creates a remote thread in the target process that executes the Loa
 
 Let's break these steps to c++ code with clarifying the Windows APIs that we'll use.
 
-So as we said we start by attaching the target process and the way to do that is to open a handle to it
+So starting by create our malicious DLL that contain a function, this function raise a message box that says " you've been hacked by Sn4ke Ey3s ".
+
+```cpp
+// InjectedDLL.cpp
+#include <windows.h>
+
+extern "C" __declspec(dllexport) void InjectedFunction() {
+    MessageBoxA(NULL, "DLL Injected Successfully!", "Success", MB_OK);
+}
+
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
+    if (ul_reason_for_call == DLL_PROCESS_ATTACH) {
+        InjectedFunction();
+    }
+    return TRUE;
+}
+```
+
+After we create our DLL structure, now we should compile the DLL code to DLL file.
+
+```bash
+cl /LD InjectedDLL.cpp /link /out:InjectedDLL.dll
+```
+
+Moving know to attaching the target process and the way to do that is to open a handle to it.
 
 ```cpp
 #include <iostream>
