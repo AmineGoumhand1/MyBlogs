@@ -287,8 +287,9 @@ void InjectDLL(DWORD processID, const char* dllPath) {
         return;
     }
 
-    // Get the address of LoadLibraryA
+    // Load the kernel32.dll
     HMODULE hKernel32 = GetModuleHandleA("kernel32.dll");
+    // Get the address of LoadLibraryA from kernel32.dll
     LPVOID pLoadLibraryA = GetProcAddress(hKernel32, "LoadLibraryA");
 
     // Create a remote thread that calls LoadLibraryA
@@ -301,3 +302,6 @@ void InjectDLL(DWORD processID, const char* dllPath) {
     }
 }
 
+So the CreateRemoteThread() takes as arguments the handle to the process, The thread routine function which is LoadLibraryA and the arguments passed to it ( in our injector code it is the memory allocated which hold the DLL path ).
+
+So 
