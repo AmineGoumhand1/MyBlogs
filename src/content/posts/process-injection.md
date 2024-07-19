@@ -310,4 +310,57 @@ void InjectDLL(DWORD processID, const char* dllPath) {
 
 So the CreateRemoteThread() takes as arguments the handle to the process, The thread routine function which is LoadLibraryA and the arguments passed to it ( in our injector code it is the memory allocated which hold the DLL path ).
 
+We need to wait for this thread to be fully executed in order to free the allocated space.
 
+Updated code :
+```cpp
+// Injector.cpp
+#include <windows.h>
+#include <iostream>
+
+void InjectDLL(DWORD processID, const char* dllPath) {
+    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processID);
+    if (!hProcess) {
+        std::cerr << "OpenProcess failed!" << std::endl;
+        return;
+    }
+
+    // Allocate memory in the target process
+    LPVOID pRemoteMemory = VirtualAllocEx(hProcess, NULL, strlen(dllPath) + 1, MEM_COMMIT, PAGE_READWRITE);
+    if (!pRemoteMemory) {
+        std::cerr << "VirtualAllocEx failed!" << std::endl;
+        CloseHandle(hProcess);
+        return;
+    }
+
+    // Write the DLL path to the allocated memory
+    if (!WriteProcessMemory(hProcess, pRemoteMemory, dllPath, strlen(dllPath) + 1, NULL)) {
+        std::cerr << "WriteProcessMemory failed!" << std::endl;
+        VirtualFreeEx(hProcess, pRemoteMemory, 0, MEM_RELEASE);
+        CloseHandle(hProcess);
+        return;
+    }
+
+    // Get the address of LoadLibraryA
+    HMODULE hKernel32 = GetModuleHandleA("kernel32.dll");
+    LPVOID pLoadLibraryA = GetProcAddress(hKernel32, "LoadLibraryA");
+
+    // Create a remote thread that calls LoadLibraryA
+    HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)pLoadLibraryA, pRemoteMemory, 0, NULL);
+    if (!hThread) {
+        std::cerr << "CreateRemoteThread failed!" << std::endl;
+        VirtualFreeEx(hProcess, pRemoteMemory, 0, MEM_RELEASE);
+        CloseHandle(hProcess);
+        return;
+    }
+
+    // Wait for the remote thread to complete
+    WaitForSingleObject(hThread, INFINITE);
+
+    // Clean up
+    VirtualFreeEx(hProcess, pRemoteMemory, 0, MEM_RELEASE);
+    CloseHandle(hThread);
+    CloseHandle(hProcess);
+}
+
+```
