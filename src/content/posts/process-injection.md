@@ -37,7 +37,7 @@ Here is a simple definition:
 
 DLL injection is a technique used to execute code within the address space of another process by forcing it to load a dynamic link library (DLL).
 
-# How DLL Injection Works ?
+## How DLL Injection Works ?
 
 DLL injection typically involves 4 important steps:
 
@@ -109,8 +109,37 @@ void InjectDLL(DWORD processID, const char* dllPath) {
 }
 ```
 
+As we see the OpenProcess() API function take several args, here are all of them :
+ 
+```cpp 
+HANDLE OpenProcess(
+  DWORD dwDesiredAccess,  // The access rights requested for the process
+  BOOL bInheritHandle,    // Indicates whether the handle is inheritable
+  DWORD dwProcessId       // The identifier of the process to be opened
+);
+```
 
-so after dow
+| Argument         | Type   | Description                                                                                           |
+|------------------|--------|-------------------------------------------------------------------------------------------------------|
+| dwDesiredAccess  | DWORD  | Specifies the access rights requested for the process. This parameter can be a combination of one or more of the following access rights: |
+|                  |        | - **PROCESS_ALL_ACCESS**: All possible access rights for a process object.                             |
+|                  |        | - **PROCESS_CREATE_PROCESS**: Required to create a process.                                            |
+|                  |        | - **PROCESS_CREATE_THREAD**: Required to create a thread.                                              |
+|                  |        | - **PROCESS_DUP_HANDLE**: Required to duplicate a handle.                                              |
+|                  |        | - **PROCESS_QUERY_INFORMATION**: Required to retrieve certain information about a process, such as its token, exit code, and priority class. |
+|                  |        | - **PROCESS_QUERY_LIMITED_INFORMATION**: Required to retrieve certain information about a process (available from Windows Vista). |
+|                  |        | - **PROCESS_SET_INFORMATION**: Required to set certain information about a process, such as its priority class. |
+|                  |        | - **PROCESS_SET_QUOTA**: Required to set memory limits.                                                |
+|                  |        | - **PROCESS_SUSPEND_RESUME**: Required to suspend or resume a process.                                 |
+|                  |        | - **PROCESS_TERMINATE**: Required to terminate a process.                                              |
+|                  |        | - **PROCESS_VM_OPERATION**: Required to perform an operation on the address space of a process (e.g., VirtualAllocEx and VirtualFreeEx). |
+|                  |        | - **PROCESS_VM_READ**: Required to read memory in a process using ReadProcessMemory.                   |
+|                  |        | - **PROCESS_VM_WRITE**: Required to write to memory in a process using WriteProcessMemory.             |
+| bInheritHandle   | BOOL   | Specifies whether the returned handle is inheritable by child processes. If this parameter is **TRUE**, the handle is inheritable. If **FALSE**, the handle is not inheritable. |
+| dwProcessId      | DWORD  | Specifies the identifier of the process to be opened. This is the process ID (PID) of the target process. |
+
+
+
 
 
 
