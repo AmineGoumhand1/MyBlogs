@@ -139,6 +139,11 @@ HANDLE OpenProcess(
 | dwProcessId      | DWORD  | Specifies the identifier of the process to be opened. This is the process ID (PID) of the target process. |
 
 
+In our implementation we'll focus on the 1st and 3rd parameters which are the desiredAccec and the PID of the target process.
+
+The third step consists of Allocating some memory in the target process in order to take the path of our malicious DLL. We can achieve that by the API function VirtualAlloc().
+
+
 
 
 
