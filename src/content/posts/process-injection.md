@@ -91,12 +91,21 @@ cl /LD InjectedDLL.cpp /link /out:InjectedDLL.dll
 
 Moving know to attaching the target process and the way to do that is to open a handle to it.
 
+Note that a handle is an abstract reference used by the Windows operating system to access and manage processes. It acts as an identifier that allows a program to perform various operations on a process, such as reading or writing memory, modifying process attributes, and interacting with its threads.
+
+So the way to do that is by using the windows API function OpenProcess().
+
 ```cpp
+// Injector.cpp
+#include <windows.h>
 #include <iostream>
 
-int main() {
-    std::cout << "Hello, world!" << std::endl;
-    return 0;
+void InjectDLL(DWORD processID, const char* dllPath) {
+    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processID);
+    if (!hProcess) {
+        std::cerr << "OpenProcess failed!" << std::endl;
+        return;
+    }
 }
 ```
 
