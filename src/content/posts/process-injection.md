@@ -1,5 +1,5 @@
 ---
-title: 'Malwares Devlopement Series | Part 2 : Process Injection | DLL Injection'
+title: 'Malwares Development Series | Part 2 : Process Injection | DLL Injection'
 published: 2024-07-19
 description: ''
 image: ''
