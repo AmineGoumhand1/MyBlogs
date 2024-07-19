@@ -74,8 +74,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         InjectedFunction();
     }
     return TRUE;
-}
-```
+} ```
 
 It's time to take some notes, The DllMain function is the entry point for a DLL (Dynamic-Link Library) in Windows. It is called by the operating system when the DLL is loaded or unloaded, or when certain events occur.
 
@@ -86,8 +85,7 @@ After we create our DLL structure, now we should compile the DLL code to DLL fil
 We can do this by executing this code
 
 ```bash
-cl /LD InjectedDLL.cpp /link /out:InjectedDLL.dll
-```
+cl /LD InjectedDLL.cpp /link /out:InjectedDLL.dll ```
 
 Moving know to attaching the target process and the way to do that is to open a handle to it.
 
@@ -106,8 +104,7 @@ void InjectDLL(DWORD processID, const char* dllPath) {
         std::cerr << "OpenProcess failed!" << std::endl;
         return;
     }
-}
-```
+} ```
 
 As we see the OpenProcess() API function take several args, here are all of them :
  
@@ -145,13 +142,26 @@ The third step consists of Allocating some memory in the target process in order
 
 Updating our Injector code :
 
-// Allocate memory in the target process
+```cpp
+// Injector.cpp
+#include <windows.h>
+#include <iostream>
+
+void InjectDLL(DWORD processID, const char* dllPath) {
+    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processID);
+    if (!hProcess) {
+        std::cerr << "OpenProcess failed!" << std::endl;
+        return;
+    }
+
+    // Allocate memory in the target process
     LPVOID pRemoteMemory = VirtualAllocEx(hProcess, NULL, strlen(dllPath) + 1, MEM_COMMIT, PAGE_READWRITE);
     if (!pRemoteMemory) {
         std::cerr << "VirtualAllocEx failed!" << std::endl;
         CloseHandle(hProcess);
         return;
     }
+} ```
 
 The syntax of the API function :
 
