@@ -1,5 +1,5 @@
 ---
-title: 'Malwares Devlopement Series | Part 1 : Introduction'
+title: 'Malwares Development Series | Part 1 : Introduction'
 published: 2024-07-17
 description: ''
 image: ''
