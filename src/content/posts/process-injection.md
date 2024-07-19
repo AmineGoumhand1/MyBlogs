@@ -67,7 +67,7 @@ So starting by create our malicious DLL that contain a function, this function r
 #include <windows.h>
 
 extern "C" __declspec(dllexport) void InjectedFunction() {
-    MessageBoxA(NULL, "DLL Injected Successfully!", "Success", MB_OK);
+    MessageBoxA(NULL, "You’ve been hacked by Sn4ke Ey3s", "Success", MB_OK);
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
@@ -364,3 +364,8 @@ void InjectDLL(DWORD processID, const char* dllPath) {
 }
 
 ```
+
+Now we can execute our Injector function in a main function to see this implementation. we should first get the pid of the desired target process ( Lets take Notepad as example ).
+
+The full Injector code version will be 
+
