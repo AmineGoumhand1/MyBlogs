@@ -93,7 +93,7 @@ Moving know to attaching the target process and the way to do that is to open a 
 
 Note that a handle is an abstract reference used by the Windows operating system to access and manage processes. It acts as an identifier that allows a program to perform various operations on a process, such as reading or writing memory, modifying process attributes, and interacting with its threads.
 
-So the way to do that is by using the windows API function OpenProcess().
+So the way to do that is by using the windows API function OpenProcess() in our Injector.cpp code
 
 ```cpp
 // Injector.cpp
@@ -142,6 +142,18 @@ HANDLE OpenProcess(
 In our implementation we'll focus on the 1st and 3rd parameters which are the desiredAccec and the PID of the target process.
 
 The third step consists of Allocating some memory in the target process in order to take the path of our malicious DLL. We can achieve that by the API function VirtualAlloc().
+
+Updating our Injector code :
+
+// Allocate memory in the target process
+    LPVOID pRemoteMemory = VirtualAllocEx(hProcess, NULL, strlen(dllPath) + 1, MEM_COMMIT, PAGE_READWRITE);
+    if (!pRemoteMemory) {
+        std::cerr << "VirtualAllocEx failed!" << std::endl;
+        CloseHandle(hProcess);
+        return;
+    }
+
+The syntax of the API function :
 
 ```cpp
 LPVOID VirtualAlloc(
