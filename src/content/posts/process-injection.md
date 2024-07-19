@@ -8,7 +8,7 @@ category: 'Malwares'
 draft: false 
 ---
 
-Hello guys, Lets begin with the first malware technique which isss DLL Injection. If you didn't check the plan of our walkthrough go to it : [Introduction](link.com)
+Hello guys, Lets begin with the first malware technique which isss DLL Injection. If you didn't check the plan of our walkthrough go to it : [Introduction](https://snakeeyes1.netlify.app/posts/my-first-post/)
 
 So if it's the first time that you encounter the term DLL, here is a small definition. 
 
