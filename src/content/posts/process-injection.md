@@ -239,6 +239,9 @@ void InjectDLL(DWORD processID, const char* dllPath) {
 }
 ```
 
+As we see, WriteProcessMemory() takes the handle to the target process, the allocated space, the path to write into the allocated space and the length of the path.
+
+So without further complications, let's move on to the important step, which is loading our malicious DLL.
 
 
 
