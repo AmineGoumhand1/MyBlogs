@@ -18,7 +18,6 @@ A DLL or Dynamic Link Libraries is a modules that contain functions and data tha
 
 You didn't understand huh, I'll give you an example, Imagine a process like notepad.
 
-
 Notepad, as a simple text editor, relies on several standard Windows DLLs. Here are some of the common ones you might see:
 
 ```kernel32.dll```: It's an important one that we will encounter many times, It provides core operating system functionalities, such as memory management, input/output operations, and process and thread creation.
@@ -59,6 +58,8 @@ The injector creates a remote thread in the target process that executes the Loa
 
 Let's break these steps to c++ code with clarifying the Windows APIs that we'll use.
 
+### DLL Creation 
+
 So starting by create our malicious DLL that contain a function, this function raise a message box that says " you've been hacked by Sn4ke Ey3s ".
 
 ```cpp
@@ -81,13 +82,14 @@ It's time to take some notes, The DllMain function is the entry point for a DLL 
 
 So the logic of DLL injection begins to appear clearly, when we will inject our DLL into the legitimate process ( ex:notepad ), our DLL will automatically load the DLLmain to execute what's inside it (malicious things).
 
-
 After we create our DLL structure, now we should compile the DLL code to DLL file.
 We can do this by executing this code
 
 ```bash
 cl /LD InjectedDLL.cpp /link /out:InjectedDLL.dll
 ```
+
+### Target process attaching 
 
 Moving know to attaching the target process and the way to do that is to open a handle to it.
 
@@ -140,6 +142,8 @@ HANDLE OpenProcess(
 
 
 In our implementation we'll focus on the 1st and 3rd parameters which are the desiredAccec and the PID of the target process.
+
+### Memory Allocation
 
 The third step consists of Allocating some memory in the target process in order to take the path of our malicious DLL. We can achieve that by the API function VirtualAlloc().
 
@@ -207,6 +211,8 @@ Every argument is described as follows :
 
 So as described, we specified the target process that we want to allocate memory from, and the size of the allocated memory which is the length of our DLL path.
 
+### Writing DLL path to the allocated memory
+
 Now, move on to write the path into the allocated memory.
 
 ```cpp
@@ -243,6 +249,7 @@ As we see, WriteProcessMemory() takes the handle to the target process, the allo
 
 So without further complications, let's move on to the important step, which is loading our malicious DLL.
 
+### DLL loading
 
 So now have you wondered how we will load our DLL into the target process. we need a magical function that can do that, which is LoadLibraryA(). This one simply load a DLL.
 
@@ -255,9 +262,7 @@ The way to achieve this is by retrieve the LoadLibraryA function from it's DLL w
 So how to retrieve to access kernel32.dll
 and load the function LoadLibraryA from it, we'll use GetModuleHandleA() to take a handle to kernel32.dll and then we'll use GetProcAdress() to retrieve the function LoadLibraryA() using its name.
 
-Time to get some action :
-
-Our updated code will be :
+Adding that to our injector code :
 
 ```cpp
 // Injector.cpp
@@ -301,7 +306,8 @@ void InjectDLL(DWORD processID, const char* dllPath) {
         return;
     }
 }
+```
 
 So the CreateRemoteThread() takes as arguments the handle to the process, The thread routine function which is LoadLibraryA and the arguments passed to it ( in our injector code it is the memory allocated which hold the DLL path ).
 
-So 
+
