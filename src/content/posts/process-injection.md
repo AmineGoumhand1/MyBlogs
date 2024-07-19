@@ -74,7 +74,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         InjectedFunction();
     }
     return TRUE;
-} ```
+}
+```
 
 It's time to take some notes, The DllMain function is the entry point for a DLL (Dynamic-Link Library) in Windows. It is called by the operating system when the DLL is loaded or unloaded, or when certain events occur.
 
@@ -85,7 +86,8 @@ After we create our DLL structure, now we should compile the DLL code to DLL fil
 We can do this by executing this code
 
 ```bash
-cl /LD InjectedDLL.cpp /link /out:InjectedDLL.dll ```
+cl /LD InjectedDLL.cpp /link /out:InjectedDLL.dll
+```
 
 Moving know to attaching the target process and the way to do that is to open a handle to it.
 
@@ -104,7 +106,8 @@ void InjectDLL(DWORD processID, const char* dllPath) {
         std::cerr << "OpenProcess failed!" << std::endl;
         return;
     }
-} ```
+}
+```
 
 As we see the OpenProcess() API function take several args, here are all of them :
  
@@ -161,7 +164,8 @@ void InjectDLL(DWORD processID, const char* dllPath) {
         CloseHandle(hProcess);
         return;
     }
-} ```
+}
+```
 
 The syntax of the API function :
 
