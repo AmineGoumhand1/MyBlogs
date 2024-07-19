@@ -205,7 +205,39 @@ Every argument is described as follows :
 |                    |           | - **PAGE_TARGETS_INVALID**: Marks the pages as targets for illegal cross-process calls.                               |
 |                    |           | - **PAGE_TARGETS_NO_UPDATE**: Prevents pages from being marked as targets for illegal cross-process calls.            |
 
+So as described, we specified the target process that we want to allocate memory from, and the size of the allocated memory which is the length of our DLL path.
 
+Now, move on to write the path into the allocated memory.
+
+```cpp
+// Injector.cpp
+#include <windows.h>
+#include <iostream>
+
+void InjectDLL(DWORD processID, const char* dllPath) {
+    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processID);
+    if (!hProcess) {
+        std::cerr << "OpenProcess failed!" << std::endl;
+        return;
+    }
+
+    // Allocate memory in the target process
+    LPVOID pRemoteMemory = VirtualAllocEx(hProcess, NULL, strlen(dllPath) + 1, MEM_COMMIT, PAGE_READWRITE);
+    if (!pRemoteMemory) {
+        std::cerr << "VirtualAllocEx failed!" << std::endl;
+        CloseHandle(hProcess);
+        return;
+    }
+
+    // Write the DLL path to the allocated memory
+    if (!WriteProcessMemory(hProcess, pRemoteMemory, dllPath, strlen(dllPath) + 1, NULL)) {
+        std::cerr << "WriteProcessMemory failed!" << std::endl;
+        VirtualFreeEx(hProcess, pRemoteMemory, 0, MEM_RELEASE);
+        CloseHandle(hProcess);
+        return;
+    }
+}
+```
 
 
 
