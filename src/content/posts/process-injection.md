@@ -143,6 +143,43 @@ In our implementation we'll focus on the 1st and 3rd parameters which are the de
 
 The third step consists of Allocating some memory in the target process in order to take the path of our malicious DLL. We can achieve that by the API function VirtualAlloc().
 
+```cpp
+LPVOID VirtualAlloc(
+  LPVOID lpAddress,
+  SIZE_T dwSize,
+  DWORD  flAllocationType,
+  DWORD  flProtect
+);
+```
+
+Every argument is described as follows :
+
+| Argument           | Type      | Description                                                                                                           |
+|--------------------|-----------|-----------------------------------------------------------------------------------------------------------------------|
+| lpAddress          | LPVOID    | The starting address of the region to allocate. If NULL, the system determines where to allocate the region.          |
+| dwSize             | SIZE_T    | The size of the region, in bytes.                                                                                     |
+| flAllocationType   | DWORD     | The type of memory allocation. This parameter can contain one or more of the following values:                        |
+|                    |           | - **MEM_COMMIT**: Allocates memory charges for the specified region of pages.                                         |
+|                    |           | - **MEM_RESERVE**: Reserves a range of the process's virtual address space.                                           |
+|                    |           | - **MEM_RESET**: Indicates data in the specified memory range is no longer needed.                                    |
+|                    |           | - **MEM_RESET_UNDO**: Reverses the effects of MEM_RESET.                                                              |
+|                    |           | - **MEM_LARGE_PAGES**: Allocates memory using large page support.                                                     |
+|                    |           | - **MEM_PHYSICAL**: Allocates physical memory that is only accessible to the caller.                                  |
+|                    |           | - **MEM_TOP_DOWN**: Allocates memory at the highest possible address.                                                 |
+|                    |           | - **MEM_WRITE_WATCH**: Causes the system to track pages that are written to.                                          |
+| flProtect          | DWORD     | The memory protection for the region of pages to be allocated. This parameter can be one of the following values:     |
+|                    |           | - **PAGE_EXECUTE**: Enables execute access to the committed region of pages.                                          |
+|                    |           | - **PAGE_EXECUTE_READ**: Enables execute or read-only access to the committed region of pages.                        |
+|                    |           | - **PAGE_EXECUTE_READWRITE**: Enables execute, read-only, or read/write access to the committed region of pages.      |
+|                    |           | - **PAGE_EXECUTE_WRITECOPY**: Enables execute, read-only, or copy-on-write access to a committed region of pages.     |
+|                    |           | - **PAGE_NOACCESS**: Disables all access to the committed region of pages.                                            |
+|                    |           | - **PAGE_READONLY**: Enables read-only access to the committed region of pages.                                       |
+|                    |           | - **PAGE_READWRITE**: Enables read-only or read/write access to the committed region of pages.                        |
+|                    |           | - **PAGE_WRITECOPY**: Enables read-only or copy-on-write access to a committed region of pages.                       |
+|                    |           | - **PAGE_TARGETS_INVALID**: Marks the pages as targets for illegal cross-process calls.                               |
+|                    |           | - **PAGE_TARGETS_NO_UPDATE**: Prevents pages from being marked as targets for illegal cross-process calls.            |
+
+
 
 
 
