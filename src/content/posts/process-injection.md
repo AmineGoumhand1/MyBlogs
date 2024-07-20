@@ -85,8 +85,13 @@ So the logic of DLL injection begins to appear clearly, when we will inject our 
 After we create our DLL structure, now we should compile the DLL code to DLL file.
 We can do this by executing this code
 
-```bash
+```powershell
 cl /LD InjectedDLL.cpp /link /out:InjectedDLL.dll
+```
+or ( recommended )
+
+```powershell
+g++ - shared InjectedDLL.dll InjectedDLL.cpp
 ```
 
 ### Target process attaching 
@@ -295,7 +300,7 @@ void InjectDLL(DWORD processID, const char* dllPath) {
     // Load the kernel32.dll
     HMODULE hKernel32 = GetModuleHandleA("kernel32.dll");
     // Get the address of LoadLibraryA from kernel32.dll
-    LPVOID pLoadLibraryA = GetProcAddress(hKernel32, "LoadLibraryA");
+    LPTHREAD_START_ROUTINE pLoadLibraryA = (LPTHREAD_START_ROUTINE)GetProcAddress(hKernel32, "LoadLibraryA");
 
     // Create a remote thread that calls LoadLibraryA
     HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)pLoadLibraryA, pRemoteMemory, 0, NULL);
@@ -343,7 +348,7 @@ void InjectDLL(DWORD processID, const char* dllPath) {
 
     // Get the address of LoadLibraryA
     HMODULE hKernel32 = GetModuleHandleA("kernel32.dll");
-    LPVOID pLoadLibraryA = GetProcAddress(hKernel32, "LoadLibraryA");
+    LPTHREAD_START_ROUTINE pLoadLibraryA = (LPTHREAD_START_ROUTINE)GetProcAddress(hKernel32, "LoadLibraryA");
 
     // Create a remote thread that calls LoadLibraryA
     HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)pLoadLibraryA, pRemoteMemory, 0, NULL);
