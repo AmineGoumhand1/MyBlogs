@@ -395,4 +395,6 @@ int main() {
 
 Boooooom, I hacked my self, You can customise the DLL to do something advanced like injecting a shell code to get a reverse shell, or something else. it depends on your needs. But remember, do it on your machine, not your girlfriend's machine.
 
-I hope you got something from this walkthrough. 
+I hope you enjoyed this walkthrough. 
+
+## See you next time Inchallah, to cover the next topic.
