@@ -399,6 +399,7 @@ int main() {
 ![ProcessPID](/favicon/4.jpeg)
 
 Boooooom, I hacked my self, You can customise the DLL to do something advanced like injecting a shell code to get a reverse shell, or something else. it depends on your needs. But remember, do it on your machine, not your friend's machine.
+If you are facing some errors or issues, try to disable the Windows Defender, because defender know these types of attacks. and that what we are seeking In this series of blogs ( To bypass this freak ).
 
 I hope you enjoyed this walkthrough. 
 
