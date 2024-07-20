@@ -393,7 +393,7 @@ int main() {
 
 ![ProcessPID](/favicon/4.jpeg)
 
-Boooooom, I hacked my self, You can customise the DLL to do something advanced like injecting a shell code to get a reverse shell, or something else. it depends on your needs. But remember, do it on your machine, not your girlfriend's machine.
+Boooooom, I hacked my self, You can customise the DLL to do something advanced like injecting a shell code to get a reverse shell, or something else. it depends on your needs. But remember, do it on your machine, not your friend's machine.
 
 I hope you enjoyed this walkthrough. 
 
