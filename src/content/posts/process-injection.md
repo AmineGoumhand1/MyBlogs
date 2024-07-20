@@ -258,13 +258,13 @@ So without further complications, let's move on to the important step, which is 
 
 So now have you wondered how we will load our DLL into the target process. we need a magical function that can do that, which is LoadLibraryA(). This one simply load a DLL.
 
-But wait, we need to use it to load the DLL Into the target process and no to our injector code process.
+But wait, we need to use it to load the DLL Into the target process and not to our injector code process.
 
 So how to do that ?
 
 The way to achieve this is by retrieve the LoadLibraryA function from it's DLL which is kernel32.dll then create a remote thread for the target process to execute this LoadLibraryA that will load our malicious DLL.
 
-So how to retrieve to access kernel32.dll
+So how to access kernel32.dll
 and load the function LoadLibraryA from it, we'll use GetModuleHandleA() to take a handle to kernel32.dll and then we'll use GetProcAdress() to retrieve the function LoadLibraryA() using its name.
 
 Adding that to our injector code :
