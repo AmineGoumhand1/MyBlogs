@@ -365,7 +365,7 @@ void InjectDLL(DWORD processID, const char* dllPath) {
 
 ```
 
-Now we can execute our Injector function in a main function to see this implementation. But first let's implement the Injected DLL cpp code and the commande g++ - shared InjectedDLL.dll InjectedDLL.cpp to transform the code to a DLL. After doing that we should have the DLL, The only thing remains is choosing notepad as a target process, get the pid of it from Process Explorer which is a program that monitor processes.
+Now we can execute our Injector function in a main function to see this implementation. But first let's implement the Injected DLL cpp code, using the commande ```g++ - shared InjectedDLL.dll InjectedDLL.cpp``` to transform the code to a DLL. After doing that we should have the DLL, The only thing remains is choosing notepad as a target process, get the pid of it from Process Explorer which is a program that monitor processes.
 
 ![ProcessPID](/favicon/2.jpeg)
 
@@ -393,4 +393,6 @@ int main() {
 
 ![ProcessPID](/favicon/4.jpeg)
 
-Boooooom, I got you
+Boooooom, I hacked my self, You can customise the DLL to do something advanced like injecting a shell code to get a reverse shell, or something else. it depends on your needs. But remember, do it on your machine, not your girlfriend's machine.
+
+I hope you got something from this walkthrough. 
