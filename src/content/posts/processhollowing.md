@@ -26,31 +26,31 @@ So we can say that Process hollowing is a technique used to inject malicious cod
 
 The Process Hollowing operates on six important steps which are :
 
-  - **Create a Suspended Process**
+- **Create a Suspended Process**
     
         First, we create a new instance of a legitimate process (e.g., notepad.exe) in a suspended state using CreateProcess  
         with the CREATE_SUSPENDED flag. This means the process is created but not yet executed.
 
-  - **Unmap the Process's Memory**
+- **Unmap the Process's Memory**
     
         Then, we use ZwUnmapViewOfSection or a similar API call to unmap the memory of the main executable image of the  
         suspended process. This effectively "hollows out" the process.
 
-  - **Allocate Memory in the Process**
+- **Allocate Memory in the Process**
     
         Allocates memory within the hollowed-out process using VirtualAllocEx.
 
-  - **Write Malicious Code to the Process**
+- **Write Malicious Code to the Process**
     
         We write the malicious code or the new executable image into the allocated memory of the suspended process 
         using WriteProcessMemory.
 
-  - **Set Entry Point**
+- **Set Entry Point**
     
         We modifie the entry point of the suspended process to point to the malicious code. This can be done by 
         modifying the PEB (Process Environment Block) structure or by changing the CONTEXT of the process.
 
-  - **Resume the Process**
+- **Resume the Process**
     
         Finally, we need to resume the suspended process using ResumeThread. The process starts executing the malicious code 
         instead of the original legitimate code.
