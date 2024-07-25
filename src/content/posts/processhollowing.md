@@ -8,8 +8,9 @@ category: 'Malwares'
 draft: false 
 ---
 
-Hello, as a continuing on our walkthrough about malwares techniques, Today we will cover the Process Hollowing technique.
+Hello, as a continuaton on our walkthrough about malwares techniques, Today we will cover the Process Hollowing technique.
 During this blog, we'll follow this plan :
+
 - **What is Process Hollowing ?**
 - **How Process Hollowing works ?**
 - **Process Hollowing Implementation**
@@ -49,6 +50,7 @@ We modifie the entry point of the suspended process to point to the malicious co
 - **Resume the Process**
     
 Finally, we need to resume the suspended process using ResumeThread. The process starts executing the malicious code instead of the original legitimate code.
+
 
 
 
