@@ -15,6 +15,8 @@ During this blog, we'll follow this plan :
 - **How Process Hollowing works ?**
 - **Process Hollowing Implementation**
 
+Note : This Techniques requires a deep understanding to Windows Process Mechanisms like PEB and MEMORY stuffs, So i recommende you to go take a look on them.
+
 So let's begin
 
 ## What is Process Hollowing
@@ -42,6 +44,10 @@ Allocates memory within the hollowed-out process using VirtualAllocEx.
 - **Write Malicious Code to the Process**
 
 We write the malicious code or the new executable image into the allocated memory of the suspended process using WriteProcessMemory.
+
+- **Adjust Base Adresses ( The hard part )**
+
+The purpose of this process is to ensure that all addresses within the loaded image are correctly adjusted to reflect the new base address in memory. This is necessary because the image may not always be loaded at its preferred base address, requiring relocation to function correctly.
 
 - **Set Entry Point**
     
