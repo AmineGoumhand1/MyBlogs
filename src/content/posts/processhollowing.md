@@ -57,8 +57,13 @@ We modifie the entry point of the suspended process to point to the malicious co
     
 Finally, we need to resume the suspended process using ResumeThread. The process starts executing the malicious code instead of the original legitimate code.
 
+## C++ Implamentation
 
+Starting with importing the necessary libraries :
 
+#include <windows.h>
+#include "internals.h"
+#include "pe.h"
 
 
 
