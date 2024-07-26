@@ -15,7 +15,7 @@ During this blog, we'll follow this plan :
 - **How Process Hollowing works ?**
 - **Process Hollowing Implementation**
 
-Note : This Techniques requires a deep understanding to Windows Process Mechanisms like PEB and MEMORY stuffs, So i recommende you to go take a look on them.
+Note : This Technique requires a deep understanding to Windows Process Mechanisms like PEB and MEMORY stuffs, So i recommende you to go take a look on them.
 
 So let's begin
 
