@@ -61,10 +61,11 @@ Finally, we need to resume the suspended process using ResumeThread. The process
 
 Starting with importing the necessary libraries :
 
+```cpp
 #include <windows.h>
 #include "internals.h"
 #include "pe.h"
-
+```
 
 
 
