@@ -162,6 +162,6 @@ The purpose of reading the base address of the executable image is to know where
 
 After this step, we should get a handle on our malicious file that we want to replace the target's memory with, using CreateFileA(), reading it's content to a buffer and converts the raw image buffer (buffer) into a LOADED_IMAGE structure, which contains parsed information about the image.
 
-So now while we got the necessary informations, let's Unmap the target's process memory with NtUnmapViewOfSection, imported from the ntdll.dll library.
+So after getting the necessary informations, we Unmapped the target's process memory with NtUnmapViewOfSection, imported from the ntdll.dll library.
 
 
