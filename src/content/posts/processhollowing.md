@@ -106,17 +106,6 @@ You can find more a about them in Windows APIs documentation here [STARTUPINFOA]
 
 So after creating the suspended process, let's Unmap it.
 
-Before doing that, we should know about the PEB structure, the PEB is a data structure in the Windows operating system that holds information about a process. It includes details such as loaded modules, heap addresses, and the process image base address. Accessing the PEB of a target process is necessary to retrieve this critical information.
-
-So let's take a pointer on the PEB with ReadRemotePEB() and load Image base address from it using ReadRemoteImage().
-
-The purpose of reading the base address of the executable image is to know where the executable image of the process is loaded in memory.
-
-After this step, we should get a handle on our malicious file that we want to replace the target's memory with, using CreateFileA(), reading it's content to a buffer and converts the raw image buffer (buffer) into a LOADED_IMAGE structure, which contains parsed information about the image.
-
-So now while we got the necessary informations, let's Unmap the target's process memory with NtUnmapViewOfSection, imported from the ntdll.dll library.
-
-
 ```cpp
 PPEB pPEB = ReadRemotePEB(pProcessInfo->hProcess);
     PLOADED_IMAGE pImage = ReadRemoteImage(pProcessInfo->hProcess, pPEB->ImageBaseAddress);
