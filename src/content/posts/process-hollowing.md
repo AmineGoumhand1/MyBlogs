@@ -349,53 +349,7 @@ now let's implement this on our code :
         }
     }
 ```
-so this part is a little bit sneaky, we just check if the delta (dwDelta) is equal 0 or not. If not, we iterate over the sections to look for the .reloc section. once we got the .reloc, we do the rebasing of image.
-
-# Detailed Explanation of Relocation Processing Code
-
-## Initial Setup
-
-1. **Check if Relocation is Necessary**
-
-    ```c
-    if (dwDelta)
-    ```
-
-    - **Purpose:** This condition checks if there is a difference (`dwDelta`) between the preferred base address of the PE file and the actual base address where it is loaded.
-    - **Explanation:** If `dwDelta` is non-zero, it means the base address has changed, and relocation processing is needed.
-
-## Loop Through Sections
-
-2. **Loop Through Sections**
-
-    ```c
-    for (DWORD x = 0; x < pSourceImage->NumberOfSections; x++)
-    ```
-
-    - **Purpose:** This loop iterates through each section of the PE file.
-    - **Explanation:** `pSourceImage->NumberOfSections` gives the total number of sections in the PE file. The loop index `x` is used to access each section.
-
-3. **Check Section Name**
-
-    ```c
-    char* pSectionName = ".reloc";
-    if (memcmp(pSourceImage->Sections[x].Name, pSectionName, strlen(pSectionName)))
-        continue;
-    ```
-
-    - **Purpose:** Identify if the current section is the `.reloc` section.
-    - **Explanation:** `memcmp` compares the section name with the string `.reloc`. If they do not match, the loop continues to the next section.
-
-## Processing the `.reloc` Section
-
-4. **Found the `.reloc` Section**
-
-    ```c
-    printf("Rebasing image\r\n");
-    ```
-
-    - **Purpose:** Print a message indicating that the relocation processing is starting.
-    - **Explanation:** This informs the user that the `.reloc` section has been found and the rebasing process is underway.
+so this part is a little bit sneaky, we just check if the delta (dwDelta) is equal 0 or not. If not, we iterate over the sections to look for the .reloc section. once we got the .reloc, we do the rebasing of image. Here is a break down of the code :
 
 5. **Get the Address of the Relocation Section's Raw Data**
 
@@ -403,20 +357,16 @@ so this part is a little bit sneaky, we just check if the delta (dwDelta) is equ
     DWORD dwRelocAddr = pSourceImage->Sections[x].PointerToRawData;
     DWORD dwOffset = 0;
     ```
-
-    - **Purpose:** Initialize the address and offset for reading the relocation data.
-    - **Explanation:** `dwRelocAddr` is the starting address of the raw data for the `.reloc` section, and `dwOffset` is set to zero to begin processing from the start.
+We start by initializing the address and offset for reading the relocation data. `dwRelocAddr` is the starting address of the raw data for the `.reloc` section, and `dwOffset` is set to zero to begin processing from the start.
 
 6. **Get the Relocation Data Directory**
 
     ```c
     IMAGE_DATA_DIRECTORY relocData = pSourceHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
     ```
+This retrieve the relocation data directory from the PE file's optional header. This directory contains information about the relocation data size and virtual address.
 
-    - **Purpose:** Retrieve the relocation data directory from the PE file's optional header.
-    - **Explanation:** This directory contains information about the relocation data size and virtual address.
-
-## Process Each Relocation Block
+Now lets start processing each relocation block
 
 7. **Process Relocation Data**
 
@@ -434,8 +384,7 @@ so this part is a little bit sneaky, we just check if the delta (dwDelta) is equ
     dwOffset += sizeof(BASE_RELOCATION_BLOCK);
     ```
 
-    - **Purpose:** Access the header of the current relocation block and update the offset.
-    - **Explanation:** `pBlockheader` points to the beginning of the relocation block header in the data buffer. `dwOffset` is incremented by the size of the block header to move to the next section of data.
+now we accessing the header of the current relocation block and update the offset. `pBlockheader` points to the beginning of the relocation block header in the data buffer and `dwOffset` is incremented by the size of the block header to move to the next section of data.
 
 9. **Calculate Number of Relocation Entries**
 
@@ -444,17 +393,14 @@ so this part is a little bit sneaky, we just check if the delta (dwDelta) is equ
     PBASE_RELOCATION_ENTRY pBlocks = (PBASE_RELOCATION_ENTRY)&pBuffer[dwRelocAddr + dwOffset];
     ```
 
-    - **Purpose:** Determine the number of relocation entries in the current block.
-    - **Explanation:** `CountRelocationEntries` calculates how many entries are present based on the block size. `pBlocks` points to the start of these entries.
+After we got the `pBlockheader`, lets determine the number of relocation entries in the current block. `CountRelocationEntries` calculates how many entries are present based on the block size. `pBlocks` points to the start of these entries.
 
 10. **Process Each Relocation Entry**
 
     ```c
     for (DWORD y = 0; y < dwEntryCount; y++)
     ```
-
-    - **Purpose:** Iterate through each relocation entry in the current block.
-    - **Explanation:** `dwEntryCount` gives the number of entries to process. The loop index `y` is used to access each entry.
+Iterating through each relocation entry in the current block. `dwEntryCount` gives the number of entries to process. The loop index `y` is used to access each entry.
 
 11. **Skip Non-Relocatable Entries**
 
@@ -463,20 +409,16 @@ so this part is a little bit sneaky, we just check if the delta (dwDelta) is equ
     if (pBlocks[y].Type == 0)
         continue;
     ```
+We should skip entries that are not relocatable. `dwOffset` is incremented to move to the next entry. Entries with `Type` equal to `0` (IMAGE_REL_BASED_ABSOLUTE) are not relocatable and are skipped.
 
-    - **Purpose:** Skip entries that are not relocatable.
-    - **Explanation:** `dwOffset` is incremented to move to the next entry. Entries with `Type` equal to `0` (IMAGE_REL_BASED_ABSOLUTE) are not relocatable and are skipped.
-
-## Adjusting the Addresses
+Now after we get access to the entries, we should adjust adresses.
 
 12. **Calculate the Address to be Relocated**
 
     ```c
     DWORD dwFieldAddress = pBlockheader->PageAddress + pBlocks[y].Offset;
     ```
-
-    - **Purpose:** Compute the address that needs adjustment.
-    - **Explanation:** The `dwFieldAddress` is calculated by adding the `PageAddress` from the block header to the `Offset` from the entry.
+Starting by calculating the address that needs adjustment. The `dwFieldAddress` is calculated by adding the `PageAddress` from the block header to the `Offset` from the entry.
 
 13. **Read the Value at the Address**
 
@@ -491,8 +433,7 @@ so this part is a little bit sneaky, we just check if the delta (dwDelta) is equ
     );
     ```
 
-    - **Purpose:** Read the current value from the target process memory.
-    - **Explanation:** `ReadProcessMemory` retrieves the value from the calculated address into `dwBuffer`.
+Reading the current value from the target process memory. The `ReadProcessMemory` retrieves the value from the calculated address into `dwBuffer`.
 
 14. **Adjust the Value by the Relocation Delta**
 
@@ -500,8 +441,7 @@ so this part is a little bit sneaky, we just check if the delta (dwDelta) is equ
     dwBuffer += dwDelta;
     ```
 
-    - **Purpose:** Adjust the value by the relocation delta.
-    - **Explanation:** The value read from memory is updated by adding `dwDelta` to correct the address.
+ Adjust the value by the relocation delta. The value read from memory is updated by adding `dwDelta` to correct the address.
 
 15. **Write the Adjusted Value Back**
 
@@ -515,8 +455,7 @@ so this part is a little bit sneaky, we just check if the delta (dwDelta) is equ
     );
     ```
 
-    - **Purpose:** Write the adjusted value back to the process memory.
-    - **Explanation:** `WriteProcessMemory` updates the value at the computed address with the adjusted `dwBuffer`.
+Write the adjusted value back to the process memory. `WriteProcessMemory` updates the value at the computed address with the adjusted `dwBuffer`.
 
 16. **Check if Write Was Successful**
 
@@ -528,19 +467,14 @@ so this part is a little bit sneaky, we just check if the delta (dwDelta) is equ
     }
     ```
 
-    - **Purpose:** Check if the memory write operation was successful.
-    - **Explanation:** If `bSuccess` is `FALSE`, an error message is printed, and the loop continues to the next entry.
+Check if the memory write operation was successful. If `bSuccess` is `FALSE`, an error message is printed, and the loop continues to the next entry.
 
 17. **Break the Loop**
 
     ```c
     break;
     ```
+Exit the loop once the `.reloc` section has been fully processed. The loop terminates after processing the `.reloc` section to prevent unnecessary iterations.
 
-    - **Purpose:** Exit the loop once the `.reloc` section has been fully processed.
-    - **Explanation:** The loop terminates after processing the `.reloc` section to prevent unnecessary iterations.
 
-## Summary
-
-This code effectively handles the relocation section of a PE file, ensuring that all addresses are adjusted based on the relocation delta. It involves reading and writing memory, making it suitable for scenarios where PE file base addresses need to be adjusted for correct execution.
 
