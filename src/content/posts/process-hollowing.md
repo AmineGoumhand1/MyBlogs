@@ -174,10 +174,10 @@ This is easy right ?
 
 let's cover some of its componants :
 
-DOS Header: This one contains a magic number (MZ) and a pointer to the NT Headers.
-NT Headers: Main header for the PE file, including the File Header and Optional Header.
-Section Headers: This one describe each section of the executable (e.g., code, data, resources).
-Data Directories: Pointers to other important tables and data structures, like the export, import, and relocation tables. We will see what are these things in other blogs. and we will foncus only on relocation and sections.
+- **DOS Header** : This one contains a magic number (MZ) and a pointer to the NT Headers.
+- **NT Headers** : Main header for the PE file, including the File Header and Optional Header.
+- **Section Headers** : This one describe each section of the executable (e.g., code, data, resources).
+- **Data Directories** : Pointers to other important tables and data structures, like the export, import, and relocation tables. We will see what are these things in other blogs. and we will foncus only on relocation and sections.
 
 Here are some common Sections in PE Files.
 
