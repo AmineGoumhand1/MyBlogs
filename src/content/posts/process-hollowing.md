@@ -527,7 +527,7 @@ if (!SetThreadContext(pProcessInfo->hThread, pContext))
 ```
 this steps involves managing the thread context to ensure proper execution of the relocated code. First, a new CONTEXT structure is allocated and initialized with CONTEXT_INTEGER to indicate that the integer registers are being modified. The GetThreadContext function is then called to retrieve the current context of the thread. Once the context is retrieved, the EAX register is set to the entry point address (dwEntrypoint), effectively setting the instruction pointer to the entry point of the relocated code. The SetThreadContext function is then used to update the thread context with these modified values. Throughout this process, any errors encountered while getting or setting the thread context are handled by printing error messages and returning from the function to ensure that issues are promptly addressed.
 
-The last step, after setting all, we can resume the main thread.
+The last step, after setting all, is resuming the main thread.
 
 ```cpp
 printf("Resuming thread\r\n");
@@ -540,3 +540,5 @@ if (!ResumeThread(pProcessInfo->hThread))
 
 printf("Process hollowing complete\r\n");
 ```
+
+
