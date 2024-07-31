@@ -409,7 +409,7 @@ Iterating through each relocation entry in the current block. `dwEntryCount` giv
     if (pBlocks[y].Type == 0)
         continue;
     ```
-We should skip entries that are not relocatable. `dwOffset` is incremented to move to the next entry. Entries with `Type` equal to `0` (IMAGE_REL_BASED_ABSOLUTE) are not relocatable and are skipped.
+We should skip entries that are not relocatable. `dwOffset` is incremented to move to the next entry. The if statement checks if the Type field of the current relocation entry is 0 (IMAGE_REL_BASED_ABSOLUTE you should read about this). A relocation type of 0 means that the entry is not relocatable and should be ignored. If the type is 0, the continue statement skips the rest of the loop's body and moves to the next iteration, effectively ignoring this entry.
 
 Now after we get access to the entries, we should adjust adresses.
 
@@ -433,7 +433,7 @@ Starting by calculating the address that needs adjustment. The `dwFieldAddress` 
     );
     ```
 
-Reading the current value from the target process memory. The `ReadProcessMemory` retrieves the value from the calculated address into `dwBuffer`.
+Now lets read the current value from the target process memory. The `ReadProcessMemory` retrieves the value from the calculated address into `dwBuffer`.
 
 10. **Adjust the Value by the Relocation Delta**
 
@@ -441,7 +441,7 @@ Reading the current value from the target process memory. The `ReadProcessMemory
     dwBuffer += dwDelta;
     ```
 
- Adjust the value by the relocation delta. The value read from memory is updated by adding `dwDelta` to correct the address.
+ After reading that value, we should adjust it by the relocation delta. The value read from memory is updated by adding `dwDelta` to correct the address.
 
 11. **Write the Adjusted Value Back**
 
@@ -474,7 +474,7 @@ Check if the memory write operation was successful. If `bSuccess` is `FALSE`, an
     ```c
     break;
     ```
-Exit the loop once the `.reloc` section has been fully processed. The loop terminates after processing the `.reloc` section to prevent unnecessary iterations.
+Exit the loop once the `.reloc` section has been fully processed. This loop terminates after processing the `.reloc` section to prevent unnecessary iterations.
 
 
 
