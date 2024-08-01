@@ -2,12 +2,13 @@
 title: 'Malwares Development Series | Part 3 : Process Injection | Process Hollowing'
 published: 2024-07-29
 description: ''
-image: ''
+image: '/favicon/malwware.png'
 tags: ['Malwares', 'CTF', 'Forensics', 'DFIR', 'RedTeam', 'BlueTeam', 'APT', 'Threat Hunting']
 category: 'Malwares'
 draft: false 
 ---
-![Back](/favicon/malwware.png
+![Back](/favicon/malwware.png)
+
 Hello, as a continuaton on our walkthrough about malwares techniques, Today we will cover the Process Hollowing technique.
 During this blog, we'll follow this plan :
 
