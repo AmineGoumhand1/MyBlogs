@@ -82,7 +82,7 @@ We will see what are these Typdefs, don't worry.
 
 ### Suspended Process Creation
 
-So as we said we should create a new instance of a legitimate process ( Notepade ) in a suspended state, why, because we should unmap its original code and replace it with our malicious one before the execution of its main thread.
+So as we said we should create a new instance of a legitimate process ( calc.exe ) in a suspended state, why, because we should unmap its original code and replace it with our malicious one before the execution of its main thread.
 
 So i'm gonna implement this inside a main function.
 ```cpp
@@ -463,6 +463,14 @@ int main() {
     return 0;
 }
 ```
+Compiling it with g++.
+
+```bash
+g++ HelloWorld.cpp -o HelloWorld.exe -mwindows
+```
+## Testing
+
+Here is my Linkedin video demo : [Process Hollowing Demo]()
 
 
 
