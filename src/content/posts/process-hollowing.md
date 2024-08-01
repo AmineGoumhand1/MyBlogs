@@ -210,9 +210,6 @@ Now our target process is clear of sections, what we need know os to allocate sp
 
 ### Allocate and write malicious code
 
-First, the dos_head pointer is assigned to the DOS header of the executable file, which is the first part of the PE file and contains legacy DOS-related information. This is done by casting the base address of the loaded file in memory (EvilImage) to a PIMAGE_DOS_HEADER type. Next, the code calculates the address of the NT headers by adding the offset stored in the e_lfanew field of the DOS header to the base address of the file. This offset indicates where the NT headers begin. The NT headers contain essential information about the PE file, such as the PE signature, file header, and optional header, which includes various data directories.
-As usual, to allocate memory in the target process we use VirtualAllocEx().
-
 ```cpp
     PIMAGE_DOS_HEADER dos_head = (PIMAGE_DOS_HEADER)EvilImage;
     PIMAGE_NT_HEADERS nt_head = (PIMAGE_NT_HEADERS)((LPBYTE)EvilImage + dos_head->e_lfanew);
