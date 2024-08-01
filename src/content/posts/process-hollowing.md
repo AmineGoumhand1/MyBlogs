@@ -7,7 +7,7 @@ tags: ['Malwares', 'CTF', 'Forensics', 'DFIR', 'RedTeam', 'BlueTeam', 'APT', 'Th
 category: 'Malwares'
 draft: false 
 ---
-![Back](/favicon/malwware.png)
+![Back](/favicon/malwwware.jpg)
 
 Hello, as a continuaton on our walkthrough about malwares techniques, Today we will cover the Process Hollowing technique.
 During this blog, we'll follow this plan :
