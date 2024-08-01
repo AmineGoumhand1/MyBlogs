@@ -161,6 +161,7 @@ There is other ways to retreive the base adress like retreive it from the PEB st
 We will cover this in coming blogs.
 
 ### Unmapping Sections
+
 After we loaded our malicious file image in memory, lets unmap the target process.
 The way to do that is by using the NtUnmapViewOfSection from the ntdll.dll library, to import it from this library we use  GetModuleHandleA() to get a handle for the ntdll.dll and GetProcAddress() to retrive the NtUnmapViewOfSection API from it.
 So lets unmap the PE sections of the target process. If you dont know what i mean by Sections, lets cover the PE file architecture.
@@ -192,6 +193,8 @@ Here are some common Sections in PE Files.
 | `.tls`   | Contains data for thread-local storage.                                                 | Read-write          |
 | `.debug` | Contains debugging information.  
 
+Here is a good image that shows the structure of the header. ( taken from [Here](https://github.com/corkami/pics/blob/master/binary/PE.png)
+[]('PE.png')
 So i encourage you to do your homeworks about these stuffs.
 
 ```cpp
