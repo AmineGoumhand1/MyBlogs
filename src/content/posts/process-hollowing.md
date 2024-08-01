@@ -193,8 +193,9 @@ Here are some common Sections in PE Files.
 | `.tls`   | Contains data for thread-local storage.                                                 | Read-write          |
 | `.debug` | Contains debugging information.  
 
-Here is a good image that shows the structure of the header. ( taken from [Here](https://github.com/corkami/pics/blob/master/binary/PE.png)
-[]('PE.png')
+Here is a good image that shows the structure of the header. ( taken from [Here](https://github.com/corkami/pics/blob/master/binary/PE.png) ).
+
+[image]('PE.png')
 So i encourage you to do your homeworks about these stuffs.
 
 ```cpp
