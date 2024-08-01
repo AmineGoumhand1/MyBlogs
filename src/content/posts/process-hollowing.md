@@ -2,7 +2,7 @@
 title: 'Malwares Development Series | Part 3 : Process Injection | Process Hollowing'
 published: 2024-07-29
 description: ''
-image: '/favicon/malwware.png'
+image: ''
 tags: ['Malwares', 'CTF', 'Forensics', 'DFIR', 'RedTeam', 'BlueTeam', 'APT', 'Threat Hunting']
 category: 'Malwares'
 draft: false 
