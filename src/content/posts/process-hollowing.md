@@ -406,6 +406,7 @@ Doing this for both architectures.
 pContext->Eax is set to the base address of the loaded image plus the entry point offset. This effectively points the EAX register to the starting address of the executable's code.
 - **For 64-bit (x64)**
 pContext->Rcx is similarly set to the base address plus the entry point offset, but in this case, it updates the RCX register.
+
 ```
     #ifdef _X86_
     pContext->Eax = (DWORD)BaseAddress + nt_head->OptionalHeader.AddressOfEntryPoint;
@@ -424,3 +425,4 @@ pContext->Rcx is similarly set to the base address plus the entry point offset, 
     }
 }
 ```
+And finally we can resume the main thread by using ResumeThread(proc_info.hThread)
