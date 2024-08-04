@@ -471,7 +471,7 @@ decrypted = ''.join(chr(ord(char) ^ 3) for char in encrypted)
 print(decrypted)
 ```
 
-**Flag : n00bz{from_paris_wth_xor}**
+<span class="category forensics">n00bz{from_paris_wth_xor}</span> 
 
 
 # Web
@@ -536,7 +536,8 @@ To generate the correct UUID that will allow access to the flag, we need to foll
 
 And we got the uid, navigate with it and get the flag : [url](http://24.199.110.35:40150/3c68e6cc-15a7-59d4-823c-e7563bbb326c)
 
-**Flag : n00bz{1337-13371337-1337-133713371337-1337}**
+<span class="category forensics">n00bz{1337-13371337-1337-133713371337-1337}</span> 
+
 
 # Misc 
 
@@ -581,7 +582,8 @@ The hack of this is to enter a number that can trick the server, so if you enter
 So I looked carefully and I've seen how the flag being returned, `print(flag[:questions])` . You noticed huh? 
 So i entered -1 and got the flag.
 
-**Flag : n00bz{m4th_15nt_4ll_4b0ut_3qu4t10n5}**
+<span class="category forensics">n00bz{m4th_15nt_4ll_4b0ut_3qu4t10n5}</span> 
+
 
 ### Agree
 - **description** : I hope you like our Terms of Service and Privacy Policy of our website! .
@@ -589,7 +591,8 @@ So i entered -1 and got the flag.
 So a quit simple one, where we can find the `Terms of Service and Privacy Policy` ?, here i tried to register to a new account, and i saw the `Terms of Service and Privacy Policy` section. 
 I explored the `Terms of Service` and get the first part of the flag then the second part was in the `Privacy Policy`.
 
-**Flag : n00bz{Terms_0f_Serv1c3s_4nd_pr1v4cy_p0l1cy_6f3a4d}**
+<span class="category forensics">n00bz{Terms_0f_Serv1c3s_4nd_pr1v4cy_p0l1cy_6f3a4d}</span> 
+
 
 # Blockchain
 
