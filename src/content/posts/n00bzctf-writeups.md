@@ -47,26 +47,26 @@ As we are seeing, there is some coordinates there, except they are in degrees, m
 **Latitude**
 13 degrees, 22 minutes, 12 seconds North
 
-DD=degrees+(minutes60)+(seconds3600)DD=degrees+(60minutes​)+(3600seconds​)
+Convert to decimal degrees:
+
+DD=degrees+(minutes/60)+(seconds/3600)
 
 So,
-DDLatitude=13+(2260)+(123600)DDLatitude​=13+(6022​)+(360012​)
-DDLatitude=13+0.3667+0.0033DDLatitude​=13+0.3667+0.0033
-DDLatitude≈13.3700DDLatitude​≈13.3700
+DDLatitude=13+(22/60)+(12/3600)
+DDLatitude=13+0.3667+0.0033
+DDLatitude≈13.3700
 
 Since it is North, the sign remains positive.
 
 **Longitude**
 13 degrees, 22 minutes, 12 seconds West
 
-DD=degrees+(minutes60)+(seconds3600)DD=degrees+(60minutes​)+(3600seconds​)
+Same calculations, we find :
 
-So,
-DDLongitude=13+(2260)+(123600)DDLongitude​=13+(6022​)+(360012​)
-DDLongitude=13+0.3667+0.0033DDLongitude​=13+0.3667+0.0033
-DDLongitude≈13.3700DDLongitude​≈13.3700
+DDLatitude≈-13.3700
 
 Since it is West, the sign is negative.
+
 **Final Coordinates**
 Latitude: 13.3700
 Longitude: -13.3700
