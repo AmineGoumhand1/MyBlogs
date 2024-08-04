@@ -42,7 +42,7 @@ Welcome. In this blog, I'll cover some challenges from the n00bz ctf that i part
 
 We are given an image of a plane, so the first thing I did is looking at the metadata of the image using exiftool.
 ![ ](/favicon/plane1.png)
-As we are seeing, there is some coordinates there, except they are in degrees, minutes, and seconds (DMS). Lets convert those to decimal degrees (DD):
+As we are seeing, there is some coordinates there, except they are in `degrees, minutes, and seconds (DMS)`. Lets convert those to decimal `degrees (DD)` :
 
 **Latitude**
 13 degrees, 22 minutes, 12 seconds North
@@ -54,9 +54,7 @@ DD=degrees+(minutes/60)+(seconds/3600)
 So,
 ```
 DDLatitude=13+(22/60)+(12/3600)
-
 DDLatitude=13+0.3667+0.0033
-
 DDLatitude≈13.3700
 ```
 Since it is North, the sign remains positive.
@@ -81,12 +79,13 @@ Since it is West, the sign is negative.
 
 - **description** : The Wave is not audible, perhaps corrupted? Note: Wrap the flag in n00bz{}. There are no spaces in the flag and it is all lowercase.
 
-As we heard in the description, "perhaps corrupted",so i looked to the hex headers with hexedit, and yes there is some missed up values that needs fixing. ( those highlighted by green color like 3030 sequences seems to be incorrect ).
+As we heard in the description, "perhaps corrupted",so i looked to the hex headers with hexedit, and yes there is some missed up values that needs fixing. ( those highlighted by green color like `3030 sequences` seems to be incorrect ).
 ![wave](/favicon/wavve.png)
-How? I took my browser to the famous hex headers website : [GaryKessler](garykessler.net/)
-Searching for **wav** and grap the correct hex headers `52 49 46 46 xx xx xx xx 57 41 56 45 66 6D 74 20` , according to this, the `xx xx xx xx` is the file size (little endian). so replacing the new headers we can see that somethins not right, here i was blocked but after some googling i found that the `data` chunk keyword should be there in hex to identify data section, after i found it `64 61 74 61`, i replaced it and it workkks. 
+How? I took my browser to the famous hex headers website : [GaryKessler](https://garykessler.net/)
+Searching for **wav** and grap the correct hex headers `52 49 46 46 xx xx xx xx 57 41 56 45 66 6D 74 20`.
+According to this, the `xx xx xx xx` is the file size (little endian). So replacing the new headers we can see that somethins not right, here i was blocked but after some googling i found that the `data` chunk keyword should be there in hex to identify data section, after i found it `64 61 74 61`, i replaced it and it workkks. 
 
-I can hear some beeping after playing the wav sound, that so familiar its a morse code, so i navigate to this website [morsecode](https://morsecode.world/international/decoder/audio-decoder-adaptive.html), upload the file, decode it which will give  "beepbopmorsecode" and wrap it to the flag format.
+I can hear some beeping after playing the wav sound, that so familiar its a morse code, so i took my self to this website [morsecode](https://morsecode.world/international/decoder/audio-decoder-adaptive.html), upload the file, decode it which will give  `beepbopmorsecode` and wrap it to the flag format.
 
 **Flag : n00bz{beepbopmorsecode}**
 
@@ -101,7 +100,7 @@ Nothing interesting so i started with analyzing file with `file` tool.
 file disk1.img
 --> disk1.img: Linux rev 1.0 ext4 filesystem data, UUID=7b1c29f0-7159-4456-9ca8-db40f35bc6ff, volume name "cloudimg-rootfs" (needs journal recovery)  (extents) (64bit) (large files) (huge files)                 
 ```
-As we see it is a linux disk but damaged or has some filesystem journal recovery issue. Here i was stuck for about 30 min ( after mounting the disk fails ) trying to understand the journal recovery for ext4, but i get a result of how to fix this using a tool e2fsck, lets run it.
+As we see it is a linux disk but damaged or has some filesystem journal recovery issue. Here i was stuck for about 30 min ( after mounting the disk fails ) trying to understand the journal recovery for ext4, but i got a result of how to fix this using a tool e2fsck, lets run it.
 ![image](/favicon/golf1.png)
 As we see there is some problems with the size, so i tought why not resizing the disk image to match the filesystem's reported size, but this is a bit of a workaround and should be done carefully. and that was the clue.
 
