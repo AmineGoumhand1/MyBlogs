@@ -21,7 +21,6 @@ Welcome. In this blog, I'll cover some challenges from the n00bz ctf that i part
 |     OSINT              |    Pastebin 285pts    | 
 |     OSINT              |    gang2 425pts    | 
 |     OSINT              |    gang3 490pts    | 
-
 | Misc | Additions 121pts |
 | Misc | Sanity check 100pts |
 | Misc | Subtraction 453pts|
@@ -398,6 +397,9 @@ print(decrypted)
 
 - **description** : Tired of storing passwords? No worries! This super secure website is passwordless!.
 Attachments :  app.py | http://24.199.110.35:40150/
+
+The website give us :
+![](/favicon/passw1.png)
 
 The app.py : 
 ```python
