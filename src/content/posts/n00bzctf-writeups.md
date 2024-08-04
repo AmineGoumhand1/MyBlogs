@@ -41,8 +41,8 @@ Welcome. In this blog, I'll cover some challenges from the n00bz ctf that i part
 - **description** : So many plane-related challenges! Why not another one? The flag is the latitude, longitude of the place this picture is taken from, rounded upto two decimal places. Example: n00bz{55.51,-20.27}.
 
 We are given an image of a plane, so the first thing I did is to look at the metadata of the image using exiftool.
-
-As we are seeing, there is some coordinates there, except they are in degrees, minutes, and seconds (DMS). Lets convert it to decimal degrees (DD):
+![image](/favicon/plane1.png)
+As we are seeing, there is some coordinates there, except they are in degrees, minutes, and seconds (DMS). Lets convert those to decimal degrees (DD):
 
 **Latitude**
 13 degrees, 22 minutes, 12 seconds North
@@ -61,7 +61,7 @@ Since it is North, the sign remains positive.
 **Longitude**
 13 degrees, 22 minutes, 12 seconds West
 
-Same calculations, we find :
+Same calculations, I found :
 
 DDLatitude≈-13.3700
 
@@ -77,38 +77,57 @@ Longitude: -13.3700
 ### Wave
 
 - **description** : The Wave is not audible, perhaps corrupted? Note: Wrap the flag in n00bz{}. There are no spaces in the flag and it is all lowercase.
-As we heard in the description, "perhaps corrupted", so i looked to the hex headers with hexedit, and yes there is some missed up values that needs fixing.
-How? I took my browser to the famous hex headers website : garykessler.net/
-Searching for **wav** and grap the correct hex headers 52 49 46 46 xx xx xx xx 57 41 56 45 66 6D 74 20 , according to this, the xx xx xx xx is the file
-size (little endian). so replacing the new headers we can see that somethins not right, here i was blocked but after some googling i found that the data keyword should be there in hex to identify data section, after i found it ( 64 61 74 61 ), i replaced it and it workkks. now you can here some beeping after playing the wav sound, that so familiar its a morse code, so i navigate to this website https://morsecode.world/international/decoder/audio-decoder-adaptive.html, upload the file, decode it which will give  "beepbopmorsecode" and wrap it to the flag format.
+
+As we heard in the description, "perhaps corrupted",so i looked to the hex headers with hexedit, and yes there is some missed up values that needs fixing. ( those highlighted by green color like 3030 sequences seems to be incorrect ).
+![wave](/favicon/wavve.png)
+How? I took my browser to the famous hex headers website : [GaryKessler](garykessler.net/)
+Searching for **wav** and grap the correct hex headers `52 49 46 46 xx xx xx xx 57 41 56 45 66 6D 74 20` , according to this, the `xx xx xx xx` is the file size (little endian). so replacing the new headers we can see that somethins not right, here i was blocked but after some googling i found that the `data` chunk keyword should be there in hex to identify data section, after i found it `64 61 74 61`, i replaced it and it workkks. 
+
+I can hear some beeping after playing the wav sound, that so familiar its a morse code, so i navigate to this website [morsecode](https://morsecode.world/international/decoder/audio-decoder-adaptive.html), upload the file, decode it which will give  "beepbopmorsecode" and wrap it to the flag format.
 
 **Flag : n00bz{beepbopmorsecode}**
 
 ### Disk Golf
 
 This chall is my favorite one on this ctf, because it tested my abilities in Filesystems understanding like ext4.
+
 - **description** : Let's play some disk golf!
-Nothing interesting so i started with analyzing file with file tool.
 
+Nothing interesting so i started with analyzing file with `file` tool.
+```
+file disk1.img
+--> disk1.img: Linux rev 1.0 ext4 filesystem data, UUID=7b1c29f0-7159-4456-9ca8-db40f35bc6ff, volume name "cloudimg-rootfs" (needs journal recovery)  (extents) (64bit) (large files) (huge files)                 
+```
 As we see it is a linux disk but damaged or has some filesystem journal recovery issue. Here i was stuck for about 30 min ( after mounting the disk fails ) trying to understand the journal recovery for ext4, but i get a result of how to fix this using a tool e2fsck, lets run it.
-
+![image](/favicon/golf1.png)
 As we see there is some problems with the size, so i tought why not resizing the disk image to match the filesystem's reported size, but this is a bit of a workaround and should be done carefully. and that was the clue.
 
  The idea is to increase the size of the disk image file to accommodate the filesystem's expected size. Lets calculate it :
- 12844795 blocks * 4096 bytes/block = 52616196096 bytes (approximately 52.6 GB) ( Note that 4096=4KO which is the size of ext4 inode block )
+ `12844795 blocks * 4096 bytes/block = 52616196096 bytes` (approximately 52.6 GB) ( Note that 4096=4KO which is the size of ext4 inode block )
  after calculating the new size, lets change it on disk.
+ 
+```bash
 sudo truncate -s 52616196096 disk1.img
+```
+Now lets run `e2fsck` to fix the filesystem.
 
-runnig this again sudo e2fsck -f disk1.img and the ext4 filesystem should be fixed, now lets mount it.
+```bash
+sudo e2fsck -f disk1.img
+```
+![image](/favicon/golf3.png)
+
+lets re-mount it.
+```bash
 sudo mkdir -p /mnt/disk1
 sudo mount -o loop,ro,noload disk1.img /mnt/disk1
-
+```
 Finally navigating to the mounting place, we get :
-
-
-
-
-
+![first](/favicon/first.png)
+Opening the john doe folder,
+![fourth](/favicon/fourth.png)
+We can see that there is two txt docs named flag1 and 2, the flag2 is just fake one, the flag1 is a base 85 encoding.
+`156 60 60 142 172 173 67 150 63 137 154 60 156 147 137 64 167 64 61 164 63 144 137 144 61 65 153 137 146 60 162 63 156 163 61 143 65 175`
+Passing it to Cyberchef and I got the flag.
 
 
 **Flag : n00bz{7h3_l0ng_4w41t3d_d15k_f0r3ns1c5}**
@@ -131,6 +150,7 @@ You can use dcode.fr to decode it.
 ### RSA
 
 - **description** : The cryptography category is incomplete without RSA. So here is a simple RSA challenge. Have fun!.
+Given : e, c and n.
 
 Another classic challenge implementing the cube root attack ( rsa ), because as we see the e is too small.
 
@@ -160,6 +180,7 @@ print(f"Decrypted message (as integer): {m_int}")
 print(f"Decrypted message (as bytes): {m_bytes}")
 print(f"Decrypted message (as text): {decrypted_message}")
 ```
+
 **Flag : n00bz{crypt0_1s_1nc0mpl3t3_w1th0ut_rs4!!}**
 
 ### Vinegar2
@@ -251,8 +272,9 @@ The organizers putted some really good osint challenges. But still unable to sol
 - **description** : Here's a picture of a plane's tail. Can you find the airline's hub (the airport where they mostly operate from). Use the three letter airport IATA code and wrap it in n00bz{}. Example: n00bz{SFO}.
 
 So first thing i tried here is to google this image, but google gives me some shitty results like Sonic speed .. After some manual googling about plane tails i found this interesting photographer [website](https://airlinersgallery.smugmug.com/Airline-Tails/Airline-Tails) that loves taking pictures of plane tails, there are a lot of Tails so i started by checking one by one till i found the one that matches the given image.
-
-As we can see, it is for "Air Tahiti Nui" Airlines. so lets grap the Airport code from the IANA official [website](https://www.iata.org/en/publications/directories/code-search/?airport.search=Air%20Tahiti%20Nui), searching by "Air Tahiti Nui".
+![image](/favicon/tail1.png)
+As we can see, it is for "Air Tahiti Nui" Airlines. so lets grap the Airport code from the IATA official [website](https://www.iata.org/en/publications/directories/code-search/?airport.search=Air%20Tahiti%20Nui), searching by "Air Tahiti Nui".
+![image](/favicon/tahiti.png)
 
 And we found it ( Cityname : Tahiti and code : PPT )
 
@@ -263,8 +285,11 @@ And we found it ( Cityname : Tahiti and code : PPT )
 - **description** : John Doe has been suspected of creating a gang. The members of team n00bzUnit3d also seem associated with it. Can you find out if John Doe has recently joined the team? You might find what you are looking for ;) P.S.: The team website might help.
 
 So after reading the description, we know that we are looking for a member of the n00bzUnit3d team, so discovering their website,
+![image](/favicon/osint2.png)
 
 Navigating to the Members section, I noticed John Doe name when i hovered on the last profile. So I discovered this profile and i got the flag.
+![image](/favicon/tail1.png)
+![image](/favicon/osint222.png)
 
 **Flag : n00bz{1ts_051N7_71m3_3e4a7d6f}**
 
@@ -277,7 +302,7 @@ Note:- https://pastebin.com/u/abhinav654321 New info:- https://pastebin.com/j1Un
 
 So before the hints were there, we have only the first line and the link to the pastebin [website](https://pastebin.com/u/abhinav654321),
 
-atfer i discovered this one, i found nothing just some comments that hints to some deleted content, so i combined this with the description "was created long time back." and i was sure that is a wayback machine challenge, so i graped the pastebin website and wayback it and we can retreive the deleted content.
+atfer i discovered this one, i found nothing, just some comments that hints to some deleted content, so i combined this with the description `was created long time back.` and i was sure that is a wayback machine challenge, so i graped the pastebin website and wayback it and I was able to retreive the deleted content.
 
 **Flag : n00bz{l0ng_t1m3_ag0_m34ns_w4yb4ck}**
 
