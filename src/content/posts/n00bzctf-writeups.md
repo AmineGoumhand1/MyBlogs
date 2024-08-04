@@ -11,34 +11,82 @@ Welcome. In this blog, I'll cover some challenges from the n00bz ctf that i part
 
 # Solved Challenges
 
-| Category         | Name / Points   | 
-|------------------|--------|
-| Forensics  | Plane 100pts  
-| Forensics  | Wave 391pts   | 
-| Forensics | disk golf 464pts |
-| OSINT                 | Tail 100pts       | 
-|   OSINT               |     The Gang 100pts   | 
-|     OSINT              |    Pastebin 285pts    | 
-|     OSINT              |    gang2 425pts    | 
-|     OSINT              |    gang3 490pts    | 
-| Misc | Additions 121pts |
-| Misc | Sanity check 100pts |
-| Misc | Subtraction 453pts|
-| Web | Passwordless 100pts |
-| Web | Focus on yourSELF 436pts |
-| Web | File sharing portal 483pts |
-| Reverse | Vacation 250pts |
-| Reverse | Brain 426pts |
-| Reverse | FlagChecker 426pts |
-| Crypto | Vinegar 100pts |
-| Crypto | Vinegar2 165pts |
-| Crypto | Rsa 100pts |
-| Crypto | Random 454pts|
-| Programming | Sillygoos 274pts |
-| Programming | Numbers2 416pts|
-| Blockchain | EVM 372pts |
-| Blockchain | EVM : Conditions  462pts|
+<style>
+  table {
+    width: 100%;
+  }
+  th {
+    background-color: #f8f9fa;
+    color: #343a40;
+  }
+  td {
+    padding: 10px;
+  }
+  .category {
+    background-color: #d1ecf1;
+    color: #0c5460;
+  }
+  .forensics {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  .osint {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  .misc {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+  .web {
+    background-color: #d1ecf1;
+    color: #0c5460;
+  }
+  .reverse {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  .crypto {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  .programming {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+  .blockchain {
+    background-color: #d1ecf1;
+    color: #0c5460;
+  }
+</style>
 
+| Category         | Name / Points        | 
+|------------------|----------------------|
+| <span class="forensics">Forensics</span>  | Plane 100pts          |  
+| <span class="forensics">Forensics</span>  | Wave 391pts           | 
+| <span class="forensics">Forensics</span>  | Disk Golf 464pts      |
+| <span class="osint">OSINT</span>         | Tail 100pts           | 
+| <span class="osint">OSINT</span>         | The Gang 100pts       | 
+| <span class="osint">OSINT</span>         | Pastebin 285pts       | 
+| <span class="osint">OSINT</span>         | Gang2 425pts          | 
+| <span class="osint">OSINT</span>         | Gang3 490pts          | 
+| <span class="misc">Misc</span>           | Additions 121pts      |
+| <span class="misc">Misc</span>           | Sanity Check 100pts   |
+| <span class="misc">Misc</span>           | Subtraction 453pts    |
+| <span class="web">Web</span>             | Passwordless 100pts   |
+| <span class="web">Web</span>             | Focus on YourSELF 436pts|
+| <span class="web">Web</span>             | File Sharing Portal 483pts |
+| <span class="reverse">Reverse</span>     | Vacation 250pts       |
+| <span class="reverse">Reverse</span>     | Brain 426pts          |
+| <span class="reverse">Reverse</span>     | FlagChecker 426pts    |
+| <span class="crypto">Crypto</span>       | Vinegar 100pts        |
+| <span class="crypto">Crypto</span>       | Vinegar2 165pts       |
+| <span class="crypto">Crypto</span>       | Rsa 100pts            |
+| <span class="crypto">Crypto</span>       | Random 454pts         |
+| <span class="programming">Programming</span> | Sillygoos 274pts     |
+| <span class="programming">Programming</span> | Numbers2 416pts     |
+| <span class="blockchain">Blockchain</span> | EVM 372pts           |
+| <span class="blockchain">Blockchain</span> | EVM : Conditions 462pts |
 
 I'll cover the challenges that i solved. maybe some of my friends.
 
