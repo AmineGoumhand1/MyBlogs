@@ -1,5 +1,5 @@
 ---
-title: 'CTF Write-Ups : n00bz CTF'
+title: 'CTF Write-Ups : n00bz CTF 2024'
 published: 2024-08-03 
 description: ''
 image: ''
@@ -339,29 +339,37 @@ we can see there is some sort of encrypted communication guiding in the account.
 ```
 Wanna join us? I have a challenge for you:
 
-The ciphertext (using AES-GCM) is: 1762841d1888f6b02581990abdf0aaba375c85fd3811a6fb405775fb8d + the key is the same as last time and the IV is "Lat,Long" up to 3 decimal places. Use the city where we met in 2022. Also, use Cyberchef. I forgot, you will also need this: d5e749da6b02c75cb4c763939632503a
+The ciphertext (using AES-GCM) is: 1762841d1888f6b02581990abdf0aaba375c85fd3811a6fb405775fb8d + the key is the same as last time and the IV is "Lat,Long" up to 3 decimal places.
+Use the city where we met in 2022. Also, use Cyberchef. I forgot, you will also need this: d5e749da6b02c75cb4c763939632503a
 ```
 
 So we have an encrypted text with aes-gcm , which needs a tag (d5e749da6b02c75cb4c763939632503a) that they give us, for the iv `the city where we met in 2022` i tought why not to look at some n00bz previous events of ctfs and i found a [github](https://github.com/n00bzUnit3d) repo that contains their official write-ups ( specially 2022 write-up ).
-Seems like john doe still appear in these osint challs too , so i took a look and found a city with a flag that contains the location (alt,lon) which is 46.720_33.154. I'll let you explore it. So convert this ( 46.720,33.154 ) to hex and we should get `34 36 2E 37 32 30 2C 33 33 2E 31 35 34`.
+
+Seems like john doe still appear in these osint challs too , so i took a look and found a city with a flag that contains the location (alt,lon) which is 46.720_33.154. I'll let you explore it. 
+So convert this ( 46.720,33.154 ) to hex and we should get `34 36 2E 37 32 30 2C 33 33 2E 31 35 34`.
 
 Now lets search for the key, from the discription we have that they used this key before so returning back to the github repo and found nothing else in 2022 event, so i explored osint 2023 and i found this :
 
 ```
-Description - John Doe has escaped our high secruity prison again! We managed to intercept an xor key that he uses to send encrypted messages to people! Your aim is to find classified information on his top secret website! Start with the encrypted message - b'\x13\x00\x1d-A*!\x00Q\x16R\x02\x12\x07\n\x1b>\x0e\x06\x1a~O-D CU\t\x0e\x06 E2\n\x17bA#\x0b\t>O\x11\x011O\tH*\x1b\x10-\x08\x00)E\x02\nMck~)\x07"\x01H*+\n_\x01\x00\x00\x00c\n\x00!\x12V\r\x1d4A\x19\x16\x0b"O!N(\x00\x13Dy\x02\x000\x08\rn\x16\x19E\x16,\x0fS\x17H+\x1c\x03N)\nEU1\x0e\x01c\x10\x1b+\x16\x02\x0c\x1d-A\x11\x15\r8\x16H\x0f#\x0e\x0cOx' and the secret key - YouCanNeverCatchJohnDoe!. We also intercepted the name of his account - 31zdugxvkayexc4hzqhixxcfxb4y
+Description - John Doe has escaped our high secruity prison again! We managed to intercept an xor key that he uses to send encrypted messages to people! Your aim is to find classified information on his top secret website! Start with the encrypted message -
+ b'\x13\x00\x1d-A*!\x00Q\x16R\x02\x12\x07\n\x1b>\x0e\x06\x1a~O-D CU\t\x0e\x06 E2\n\x17bA#\x0b\t>O\x11\x011O\tH*\x1b\x10-\x08\x00)E\x02\nMck~)\x07"\x01H*+\n_\x01\x00\x00\x00c\n\x00!\x12V\r\x1d4A\x19\x16\x0b"O!N(\x00\x13Dy\x02\x000\x08\rn\x16\x19E\x16,\x0fS\x17H+\x1c\x03N)\nEU1\x0e\x01c\x10\x1b+\x16\x02\x0c\x1d-A\x11\x15\r8\x16H\x0f#\x0e\x0cOx'
+and the secret key - YouCanNeverCatchJohnDoe!. We also intercepted the name of his account - 31zdugxvkayexc4hzqhixxcfxb4y
 ```
 I got the keyyy, its `YouCanNeverCatchJohnDoe!`, convert it to hex to get `596f7543616e4e6576657243617463684a6f686e446f6521`.
 Lets decrypt these now on CyberChef as they said.
 ![](/favicon/riddle4.png)
 
-we got a discord server, `https://discord.gg/9v2FEjndCb`. I explored it to find some sort of communication about the meeting place of the OG (Original Gangster). By identifying what they are saying, you can conclude that the meeting was in the `Statue of Prosparity`. and we finally search for its location on the mentioned airport, after i searched on wikipedia i found a non - exact location. They said that in the description. So i grap the wrong Wikipedia location and upload it to OpenStreetMap to correct it. 
+we got a discord server, `https://discord.gg/9v2FEjndCb`. 
+I explored it to find some sort of communication about the meeting place of the OG (Original Gangster). 
+By identifying what they are saying, you can conclude that the meeting was in the `Statue of Prosparity`. and we finally search for its location on the mentioned airport, after i searched on wikipedia i found a non - exact location. 
+They said that in the description. So i grap the wrong Wikipedia location and upload it to OpenStreetMap to correct it. 
 ![](/favicon/riddle5.png)
 
 Boom, Found it : 13.19920, 77.68228
+
 **Flag : n00bz{13.199,77.682}**
 
 That was a consuming challenge.
-
 
 # Reverse
 
@@ -455,9 +463,9 @@ And we got the uid, navigate with it and get the flag : [url](http://24.199.110.
 
 **Flag : n00bz{1337-13371337-1337-133713371337-1337}**
 
-
-# Misc
 # Blockchain
+
+My TEAMmate will cover the blockchain challs sooon.
 
 
 
