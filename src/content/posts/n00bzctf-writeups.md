@@ -7,7 +7,8 @@ tags: ['CTF', 'DFIR', 'Forensics' , 'Crypto' , 'OSINT' , 'Reverse' , 'Web']
 category: 'CTF'
 draft: false 
 ---
-Welcome. In this blog, I'll cover some challenges from the n00bz ctf that i participated in with my team 0M3G4_SQU4D.
+![](/favicon/dashbord1.png)
+### Welcome. In this blog, I'll cover some challenges from the n00bz ctf that i participated in with my team 0M3G4_SQU4D.
 
 # Solved Challenges
 
@@ -19,7 +20,7 @@ Welcome. In this blog, I'll cover some challenges from the n00bz ctf that i part
   .forensics {
        font-weight: bold;
 
-    color:0FF641 ;
+    color: #0FF641 ;
     border-radius: 8px;
     padding: 5px;
     margin: 2px;
