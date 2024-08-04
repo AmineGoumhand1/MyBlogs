@@ -40,8 +40,8 @@ Welcome. In this blog, I'll cover some challenges from the n00bz ctf that i part
 
 - **description** : So many plane-related challenges! Why not another one? The flag is the latitude, longitude of the place this picture is taken from, rounded upto two decimal places. Example: n00bz{55.51,-20.27}.
 
-We are given an image of a plane, so the first thing I did is to look at the metadata of the image using exiftool.
-![image](/favicon/plane1.png)
+We are given an image of a plane, so the first thing I did is looking at the metadata of the image using exiftool.
+![ ](/favicon/plane1.png)
 As we are seeing, there is some coordinates there, except they are in degrees, minutes, and seconds (DMS). Lets convert those to decimal degrees (DD):
 
 **Latitude**
@@ -52,24 +52,27 @@ Convert to decimal degrees:
 DD=degrees+(minutes/60)+(seconds/3600)
 
 So,
+```
 DDLatitude=13+(22/60)+(12/3600)
-DDLatitude=13+0.3667+0.0033
-DDLatitude≈13.3700
 
+DDLatitude=13+0.3667+0.0033
+
+DDLatitude≈13.3700
+```
 Since it is North, the sign remains positive.
 
 **Longitude**
 13 degrees, 22 minutes, 12 seconds West
 
 Same calculations, I found :
-
+```
 DDLatitude≈-13.3700
-
+```
 Since it is West, the sign is negative.
 
 **Final Coordinates**
-Latitude: 13.3700
-Longitude: -13.3700
+`Latitude: 13.3700`
+`Longitude: -13.3700`
 
 
 **Flag : n00bz{13.37,-13.37}**
