@@ -129,6 +129,7 @@ Opening the john doe folder,
 ![fourth](/favicon/fourth.png)
 We can see that there is two txt docs named flag1 and 2, the flag2 is just fake one, the flag1 is an octal base encoding.
 `156 60 60 142 172 173 67 150 63 137 154 60 156 147 137 64 167 64 61 164 63 144 137 144 61 65 153 137 146 60 162 63 156 163 61 143 65 175`
+
 Passing it to Cyberchef and I got the flag.
 
 
