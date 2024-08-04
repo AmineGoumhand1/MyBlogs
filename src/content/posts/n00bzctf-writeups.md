@@ -15,17 +15,26 @@ Welcome. In this blog, I'll cover some challenges from the n00bz ctf that i part
 |------------------|--------|
 | Forensics  | Plane 200pts  
 | Forensics  | Wave 446   | 
+| Forensics | disk golf 495 |
 | OSINT                 | Tail 216       | 
 |   OSINT               |     The Gang 246   | 
 |     OSINT              |    Pastebin 400    | 
 | Misc | Additions 318pts |
 | Misc | Sanity check 100pts |
+| Misc | Subtraction |
 | Web | Passwordless 162pts |
 | Reverse | Vacation 250pts |
 | Reverse | Brain 426pts |
 | Crypto | Vinegar 100pts |
+| Crypto | Vinegar2 |
+| Crypto | Rsa |
+| Programming | Sillygoos |
+| Programming | Numbers2 |
 
-## Forensics
+
+
+
+# Forensics
 
 ### Plane
 
