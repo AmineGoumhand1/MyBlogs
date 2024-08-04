@@ -533,6 +533,59 @@ And we got the uid, navigate with it and get the flag : [url](http://24.199.110.
 
 **Flag : n00bz{1337-13371337-1337-133713371337-1337}**
 
+# Misc 
+
+### Addition 
+- **description** : My little brother is learning math, can you show him how to do some addition problems?
+Given : nc server with a python script.
+
+server.py
+```python
+import time
+import random
+
+questions = int(input("how many questions do you want to answer? "))
+
+for i in range(questions):
+    a = random.randint(0, 10)
+    b = random.randint(0, 10)
+
+    yourans = int(input("what is " + str(a) + ' + ' + str(b) + ' = '))
+
+    print("calculating")
+
+    totaltime = pow(2, i)
+
+    print('.')
+    time.sleep(totaltime / 3)
+    print('.')
+    time.sleep(totaltime / 3)
+    print('.')
+    time.sleep(totaltime / 3)
+
+    if yourans != a + b:
+        print("You made my little brother cry 😭")
+        exit(69)
+
+f = open('/flag.txt', 'r')
+flag = f.read()
+print(flag[:questions])
+```
+So as we can see the script generates a series of addition questions for the user, with progressively longer pauses before confirming each answer. 
+The hack of this is to enter a number that can trick the server, so if you entered 40 for example you'll be stuck for infinite time.
+So I looked carefully and I've seen how the flag being returned, `print(flag[:questions])` . You noticed huh? 
+So i entered -1 and got the flag.
+
+**Flag : n00bz{m4th_15nt_4ll_4b0ut_3qu4t10n5}**
+
+### Agree
+- **description** : I hope you like our Terms of Service and Privacy Policy of our website! .
+
+So a quit simple one, where we can find the `Terms of Service and Privacy Policy` ?, here i tried to register to a new account, and i saw the `Terms of Service and Privacy Policy` section. 
+I explored the `Terms of Service` and get the first part of the flag then the second part was in the `Privacy Policy`.
+
+**Flag : n00bz{Terms_0f_Serv1c3s_4nd_pr1v4cy_p0l1cy_6f3a4d}**
+
 # Blockchain
 
 My TEAMmate will cover the blockchain challs sooon.
