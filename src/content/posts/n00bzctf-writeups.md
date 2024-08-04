@@ -242,3 +242,24 @@ print(flag)
 
 **Flag : n00bz{4lph4num3r1c4l_1s_n0t_4_pr0bl3m}**
 
+# OSINT
+
+The organizers putted some really good osint challenges. But still unable to solve them all, anyway we managed to solve the first 3.
+
+### Tail
+
+- **description** : Here's a picture of a plane's tail. Can you find the airline's hub (the airport where they mostly operate from). Use the three letter airport IATA code and wrap it in n00bz{}. Example: n00bz{SFO}.
+
+So first thing i tried here is to google this image, but google gives me some shitty results like Sonic speed .. After some manual googling about plane tails i found this interesting photographer [website](https://airlinersgallery.smugmug.com/Airline-Tails/Airline-Tails) that loves taking pictures of plane tails, there are a lot of Tails so i started by checking one by one till i found the one that matches the given image.
+
+As we can see, it is for "Air Tahiti Nui" Airlines. so lets grap the Airport code from the IANA official [website](https://www.iata.org/en/publications/directories/code-search/?airport.search=Air%20Tahiti%20Nui), searching by "Air Tahiti Nui".
+
+And we found it ( Cityname : Tahiti and code : PPT )
+
+**Flag : n00bz{PPT}**
+
+
+
+
+
+
