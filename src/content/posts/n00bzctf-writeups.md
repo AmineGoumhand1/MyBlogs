@@ -1,6 +1,6 @@
 ---
 title: 'CTF Write-Ups : n00bz CTF'
-published: 2024-08-03
+published: 2024-08-03 
 description: ''
 image: ''
 tags: ['CTF', 'DFIR', 'Forensics' , 'Crypto' , 'OSINT' , 'Reverse' , 'Web']
