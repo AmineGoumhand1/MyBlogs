@@ -258,6 +258,33 @@ And we found it ( Cityname : Tahiti and code : PPT )
 
 **Flag : n00bz{PPT}**
 
+### Gang
+
+- **description** : John Doe has been suspected of creating a gang. The members of team n00bzUnit3d also seem associated with it. Can you find out if John Doe has recently joined the team? You might find what you are looking for ;) P.S.: The team website might help.
+
+So after reading the description, we know that we are looking for a member of the n00bzUnit3d team, so discovering their website,
+
+Navigating to the Members section, I noticed John Doe name when i hovered on the last profile. So I discovered this profile and i got the flag.
+
+**Flag : n00bz{1ts_051N7_71m3_3e4a7d6f}**
+
+### Pastebin
+
+- **description** :Just go to my pastebin which was created long time back.
+Important!
+There have been some changes to this challenge due things outside our control (like deletion of the pastebin). The above description is still valid (and so is the original info), but you will need the new info to solve the challenge now. Challenge is still solvable. Author: noob_abhinav
+Note:- https://pastebin.com/u/abhinav654321 New info:- https://pastebin.com/j1UnKA7m
+
+So before the hints were there, we have only the first line and the link to the pastebin [website](https://pastebin.com/u/abhinav654321),
+
+atfer i discovered this one, i found nothing just some comments that hints to some deleted content, so i combined this with the description "was created long time back." and i was sure that is a wayback machine challenge, so i graped the pastebin website and wayback it and we can retreive the deleted content.
+
+**Flag : n00bz{l0ng_t1m3_ag0_m34ns_w4yb4ck}**
+
+
+
+
+
 
 
 
