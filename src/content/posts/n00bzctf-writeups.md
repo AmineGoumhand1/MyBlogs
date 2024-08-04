@@ -116,7 +116,7 @@ Finally navigating to the mounting place, we get :
 
 # Crypto
 
-### Venegar
+### Vinegar
 
 - **description** : Can you decode this message? Note: Wrap the decrypted text in n00bz{}.
 
@@ -134,4 +134,111 @@ You can use dcode.fr to decode it.
 
 Another classic challenge implementing the cube root attack ( rsa ), because as we see the e is too small.
 
+```python
+from sympy import Integer, real_root
+
+# Given values
+e = 3
+c = 13037717184940851534440408074902031173938827302834506159512256813794613267487160058287930781080450199371859916605839773796744179698270340378901298046506802163106509143441799583051647999737073025726173300915916758770511497524353491642840238968166849681827669150543335788616727518429916536945395813
+
+# Compute the cube root of the ciphertext
+m = real_root(Integer(c), e)
+
+# Convert the SymPy Integer to a native Python int
+m_int = int(m)
+
+# Convert the integer to bytes
+m_bytes = m_int.to_bytes((m_int.bit_length() + 7) // 8, byteorder='big')
+
+# Convert bytes to a string if it represents text
+try:
+    decrypted_message = m_bytes.decode('utf-8')
+except UnicodeDecodeError:
+    decrypted_message = m_bytes
+
+print(f"Decrypted message (as integer): {m_int}")
+print(f"Decrypted message (as bytes): {m_bytes}")
+print(f"Decrypted message (as text): {decrypted_message}")
+```
+**Flag : n00bz{crypt0_1s_1nc0mpl3t3_w1th0ut_rs4!!}**
+
+### Vinegar2
+
+This is like a revenge for the first vinegar chall but still easy.
+
+- **description** : Never limit yourself to only alphabets! .
+from the description we know that we are dealing with numbers and chars too, so lets analyze the given code together.
+
+```python
+alphanumerical = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*(){}_?'
+matrix = []
+for i in alphanumerical:
+	matrix.append([i])
+
+idx=0
+for i in alphanumerical:
+	matrix[idx][0] = (alphanumerical[idx:len(alphanumerical)]+alphanumerical[0:idx])
+	idx += 1
+
+flag=open('../src/flag.txt').read().strip()
+key='5up3r_s3cr3t_k3y_f0r_1337h4x0rs_r1gh7?'
+assert len(key)==len(flag)
+flag_arr = []
+key_arr = []
+enc_arr=[]
+for y in flag:
+	for i in range(len(alphanumerical)):
+		if matrix[i][0][0]==y:
+			flag_arr.append(i)
+
+for y in key:
+	for i in range(len(alphanumerical)):
+		if matrix[i][0][0]==y:
+			key_arr.append(i)
+
+for i in range(len(flag)):
+	enc_arr.append(matrix[flag_arr[i]][0][key_arr[i]])
+encrypted=''.join(enc_arr)
+f = open('enc.txt','w')
+f.write(encrypted)
+```
+
+The key to the flag is to recognize that the cipher using a matrix of alphanumeric characters. The matrix is constructed by generating cyclic permutations of a predefined set of characters, which includes letters, digits, and special symbols. Each row of the matrix starts with a different character from this set, followed by a rotation of the remaining characters. 
+So we can reverse this process by reconstructing the matrix and reversing the index-based substitution to recover the original flag.
+
+So reversing it will give us the flag.
+```python
+alphanumerical = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*(){}_?'
+matrix = []
+for i in alphanumerical:
+    matrix.append([i])
+idx = 0
+for i in alphanumerical:
+    matrix[idx][0] = (alphanumerical[idx:len(alphanumerical)] + alphanumerical[0:idx])
+    idx += 1
+encrypted = '*fa4Q(}$ryHGswGPYhOC{C{1)&_vOpHpc2r0({'
+key = '5up3r_s3cr3t_k3y_f0r_1337h4x0rs_r1gh7?'
+flag_arr = []
+key_arr = []
+dec_arr = []
+for y in key:
+    for i in range(len(alphanumerical)):
+        if matrix[i][0][0] == y:
+            key_arr.append(i)
+for i in range(len(encrypted)):
+    enc_char = encrypted[i]
+    key_idx = key_arr[i]
+    enc_row = matrix[key_idx][0]
+    
+    for j in range(len(enc_row)):
+        if enc_row[j] == enc_char:
+            flag_arr.append(j)
+            break
+for idx in flag_arr:
+    dec_arr.append(alphanumerical[idx])
+flag = ''.join(dec_arr)
+print(flag)
+```
+
+**Flag : n00bz{4lph4num3r1c4l_1s_n0t_4_pr0bl3m}**
 
