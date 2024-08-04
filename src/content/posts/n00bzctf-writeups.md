@@ -12,180 +12,102 @@ Welcome. In this blog, I'll cover some challenges from the n00bz ctf that i part
 # Solved Challenges
 
 <style>
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-    font-size: 18px;
-    text-align: left;
-  }
-  th, td {
-    border: 1px solid #dddddd;
-    padding: 12px;
-    border-radius: 8px;
-  }
-  th {
-    background-color: #343a40;
-    color: #ffffff;
-  }
-  td {
-    background-color: #f8f9fa;
-    color: #343a40;
-  }
   .category {
-    background-color: #007bff;
-    color: #ffffff;
     font-weight: bold;
-    border-radius: 8px;
+    color: white;
   }
   .forensics {
-    background-color: #d4edda;
-    color: #155724;
+       font-weight: bold;
+
+    color:0FF641 ;
     border-radius: 8px;
+    padding: 5px;
+    margin: 2px;
   }
   .osint {
-    background-color: #f8d7da;
-    color: #721c24;
+	      font-weight: bold;
+
+    color: #0FF641;
     border-radius: 8px;
+    padding: 5px;
+    margin: 2px;
   }
   .misc {
-    background-color: #fff3cd;
-    color: #856404;
+	      font-weight: bold;
+
+    color: #0FF641;
     border-radius: 8px;
+    padding: 5px;
+    margin: 2px;
   }
   .web {
-    background-color: #d1ecf1;
-    color: #0c5460;
+	      font-weight: bold;
+
+    color: #0FF641;
     border-radius: 8px;
+    padding: 5px;
+    margin: 2px;
   }
   .reverse {
-    background-color: #d4edda;
-    color: #155724;
+	      font-weight: bold;
+
+    color: #0FF641;
     border-radius: 8px;
+    padding: 5px;
+    margin: 2px;
   }
   .crypto {
-    background-color: #f8d7da;
-    color: #721c24;
+	      font-weight: bold;
+
+    color: #0FF641;
     border-radius: 8px;
+    padding: 5px;
+    margin: 2px;
   }
   .programming {
-    background-color: #fff3cd;
-    color: #856404;
+	      font-weight: bold;
+
+    color: #0FF641;
     border-radius: 8px;
+    padding: 5px;
+    margin: 2px;
   }
   .blockchain {
-    background-color: #d1ecf1;
-    color: #0c5460;
+	      font-weight: bold;
+
+    color: #0FF641;
     border-radius: 8px;
+    padding: 5px;
+    margin: 2px;
   }
 </style>
-
-<table>
-  <tr>
-    <th>Category</th>
-    <th>Name / Points</th>
-  </tr>
-  <tr>
-    <td class="forensics">Forensics</td>
-    <td>Plane 100pts</td>
-  </tr>
-  <tr>
-    <td class="forensics">Forensics</td>
-    <td>Wave 391pts</td>
-  </tr>
-  <tr>
-    <td class="forensics">Forensics</td>
-    <td>Disk Golf 464pts</td>
-  </tr>
-  <tr>
-    <td class="osint">OSINT</td>
-    <td>Tail 100pts</td>
-  </tr>
-  <tr>
-    <td class="osint">OSINT</td>
-    <td>The Gang 100pts</td>
-  </tr>
-  <tr>
-    <td class="osint">OSINT</td>
-    <td>Pastebin 285pts</td>
-  </tr>
-  <tr>
-    <td class="osint">OSINT</td>
-    <td>Gang2 425pts</td>
-  </tr>
-  <tr>
-    <td class="osint">OSINT</td>
-    <td>Gang3 490pts</td>
-  </tr>
-  <tr>
-    <td class="misc">Misc</td>
-    <td>Additions 121pts</td>
-  </tr>
-  <tr>
-    <td class="misc">Misc</td>
-    <td>Sanity Check 100pts</td>
-  </tr>
-  <tr>
-    <td class="misc">Misc</td>
-    <td>Subtraction 453pts</td>
-  </tr>
-  <tr>
-    <td class="web">Web</td>
-    <td>Passwordless 100pts</td>
-  </tr>
-  <tr>
-    <td class="web">Web</td>
-    <td>Focus on YourSELF 436pts</td>
-  </tr>
-  <tr>
-    <td class="web">Web</td>
-    <td>File Sharing Portal 483pts</td>
-  </tr>
-  <tr>
-    <td class="reverse">Reverse</td>
-    <td>Vacation 250pts</td>
-  </tr>
-  <tr>
-    <td class="reverse">Reverse</td>
-    <td>Brain 426pts</td>
-  </tr>
-  <tr>
-    <td class="reverse">Reverse</td>
-    <td>FlagChecker 426pts</td>
-  </tr>
-  <tr>
-    <td class="crypto">Crypto</td>
-    <td>Vinegar 100pts</td>
-  </tr>
-  <tr>
-    <td class="crypto">Crypto</td>
-    <td>Vinegar2 165pts</td>
-  </tr>
-  <tr>
-    <td class="crypto">Crypto</td>
-    <td>Rsa 100pts</td>
-  </tr>
-  <tr>
-    <td class="crypto">Crypto</td>
-    <td>Random 454pts</td>
-  </tr>
-  <tr>
-    <td class="programming">Programming</td>
-    <td>Sillygoos 274pts</td>
-  </tr>
-  <tr>
-    <td class="programming">Programming</td>
-    <td>Numbers2 416pts</td>
-  </tr>
-  <tr>
-    <td class="blockchain">Blockchain</td>
-    <td>EVM 372pts</td>
-  </tr>
-  <tr>
-    <td class="blockchain">Blockchain</td>
-    <td>EVM: Conditions 462pts</td>
-  </tr>
-</table>
+ Category         | Name | Points        | 
+------------------|------|---------------|
+<span class="category forensics">Forensics</span> | Plane | 100pts  
+<span class="category forensics">Forensics</span> | Wave | 391pts  
+<span class="category forensics">Forensics</span> | Disk Golf | 464pts  
+<span class="category osint">OSINT</span> | Tail | 100pts  
+<span class="category osint">OSINT</span> | The Gang | 100pts  
+<span class="category osint">OSINT</span> | Pastebin | 285pts  
+<span class="category osint">OSINT</span> | Gang2 | 425pts  
+<span class="category osint">OSINT</span> | Gang3 | 490pts  
+<span class="category misc">Misc</span> | Additions | 121pts  
+<span class="category misc">Misc</span> | Sanity Check | 100pts  
+<span class="category misc">Misc</span> | Subtraction | 453pts  
+<span class="category web">Web</span> | Passwordless | 100pts  
+<span class="category web">Web</span> | Focus on yourSELF | 436pts  
+<span class="category web">Web</span> | File Sharing Portal | 483pts  
+<span class="category reverse">Reverse</span> | Vacation | 250pts  
+<span class="category reverse">Reverse</span> | Brain | 426pts  
+<span class="category reverse">Reverse</span> | FlagChecker | 426pts  
+<span class="category crypto">Crypto</span> | Vinegar | 100pts  
+<span class="category crypto">Crypto</span> | Vinegar2 | 165pts  
+<span class="category crypto">Crypto</span> | RSA | 100pts  
+<span class="category crypto">Crypto</span> | Random | 454pts  
+<span class="category programming">Programming</span> | Sillygoos | 274pts  
+<span class="category programming">Programming</span> | Numbers2 | 416pts  
+<span class="category blockchain">Blockchain</span> | EVM | 372pts  
+<span class="category blockchain">Blockchain</span> | EVM: Conditions | 462pts
 
 I'll cover the challenges that i solved. maybe some of my friends.
 
