@@ -150,8 +150,7 @@ Since it is West, the sign is negative.
 `Latitude: 13.3700`
 `Longitude: -13.3700`
 
-
-**Flag : n00bz{13.37,-13.37}**
+<span class="category forensics">n00bz{13.37,-13.37}</span> 
 
 ### Wave
 
@@ -165,7 +164,7 @@ According to this, the `xx xx xx xx` is the file size (little endian). So replac
 
 I can hear some beeping after playing the wav sound, that so familiar its a morse code, so i took my self to this website [morsecode](https://morsecode.world/international/decoder/audio-decoder-adaptive.html), upload the file, decode it which will give  `beepbopmorsecode` and wrap it to the flag format.
 
-**Flag : n00bz{beepbopmorsecode}**
+<span class="category forensics">n00bz{beepbopmorsecode}</span> 
 
 ### Disk Golf
 
@@ -210,8 +209,7 @@ We can see that there is two txt docs named flag1 and 2, the flag2 is just fake 
 
 Passing it to Cyberchef and I got the flag.
 
-
-**Flag : n00bz{7h3_l0ng_4w41t3d_d15k_f0r3ns1c5}**
+<span class="category forensics">n00bz{7h3_l0ng_4w41t3d_d15k_f0r3ns1c5}</span> 
 
 
 # Crypto
@@ -226,7 +224,8 @@ This is a simple challenge to decrypt a given vigénere cipher with a given key.
 
 You can use dcode.fr to decode it.
 
-**Flag : n00bz{vigenerecipherisfun}**
+<span class="category forensics">n00bz{vigenerecipherisfun}</span> 
+
 
 ### RSA
 
@@ -262,7 +261,8 @@ print(f"Decrypted message (as bytes): {m_bytes}")
 print(f"Decrypted message (as text): {decrypted_message}")
 ```
 
-**Flag : n00bz{crypt0_1s_1nc0mpl3t3_w1th0ut_rs4!!}**
+<span class="category forensics">n00bz{crypt0_1s_1nc0mpl3t3_w1th0ut_rs4!!}</span> 
+
 
 ### Vinegar2
 
@@ -342,7 +342,8 @@ flag = ''.join(dec_arr)
 print(flag)
 ```
 
-**Flag : n00bz{4lph4num3r1c4l_1s_n0t_4_pr0bl3m}**
+<span class="category forensics">n00bz{4lph4num3r1c4l_1s_n0t_4_pr0bl3m}</span> 
+
 
 # OSINT
 
@@ -359,7 +360,8 @@ As we can see, it is for "Air Tahiti Nui" Airlines. so lets grap the Airport cod
 
 And we found it ( Cityname : Tahiti and code : PPT )
 
-**Flag : n00bz{PPT}**
+<span class="category forensics">n00bz{PPT}</span> 
+
 
 ### Gang
 
@@ -371,7 +373,8 @@ So after reading the description, we know that we are looking for a member of th
 Navigating to the Members section, I noticed John Doe name when i hovered on the last profile. So I discovered this profile and i got the flag.
 ![image](/favicon/osint222.png)
 
-**Flag : n00bz{1ts_051N7_71m3_3e4a7d6f}**
+<span class="category forensics">n00bz{1ts_051N7_71m3_3e4a7d6f}</span> 
+
 
 ### Pastebin
 
@@ -388,7 +391,8 @@ So before the hints were there, we have only the first line and the link to the 
 atfer i discovered this one, i found nothing, just some comments that hints to some deleted content, so i combined this with the description `was created long time back.` and i was sure that is a wayback machine challenge, so i graped the pastebin website and wayback it and I was able to retreive the deleted content.
 ![](/favicon/osint3.png)
 
-**Flag : n00bz{l0ng_t1m3_ag0_m34ns_w4yb4ck}**
+<span class="category forensics">n00bz{l0ng_t1m3_ag0_m34ns_w4yb4ck}</span> 
+
 
 ### Gang2
 - **description** : You may have gotten your first flag, but it's just the beginning! John Doe, as overconfident as he is, has left you with a riddle. Maybe it hides some secrets? Continue where you left off last time. Flag will already by wrapped in n00bz{} .
@@ -398,7 +402,8 @@ So continuing from the members website, we can see the riddle
 Here i was stuck a bit but i noticed the first capitale char of each line, so join them will give USERNAME IS JOHN HACKER DOE, Emmmm, so i start searching for this on google but with no result, i toke it to W (twitter) and i found it, it's an account. Exploring the posts, and i got the flag 
 ![](/favicon/riddle3.png)
 
-**Flag : n00bz{5t0p_ch4s1ng_m3_4f2d1a7d}**
+<span class="category forensics">n00bz{5t0p_ch4s1ng_m3_4f2d1a7d}</span> 
+
 
 ### Gang3
 - **description** : Can you find out where the OG meetup point is? The flag is in the format n00bz{lat,long} with upto 3 decimal places, rounded. Continue where you left off... Note: Wikipedia can be wrong sometimes ;) .
@@ -437,7 +442,7 @@ They said that in the description. So i grap the wrong Wikipedia location and up
 
 Boom, Found it : 13.19920, 77.68228
 
-**Flag : n00bz{13.199,77.682}**
+<span class="category forensics">n00bz{13.199,77.682}</span> 
 
 That was a consuming challenge.
 
