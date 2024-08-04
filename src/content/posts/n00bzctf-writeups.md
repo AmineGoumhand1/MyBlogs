@@ -79,4 +79,36 @@ Longitude: -13.3700
 - **description** : The Wave is not audible, perhaps corrupted? Note: Wrap the flag in n00bz{}. There are no spaces in the flag and it is all lowercase.
 As we heard in the description, "perhaps corrupted", so i looked to the hex headers with hexedit, and yes there is some missed up values that needs fixing.
 How? I took my browser to the famous hex headers website : garykessler.net/
-Searching for **wav** and grap 
+Searching for **wav** and grap the correct hex headers 52 49 46 46 xx xx xx xx 57 41 56 45 66 6D 74 20 , according to this, the xx xx xx xx is the file
+size (little endian). so replacing the new headers we can see that somethins not right, here i was blocked but after some googling i found that the data keyword should be there in hex to identify data section, after i found it ( 64 61 74 61 ), i replaced it and it workkks. now you can here some beeping after playing the wav sound, that so familiar its a morse code, so i navigate to this website https://morsecode.world/international/decoder/audio-decoder-adaptive.html, upload the file, decode it which will give  "beepbopmorsecode" and wrap it to the flag format.
+
+**Flag : n00bz{beepbopmorsecode}**
+
+### Disk Golf
+
+This chall is my favorite one on this ctf, because it tested my abilities in Filesystems understanding like ext4.
+- **description** : Let's play some disk golf!
+Nothing interesting so i started with analyzing file with file tool.
+
+As we see it is a linux disk but damaged or has some filesystem journal recovery issue. Here i was stuck for about 30 min ( after mounting the disk fails ) trying to understand the journal recovery for ext4, but i get a result of how to fix this using a tool e2fsck, lets run it.
+
+As we see there is some problems with the size, so i tought why not resizing the disk image to match the filesystem's reported size, but this is a bit of a workaround and should be done carefully. and that was the clue.
+
+ The idea is to increase the size of the disk image file to accommodate the filesystem's expected size. Lets calculate it :
+ 12844795 blocks * 4096 bytes/block = 52616196096 bytes (approximately 52.6 GB) ( Note that 4096=4KO which is the size of ext4 inode block )
+ after calculating the new size, lets change it on disk.
+sudo truncate -s 52616196096 disk1.img
+
+runnig this again sudo e2fsck -f disk1.img and the ext4 filesystem should be fixed, now lets mount it.
+sudo mkdir -p /mnt/disk1
+sudo mount -o loop,ro,noload disk1.img /mnt/disk1
+
+Finally navigating to the mounting place, we get :
+
+
+
+
+
+
+
+**Flag : n00bz{7h3_l0ng_4w41t3d_d15k_f0r3ns1c5}**
