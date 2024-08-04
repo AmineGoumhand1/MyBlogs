@@ -112,3 +112,26 @@ Finally navigating to the mounting place, we get :
 
 
 **Flag : n00bz{7h3_l0ng_4w41t3d_d15k_f0r3ns1c5}**
+
+
+# Crypto
+
+### Venegar
+
+- **description** : Can you decode this message? Note: Wrap the decrypted text in n00bz{}.
+
+This is a simple challenge to decrypt a given vigénere cipher with a given key.
+"Encrypted flag :" nmivrxbiaatjvvbcjsf
+"Key :" secretkey
+
+You can use dcode.fr to decode it.
+
+**Flag : n00bz{vigenerecipherisfun}**
+
+### RSA
+
+- **description** : The cryptography category is incomplete without RSA. So here is a simple RSA challenge. Have fun!.
+
+Another classic challenge implementing the cube root attack ( rsa ), because as we see the e is too small.
+
+
