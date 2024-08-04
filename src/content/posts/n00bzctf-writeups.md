@@ -596,7 +596,58 @@ I explored the `Terms of Service` and get the first part of the flag then the se
 
 # Blockchain
 
-My TEAMmate will cover the blockchain challs sooon.
+### EVM 
+- **description** : I have some EVM runtime bytecode, whatever that means. You need to find the value, in hex, that you need to send to make the contract STOP and not self destruct. Wrap the hex in n00bz{}. If the correct answer is 9999, the flag is n00bz{0x270f}.
+
+Given : `5f346113370265fdc29ff358a314601257ff00`
+
+```asm
+Lets dissassemble this using this evm decompiler
+0x0: PUSH0     
+0x1: CALLVALUE 
+0x2: PUSH2 0x1337
+0x5: MUL       
+0x6: PUSH6 0xfdc29ff358a3
+0xd: EQ        
+0xe: PUSH1 0x12
+0x10: JUMPI     
+0x11: SELFDESTRUCT
+0x12: STOP      
+```
+We need to find the value that make the Ethereum Virtual Machine (EVM) contract stop (rather than self-destruct).
+
+here is a brief explanation :
+```asm
+0x0:  PUSH0          # Pushes 0 onto the stack
+0x1:  CALLVALUE      # Pushes the amount of Ether sent with the transaction onto the stack
+0x2:  PUSH2 0x1337   # Pushes the value 0x1337 onto the stack
+0x5:  MUL            # Multiplies the two top values on the stack
+0x6:  PUSH6 0xfdc29ff358a3 # Pushes 0xfdc29ff358a3 onto the stack
+0xd:  EQ             # Checks if the two top values on the stack are equal
+0xe:  PUSH1 0x12     # Pushes the value 0x12 onto the stack (jump destination for STOP)
+0x10: JUMPI          # Jumps to 0x12 if the top value is non-zero (if the previous EQ was true)
+0x11: SELFDESTRUCT   # Self-destructs the contract
+0x12: STOP           # Stops the execution
+```
+
+we need V * 0x1337 to equal 0xfdc29ff358a3. So, we can set up the equation and solve for V :
+`V×0x1337=0xfdc29ff358a3V×0x1337=0xfdc29ff358a3`
+
+```python
+V=0xfdc29ff358a3//0x1337
+hex_v=hex(V)
+print(hex_v)
+```
+
+and I found the value.
+
+<span class="category forensics">n00bz{0xd34db33f5}</span> 
+
+
+My TEAMmate will cover the other blockchain challs sooon.
+
+
+### Thanks a lot for reading my blog, hope you enjoyed the CTF. 
 
 
 
