@@ -291,21 +291,23 @@ So after reading the description, we know that we are looking for a member of th
 ![image](/favicon/osint2.png)
 
 Navigating to the Members section, I noticed John Doe name when i hovered on the last profile. So I discovered this profile and i got the flag.
-![image](/favicon/tail1.png)
 ![image](/favicon/osint222.png)
 
 **Flag : n00bz{1ts_051N7_71m3_3e4a7d6f}**
 
 ### Pastebin
 
-- **description** :Just go to my pastebin which was created long time back.
+- **description** : Just go to my pastebin which was created long time back.
 Important!
-There have been some changes to this challenge due things outside our control (like deletion of the pastebin). The above description is still valid (and so is the original info), but you will need the new info to solve the challenge now. Challenge is still solvable. Author: noob_abhinav
-Note:- https://pastebin.com/u/abhinav654321 New info:- https://pastebin.com/j1UnKA7m
+There have been some changes to this challenge due things outside our control (like deletion of the pastebin).
+The above description is still valid (and so is the original info), but you will need the new info to solve the challenge now.
+Challenge is still solvable. 
+Note:- https://pastebin.com/u/abhinav654321 | New info:- https://pastebin.com/j1UnKA7m
 
 So before the hints were there, we have only the first line and the link to the pastebin [website](https://pastebin.com/u/abhinav654321),
 
 atfer i discovered this one, i found nothing, just some comments that hints to some deleted content, so i combined this with the description `was created long time back.` and i was sure that is a wayback machine challenge, so i graped the pastebin website and wayback it and I was able to retreive the deleted content.
+![](/favicon/osint3.png)
 
 **Flag : n00bz{l0ng_t1m3_ag0_m34ns_w4yb4ck}**
 
@@ -335,6 +337,9 @@ print(decrypted)
 ```
 
 **Flag : n00bz{from_paris_wth_xor}**
+
+# Misc
+
 
 
 
