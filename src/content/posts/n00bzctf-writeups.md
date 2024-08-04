@@ -309,6 +309,32 @@ atfer i discovered this one, i found nothing, just some comments that hints to s
 
 **Flag : n00bz{l0ng_t1m3_ag0_m34ns_w4yb4ck}**
 
+# Reverse
+
+- **description** : My friend told me they were going on vacation, but they sent me this weird PowerShell script instead of a postcard!.
+```bash
+$bytes = [System.Text.Encoding]::ASCII.GetBytes((cat .\flag.txt))
+[System.Collections.Generic.List[byte]]$newBytes = @()
+$bytes.ForEach({
+    $newBytes.Add($_ -bxor 3)
+    })
+$newString =  [System.Text.Encoding]::ASCII.GetString($newBytes)
+echo $newString | Out-File -Encoding ascii .\output.txt
+```
+So given this powershell script with the encrypted flag : `m33ayxeqln\sbqjp\twk\{lq~`, we need to understand the operations performed on the bytes of the flag. 
+The script XORs each byte of the flag with the value 3 to create the encrypted output. Therefore, to decrypt it, we need to XOR the encrypted bytes again with the value 3.
+
+```python
+# Encrypted string
+encrypted = 'm33ayxeqln\\sbqjp\\twk\\{lq~'
+
+# Decrypt each character by XORing with 3
+decrypted = ''.join(chr(ord(char) ^ 3) for char in encrypted)
+
+print(decrypted)
+```
+
+**Flag : n00bz{from_paris_wth_xor}**
 
 
 
