@@ -41,7 +41,7 @@ Welcome. In this blog, I'll cover some challenges from the n00bz ctf that i part
 - **description** : So many plane-related challenges! Why not another one? The flag is the latitude, longitude of the place this picture is taken from, rounded upto two decimal places. Example: n00bz{55.51,-20.27}.
 
 We are given an image of a plane, so the first thing I did is to look at the metadata of the image using exiftool.
-![image](e.jpg)
+![image]()
 As we are seeing, there is some coordinates there, except they are in degrees, minutes, and seconds (DMS). Lets convert it to decimal degrees (DD):
 
 **Latitude**
