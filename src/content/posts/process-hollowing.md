@@ -83,7 +83,7 @@ We will see what are these Typdefs, don't worry.
 
 ### Suspended Process Creation
 
-So as we said we should create a new instance of a legitimate process ( calc.exe ) in a suspended state, why, because we should unmap its original code and replace it with our malicious one before the execution of its main thread.
+So as we said we should create a new instance of a legitimate process ( nptepad.exe ) in a suspended state, why, because we should unmap its original code and replace it with our malicious one before the execution of its main thread.
 
 So i'm gonna implement this inside a main function.
 ```cpp
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 First, I check for the correct number of arguments: the host process executable and the malicious executable.
-So as you can see there is two new structures that I used, STARTUPINFOA and PROCESS_INFORMATION, which are two crucial structures that provide information about the startup configuration and state of the new process and its primary thread.
+So as you can see there is two new structures that I used, `STARTUPINFOA and PROCESS_INFORMATION`, which are two crucial structures that provide information about the startup configuration and state of the new process and its primary thread.
 
 You can find more a about them in Windows APIs documentation here [STARTUPINFOA]('https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/ns-processthreadsapi-startupinfoa') and here [PROCESS_INFORMATION]('https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/ns-processthreadsapi-process_information')
 
@@ -120,7 +120,7 @@ So after creating the suspended process, let's Map our malicious file.
 ```
 So the malicious file specified by the second command-line argument ```argv[2]``` is opened for reading using the ```CreateFileA()``` function, with the ```GENERIC_READ``` flag allowing read access and ```FILE_SHARE_READ``` permitting shared read access by other processes. The ```OPEN_EXISTING``` flag just ensures the file must already exist, it is possible to not setting it if we want to create the malicious process during executing the code. 
 
-Now The handle to this file is stored in ```HEvilFile```and we can grap The size of the malicious file which is then determined using GetFileSize, which returns the size in bytes. After that a EvilImage buffer is allocated in memory to hold the contents of the malicious file, with its size matching the file size. Then we use the ReadFile() function to read the file into this EvilImage buffer, which reads the entire file into memory and stores the number of bytes read in the readbytes variable. 
+Now The handle to this file is stored in ```HEvilFile```and we can grap The size of the malicious file which is then determined using `GetFileSize`, which returns the size in bytes. After that a EvilImage buffer is allocated in memory to hold the contents of the malicious file, with its size matching the file size. Then we use the `ReadFile()` function to read the file into this `EvilImage` buffer, which reads the entire file into memory and stores the number of bytes read in the readbytes variable. 
 
 So after reading the file, 
 
@@ -137,8 +137,8 @@ So lets see it on the code.
         return 0;
     }
 ```
-Here, a new CONTEXT structure is allocated on the heap. LPCONTEXT is a pointer to a CONTEXT structure which we'll use this to hold the register values and other state information of the thread. The ContextFlags member of the CONTEXT structure is set to CONTEXT_FULL. This indicates that all parts of the thread's context should be retrieved, including the control registers, integer registers, and floating-point registers.
-Finally the GetThreadContext function is called to retrieve the context of the thread identified by proc_info.hThread.
+Here, a new `CONTEXT` structure is allocated on the heap. `LPCONTEX`T is a pointer to a `CONTEXT` structure which we'll use this to hold the register values and other state information of the thread. The `ContextFlag`s member of the `CONTEXT` structure is set to `CONTEXT_FULL`. This indicates that all parts of the thread's context should be retrieved, including the control registers, integer registers, and floating-point registers.
+Finally the `GetThreadContext` function is called to retrieve the context of the thread identified by proc_info.hThread.
 
 ### Getting the Base Address of the Suspended Process
 
@@ -155,7 +155,7 @@ In process hollowing, obtaining the base address is crucial for locating the Ent
         ReadProcessMemory(proc_info.hProcess, (PVOID)(pContext->Rdx + (sizeof(SIZE_T) * 2)), &BaseAddress, sizeof(PVOID), NULL);
     #endif
 ```
-So the way to get the base adress of the program or the target code depends on the machine architecture, in the code we defined a use case for X86 and WIN64, to retreive the base adress from the context registers ( Ebx or Rdx ).
+So the way to get the base adress of the program or the target code depends on the machine architecture, in the code we defined a use case for `X86` and `WIN64`, to retreive the base adress from the context registers ( Ebx or Rdx ).
 
 There is other ways to retreive the base adress like retreive it from the PEB structure, The PEB ( Process Environment Block ) is a structure in the Windows operating system that contains information about a process, including the base address of the loaded modules. 
 
@@ -164,7 +164,7 @@ We will cover this in coming blogs.
 ### Unmapping Sections
 
 After we loaded our malicious file image in memory, lets unmap the target process.
-The way to do that is by using the NtUnmapViewOfSection from the ntdll.dll library, to import it from this library we use  GetModuleHandleA() to get a handle for the ntdll.dll and GetProcAddress() to retrive the NtUnmapViewOfSection API from it.
+The way to do that is by using the `NtUnmapViewOfSection` from the `ntdll.dll` library, to import it from this library we use  `GetModuleHandleA()` to get a handle for the `ntdll.dll` and `GetProcAddress()` to retrive the `NtUnmapViewOfSection` API from it.
 So lets unmap the PE sections of the target process. If you dont know what i mean by Sections, lets cover the PE file architecture.
 
 A Portable Executable (PE) file is a file format used in Windows operating systems for executables, object code, and DLLs (Dynamic Link Libraries). The format is designed so that the operating system can load and manage these files efficiently. 
@@ -221,7 +221,7 @@ Now our target process is clear of sections, what we need know os to allocate sp
 
     PVOID mem = VirtualAllocEx(proc_info.hProcess, BaseAddress, nt_head->OptionalHeader.SizeOfImage, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE); 
 ```
-First, the dos_head pointer is assigned to the DOS header of the executable file, which is the first part of the PE file and contains legacy DOS-related information. This is done by casting the base address of the loaded file in memory (EvilImage) to a PIMAGE_DOS_HEADER type. Next, the code calculates the address of the NT headers by adding the offset stored in the e_lfanew field of the DOS header to the base address of the file. This offset indicates where the NT headers begin. The NT headers contain essential information about the PE file, such as the PE signature, file header, and optional header, which includes various data directories.
+First, the dos_head pointer is assigned to the DOS header of the executable file, which is the first part of the PE file and contains legacy DOS-related information. This is done by casting the base address of the loaded file in memory (EvilImage) to a `PIMAGE_DOS_HEADER` type. Next, the code calculates the address of the NT headers by adding the offset stored in the e_lfanew field of the DOS header to the base address of the file. This offset indicates where the NT headers begin. The NT headers contain essential information about the PE file, such as the PE signature, file header, and optional header, which includes various data directories.
 After that we retrieved the DOS and NT headers from the mapped malicious file, as we said before, we allocate space to contain our malicious code in the memory. we grap the size of the code to allocate from our malicious code PE header using ``` nt_head->OptionalHeader.SizeOfImage ```.
 
 ```cpp
@@ -248,9 +248,9 @@ Super easy.
 ### Adjust Base Adresses ( relocating : The hard part for me )
 
 It seems like we are done !!! but no, we should adjust the base addresses of the code and data if the executable is not loaded at its preferred base address. 
-The way to do this is by reconfiguring the relocation in .reloc section, dont worry if you didn't understand this, i'll make it easier, so let's get some information about .reloc section.
+The way to do this is by reconfiguring the relocation in `.reloc` section, dont worry if you didn't understand this, i'll make it easier, so let's get some information about .reloc section.
 
-The .reloc section in a PE file contains relocation information used by the windows loader when the executable is loaded into memory. This section is crucial when the executable is not loaded at its preferred base address, requiring adjustments to certain memory addresses within the code and data.
+The `.reloc` section in a PE file contains relocation information used by the windows loader when the executable is loaded into memory. This section is crucial when the executable is not loaded at its preferred base address, requiring adjustments to certain memory addresses within the code and data.
 
 For more understanding on why we need this relocation, When an executable is compiled, it is typically assigned a preferred base address where it expects to be loaded into memory. However, if another executable is already using that address space, the operating system will load the new executable at a different address. This is where the .reloc section comes to play.
 
@@ -329,7 +329,7 @@ For more understanding on why we need this relocation, When an executable is com
     }
 
 ```
-So to implement relocation, we start by checking if BaseOffset is non-zero. BaseOffset represents the difference between the original base address and the new base address of the process image. If BaseOffset is zero, there's no need for relocation, so the code skips this section. but this is rarely happen.
+So to implement relocation, we start by checking if BaseOffset is non-zero. BaseOffset represents the difference between the original base address and the new base address of the process image. If `BaseOffset` is zero, there's no need for relocation, so the code skips this section. but this is rarely happen.
 
 I'll break the code to steps,
 
@@ -357,8 +357,8 @@ We Retrieve the base address of the relocation section (.reloc) and the size of 
 - **.reloc blocks processing**
   
 In this part i'll talk a little bit about .reloc section architecture in order to be able to proceed.
-The architecture of the .reloc section consists of multiple relocation blocks, each starting with a BASE_RELOCATION_BLOCK structure. This structure contains two main fields: PageAddress, which specifies the base address for the relocations within the block, and BlockSize, which indicates the size of the block including the header and the relocation entries.
-Following the block header, the block contains an array of BASE_RELOCATION_ENTRY structures. Each entry represents a relocation to be performed and consists of a type field and an offset field. The type field specifies the type of relocation ( this is very important to understand ), such as adjusting a 32-bit address, and the offset field specifies the location within the 4KB page where the relocation is to be applied. The program uses these blocks and entries to update the addresses in the PE file ( malicious file ), ensuring that the code and data are correctly positioned in memory regardless of where the program is loaded.
+The architecture of the .reloc section consists of multiple relocation blocks, each starting with a `BASE_RELOCATION_BLOCK `structure. This structure contains two main fields: `PageAddress`, which specifies the base address for the relocations within the block, and `BlockSize`, which indicates the size of the block including the header and the relocation entries.
+Following the block header, the block contains an array of `BASE_RELOCATION_ENTRY` structures. Each entry represents a relocation to be performed and consists of a type field and an offset field. The type field specifies the type of relocation ( this is very important to understand ), such as adjusting a 32-bit address, and the offset field specifies the location within the `4KB` page where the relocation is to be applied. The program uses these blocks and entries to update the addresses in the PE file ( malicious file ), ensuring that the code and data are correctly positioned in memory regardless of where the program is loaded.
 I think that now we can proceed.
 ```cpp
     while (Offset < RelocData.Size) {
@@ -428,9 +428,9 @@ In this last part we should modify the context structure (pContext) to set the I
 
 Doing this for both architectures.
 - **For 32-bit (x86)**
-pContext->Eax is set to the base address of the loaded image plus the entry point offset. This effectively points the EAX register to the starting address of the executable's code.
+pContext->Eax is set to the base address of the loaded image plus the entry point offset. This effectively points the `EAX` register to the starting address of the executable's code.
 - **For 64-bit (x64)**
-pContext->Rcx is similarly set to the base address plus the entry point offset, but in this case, it updates the RCX register.
+pContext->Rcx is similarly set to the base address plus the entry point offset, but in this case, it updates the `RCX` register.
 
 ```cpp
     #ifdef _X86_
@@ -699,8 +699,8 @@ In this part, We will create a HelloWorld executable that show a message box.
 int main() {
     MessageBox(
         NULL,                 // hWnd: A handle to the owner window. NULL indicates no owner window.
-        "Hello World", // lpText: The message to be displayed.
-        "Hello World",  // lpCaption: The title of the message box.
+        "You've been hacked by Sn4keEyes", // lpText: The message to be displayed.
+        "Process Hollowing",  // lpCaption: The title of the message box.
         MB_OK | MB_ICONINFORMATION // uType: The contents and behavior of the message box. MB_OK creates an OK button, MB_ICONINFORMATION adds an information icon.
     );
     return 0;
@@ -709,7 +709,7 @@ int main() {
 Compiling it with g++.
 
 ```bash
-g++ HelloWorld.cpp -o HelloWorld.exe -mwindows
+g++ Malicious.cpp -o Malicious.exe -mwindows
 ```
 ## Testing
 
