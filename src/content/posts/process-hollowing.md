@@ -16,13 +16,13 @@ During this blog, we'll follow this plan :
 - **How Process Hollowing works ?**
 - **Process Hollowing Implementation**
 
-Note : This Technique requires a deep understanding to Windows Process Mechanisms like PEB and MEMORY stuffs, So i recommende you to go take a look on them.
+Note : This Technique requires a deep understanding to Windows Process Mechanisms like `PEB` and `MEMORY` stuffs, So i recommende you to go take a look on them.
 
 So let's begin
 
 ## What is Process Hollowing
 
-First, we need to clarify the term "Hollowing", "Hollowed out" in the context of process hollowing refers to the act of removing or unmapping the legitimate code from a process's memory space and replacing it with malicious code.
+First, we need to clarify the term "Hollowing", `Hollowed out` in the context of process hollowing refers to the act of removing or unmapping the legitimate code from a process's memory space and replacing it with malicious code.
 
 So we can say that Process hollowing is a technique used to inject malicious code into a legitimate process. The process is essentially "hollowed out" and replaced with malicious code, which then runs under the guise of the legitimate process. Guess what, This technique is often used to evade detection by security software because the malicious code is running within a process that appears legitimate. Interesting huh ?
 
@@ -32,19 +32,19 @@ The Process Hollowing operates on six important steps which are :
 
 - **Create a Suspended Process**
 
-First, we create a new instance of a legitimate process (e.g., notepad.exe) in a suspended state using CreateProcess with the CREATE_SUSPENDED flag. This means the process is created but not yet executed.
+First, we create a new instance of a legitimate process (e.g., notepad.exe) in a suspended state using `CreateProcess` with the `CREATE_SUSPENDED` flag. This means the process is created but not yet executed.
 
 - **Unmap the Process's Memory**
 
-Then, we use ZwUnmapViewOfSection or a similar API call to unmap the memory of the main executable image of the suspended process. This effectively "hollows out" the process.
+Then, we use `ZwUnmapViewOfSection` or a similar API call to unmap the memory of the main executable image of the suspended process. This effectively "hollows out" the process.
 
 - **Allocate Memory in the Process**
     
-Allocates memory within the hollowed-out process using VirtualAllocEx.
+Allocates memory within the hollowed-out process using `VirtualAllocEx`.
 
 - **Write Malicious Code to the Process**
 
-We write the malicious code or the new executable image into the allocated memory of the suspended process using WriteProcessMemory.
+We write the malicious code or the new executable image into the allocated memory of the suspended process using `WriteProcessMemory`.
 
 - **Adjust Base Adresses ( The hard part )**
 
@@ -52,7 +52,7 @@ The purpose of this process is to ensure that all addresses within the loaded im
 
 - **Set Entry Point**
     
-We modifie the entry point of the suspended process to point to the malicious code. This can be done by modifying the PEB (Process Environment Block) structure or by changing the CONTEXT of the process.
+We modifie the entry point of the suspended process to point to the malicious code. This can be done by modifying the PEB (Process Environment Block) structure or by changing the `CONTEXT` of the process.
 
 - **Resume the Process**
     
@@ -83,7 +83,7 @@ We will see what are these Typdefs, don't worry.
 
 ### Suspended Process Creation
 
-So as we said we should create a new instance of a legitimate process ( nptepad.exe ) in a suspended state, why, because we should unmap its original code and replace it with our malicious one before the execution of its main thread.
+So as we said we should create a new instance of a legitimate process ( notepad.exe ) in a suspended state, why, because we should unmap its original code and replace it with our malicious one before the execution of its main thread.
 
 So i'm gonna implement this inside a main function.
 ```cpp
