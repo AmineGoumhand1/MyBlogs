@@ -12,7 +12,7 @@ export const siteConfig: SiteConfig = {
   lang: 'en',         // 'en', 'zh_CN', 'zh_TW', 'ja'
   themeColor: {
     hue: 250,         // Default hue for the theme color, from 0 to 360. e.g. red: 0, teal: 200, cyan: 250, pink: 345
-    fixed: false,     // Hide the theme color picker for visitors
+    fixed: true,     // Hide the theme color picker for visitors
   },
   banner: {
     enable: true,
@@ -44,7 +44,7 @@ export const navBarConfig: NavBarConfig = {
 export const profileConfig: ProfileConfig = {
   avatar: 'assets/images/Profile.jpg',  // Relative to the /src directory. Relative to the /public directory if it starts with '/'
   name: 'Sn4ke_Ey3s',
-  bio: 'Cyber Security Engineering Student \n CTF Player ( Forensics, Crypto ) \n 0M3G4_SQU4D CTF Team',
+  bio: 'Cyber Security Engineering Student | CTF Player ( Forensics, Crypto ) | 0M3G4_SQU4D CTF Team',
   links: [
     {
       name: 'LinkedIn',
