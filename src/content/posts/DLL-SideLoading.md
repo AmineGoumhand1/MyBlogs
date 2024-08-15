@@ -1,5 +1,5 @@
 ---
-title: 'Malwares Development Series | Part 3 : Process Injection | DLL Side-Loading'
+title: 'Malwares Development Series | Part 4 : Process Injection | DLL Side-Loading'
 published: 2024-08-16
 description: ''
 image: ''
