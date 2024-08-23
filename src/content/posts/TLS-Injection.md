@@ -30,14 +30,14 @@ Unlike global or static variables that are shared across all threads, TLS provid
 So what we really should know is that in Windows, TLS is implemented using the operating system's support for threading. When a thread is created, it is allocated its own TLS area, which can store variables that are unique to that thread. 
 So the system manages the allocation and cleanup of TLS data automatically as threads are created and destroyed.
 
-So until now, we defined the TLS, lets get familiarized with TLS Callbacks.
+So until now, we defined the TLS, lets get familiarized with `TLS Callbacks`.
 
 One of the advanced features of TLS in Windows is the ability to specify TLS callbacks. TLS callbacks are special functions that are automatically called by the operating system at specific points in the lifetime of a thread. For example lets take the main ones :
 
-- **DLL Load**: In this case, when a DLL is loaded, and a thread is created, the TLS callback is invoked.
-- **Thread Creation**: When a new thread is created within the process, the TLS callback is invoked for that thread.
-- **Thread Exit**: Also when a thread exits, the TLS callback is invoked to clean up any TLS data.
-- **DLL Unload**: When the DLL is unloaded, the TLS callback is invoked.
+`DLL Load` : In this case, when a DLL is loaded, and a thread is created, the TLS callback is invoked.
+`Thread Creation` : When a new thread is created within the process, the TLS callback is invoked for that thread.
+`Thread Exit` : Also when a thread exits, the TLS callback is invoked to clean up any TLS data.
+`DLL Unload` : When the DLL is unloaded, the TLS callback is invoked.
 
 These are the main actions when a TLS callback is called. Now, the most question that might be confusing you is Where these callbacks can be ?. Well The PE structure is the key to this one.
 
@@ -57,24 +57,25 @@ Form of .tls section :
 |-----------------------------|
 |  TLS Data                   |
 
-The .tls section in a Portable Executable (PE) file has a specific format that includes a structure known as the TLS Directory IMAGE_TLS_DIRECTORY, which describes the various elements related to Thread Local Storage (TLS).
+The `.tls` section in a Portable Executable (PE) file has a specific format that includes a structure known as the TLS Directory `IMAGE_TLS_DIRECTORY`, which describes the various elements related to Thread Local Storage (TLS).
 
+```cpp
 typedef struct _IMAGE_TLS_DIRECTORY {
     DWORD   StartAddressOfRawData;   // RVA of the start of the TLS data
     DWORD   EndAddressOfRawData;     // RVA of the end of the TLS data
     DWORD   AddressOfIndex;          // Address of the TLS index
     DWORD   AddressOfCallBacks;      // Address of the array of TLS callback functions
     DWORD   SizeOfZeroFill;          // Size of zero-fill area
-    DWORD   Characteristics;         // Reserved, typically zero
+    DWORD   Characteristics;         //  Reserved, typically zero
 } IMAGE_TLS_DIRECTORY;
-
+```
 Lets understand what each pointer mean and it purpose:
 
-- **tartAddressOfRawData**
-This field contains !the Relative Virtual Address (RVA) of the beginning of the TLS data in the PE file.
+- **StartAddressOfRawData**
+This field contains !the Relative Virtual Address `RVA` of the beginning of the TLS data in the PE file.
 
 - **EndAddressOfRawData**
-This field contains the RVA of the end of the TLS data in the PE file.
+This field contains the `RVA` of the end of the TLS data in the PE file.
 
 - **AddressOfIndex**
 This points to a location where the thread-specific TLS index is stored. This index is used by the operating system to reference the TLS data for each thread.
@@ -87,7 +88,18 @@ This field specifies the size of the area to be zeroed out in the TLS data secti
 
 This TLS Directory is a key structure within the .tls section because it provides these necessary information for the operating system to manage TLS data for each thread.
 
-Next structure in the .tls section is the TLS callbacks, which is an array of function pointers. This array is null-terminated, meaning that the last pointer in the array is a NULL pointer. 
+Next structure in the .tls section is the TLS callbacks, which is an array of function pointers that the operating system automatically invokes at specific times in the lifecycle of a thread. These callbacks are used for initializing or cleaning up thread-specific data.. 
+This arrays is null-terminated, meaning that the last pointer in the array is a NULL pointer. 
+
+```cpp
+PIMAGE_TLS_CALLBACK tls_callbacks[] = {
+    CallbackFunction1,
+    CallbackFunction2,
+    // ... more callbacks
+    NULL  // End of the array
+};
+```
+The array is stored at the address specified by the `AddressOfCallBacks` field in the `IMAGE_TLS_DIRECTORY` structure. Each entry in the array points to a callback function that will be invoked during certain thread events.
 
 
 
