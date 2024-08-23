@@ -51,11 +51,14 @@ So lets uncover this TLS section to know more.
 Form of .tls section :
 
 |-----------------------------|
+|  Form         |
+|-----------------------------|
 |  TLS Directory              |
 |-----------------------------|
 |  TLS Callbacks Array        |
 |-----------------------------|
 |  TLS Data                   |
+|-----------------------------|
 
 The `.tls` section in a Portable Executable (PE) file has a specific format that includes a structure known as the TLS Directory `IMAGE_TLS_DIRECTORY`, which describes the various elements related to Thread Local Storage (TLS).
 
