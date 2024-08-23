@@ -41,15 +41,53 @@ One of the advanced features of TLS in Windows is the ability to specify TLS cal
 
 These are the main actions when a TLS callback is called. Now, the most question that might be confusing you is Where these callbacks can be ?. Well The PE structure is the key to this one.
 
-As I mentioned in the previous blog, a PE format is the file format for executables, object code, and DLLs in Windows operating systems. The PE file format is a data structure that encapsulates the information necessary for the Windows OS loader to manage the wrapped executable code.
+As I mentioned in the previous blog, a PE format is the file format for executables, object code, and DLLs in Windows operating systems, it is a data structure that encapsulates the information necessary for the Windows OS loader to manage the wrapped executable code.
 
 You can refer to the previous blog for more infos. So almost of windows related files are PE, and TLS has a specific section on this PE files which is .tls that define and manage variables that are unique to each thread in a process as we said before.
 So lets uncover this TLS section to know more.
 
-- **.tls section**:
+**.tls section**:
 
+Form of .tls section :
 
+|-----------------------------|
+|  TLS Directory              |
+|-----------------------------|
+|  TLS Callbacks Array        |
+|-----------------------------|
+|  TLS Data                   |
 
+The .tls section in a Portable Executable (PE) file has a specific format that includes a structure known as the TLS Directory IMAGE_TLS_DIRECTORY, which describes the various elements related to Thread Local Storage (TLS).
+
+typedef struct _IMAGE_TLS_DIRECTORY {
+    DWORD   StartAddressOfRawData;   // RVA of the start of the TLS data
+    DWORD   EndAddressOfRawData;     // RVA of the end of the TLS data
+    DWORD   AddressOfIndex;          // Address of the TLS index
+    DWORD   AddressOfCallBacks;      // Address of the array of TLS callback functions
+    DWORD   SizeOfZeroFill;          // Size of zero-fill area
+    DWORD   Characteristics;         // Reserved, typically zero
+} IMAGE_TLS_DIRECTORY;
+
+Lets understand what each pointer mean and it purpose:
+
+- **tartAddressOfRawData**
+This field contains !the Relative Virtual Address (RVA) of the beginning of the TLS data in the PE file.
+
+- **EndAddressOfRawData**
+This field contains the RVA of the end of the TLS data in the PE file.
+
+- **AddressOfIndex**
+This points to a location where the thread-specific TLS index is stored. This index is used by the operating system to reference the TLS data for each thread.
+
+- **AddressOfCallBacks**
+This is the address of an array of pointers to TLS callback functions. These functions are called by the operating system during specific events, such as thread creation or exit.
+
+- **SizeOfZeroFill**
+This field specifies the size of the area to be zeroed out in the TLS data section. It’s used for initializing TLS data with zeros.
+
+This TLS Directory is a key structure within the .tls section because it provides these necessary information for the operating system to manage TLS data for each thread.
+
+Next structure in the .tls section is the TLS callbacks, which is an array of function pointers. This array is null-terminated, meaning that the last pointer in the array is a NULL pointer. 
 
 
 
