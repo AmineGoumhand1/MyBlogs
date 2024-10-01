@@ -35,8 +35,11 @@ So until now, we defined the TLS, lets get familiarized with `TLS Callbacks`.
 One of the advanced features of TLS in Windows is the ability to specify TLS callbacks. TLS callbacks are special functions that are automatically called by the operating system at specific points in the lifetime of a thread. For example lets take the main ones :
 
 `DLL Load` : In this case, when a DLL is loaded, and a thread is created, the TLS callback is invoked.
+
 `Thread Creation` : When a new thread is created within the process, the TLS callback is invoked for that thread.
+
 `Thread Exit` : Also when a thread exits, the TLS callback is invoked to clean up any TLS data.
+
 `DLL Unload` : When the DLL is unloaded, the TLS callback is invoked.
 
 These are the main actions when a TLS callback is called. Now, the most question that might be confusing you is Where these callbacks can be ?. Well The PE structure is the key to this one.
