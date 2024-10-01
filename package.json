@@ -11,7 +11,7 @@
     "new-post": "node scripts/new-post.js",
     "format": "biome format --write ./src",
     "lint": "biome check --apply ./src"
-  },
+  }, 
   "dependencies": {
     "@astrojs/check": "^0.7.0",
     "@astrojs/rss": "^4.0.6",
