@@ -12,7 +12,7 @@ draft: false
 Welcome back to a new Process Injection technique : Thread Local Storage Injection where i'll cover its implementation and how it works.
 During this blog, we'll follow this plan :
 
-- **What is TLS Injection ?**
+- **What is TLS Injection ?** 
 - **How TLS Injection works ?**
 - **TLS Injection Implementation**
 
