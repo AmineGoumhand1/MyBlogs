@@ -141,65 +141,57 @@ Lets see this in action.
 
 ## Implementation
 
-So in this demo i will test the TLS callbacks injection on notepad and as usuall i will devide this to several steps.
+So in this demo i will test the TLS callbacks injection on notepad to trigger a DLL Injection, and as usuall i will devide this to several steps.
 
 - **Needed libraries**
 
 ```cpp
 #include "windows.h"
-#pragma comment(lib, "user32.lib")
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <tlhelp32.h>
+#include <iostream.h>
+
 ```
 
 - **TLS Callback declaration**
 
 ```cpp
-void NTAPI __stdcall TLSCallbacks(PVOID DllHandle, DWORD dwReason, PVOID Reserved);
+void NTAPI TlsCallback(PVOID DllHandle, DWORD Reason, PVOID Reserved);
 ```
 
 This declares the TLS callback function, which is executed when the application starts, before the main function.
-In the NTAPI function, DllHandle is a parameter that represents a handle to the DLL. It is typically used in DLL functions to get the handle to the DLL instance that is being loaded or unloaded.
-Same for dwReason, which is a parameter that indicates the reason why the TLS callback is being called. It can have different values such as:
+In the NTAPI function, ```DllHandle``` is a parameter that represents a handle to the DLL. It is typically used in DLL functions to get the handle to the DLL instance that is being loaded or unloaded.
+Same for ```Reason```, which is a parameter that indicates the reason why the TLS callback is being called. It can have different values such as:
 
 `DLL_PROCESS_ATTACH`: The DLL is being loaded into the address space of the process.
 `DLL_THREAD_ATTACH`: A new thread is being created in the process.
 `DLL_THREAD_DETACH`: A thread is exiting cleanly.
 `DLL_PROCESS_DETACH`: The DLL is being unloaded from the address space of the process.
 
-- **Linker Specifications**
+- **Setup PE structure**
 
 ```cpp
-#ifdef _M_IX86
-	#pragma comment (linker, "/INCLUDE:__tls_used")
-	#pragma comment (linker, "/INCLUDE:__tls_callback")
-#else
-	#pragma comment (linker, "/INCLUDE:_tls_used")
-	#pragma comment (linker, "/INCLUDE:_tls_callback")
-#endif
-
-#ifdef _M_X64
-    #pragma const_seg (".CRT$XLB")
-    const
-#else
-    #pragma data_seg (".CRT$XLB")
-#endif
+__attribute__((section(".CRT$XLB"))) PIMAGE_TLS_CALLBACK pTLSCallback = TlsCallback;
 ```
+This GCC/Clang specific attribute ```__attribute__((section(".CRT$XLB")))``` tells the compiler to place the variable into a specific section of the PE (Portable Executable) file named ```.CRT$XLB```.
 
-Imagine you are developing a DLL that uses TLS to manage per-thread data. When this DLL is loaded into a process, the operating system needs to be aware of the TLS structures and callback functions so by including the `__tls_used` and `__tls_callback` symbols, we make sure that the necessary TLS initialization and callback mechanisms are correctly set up, incluing the architecture type.
+Now time to learn a TIP, You probably asking your self what is ```.CRT$XLB```, so ```.CRT$XLB``` is a special section in a PE file reserved for CRT (C Runtime) initialization functions. The sections ```.CRT$XLA``` to ```.CRT$XLZ``` are used to store pointers to functions that the system or runtime calls during process/thread initialization or termination.
 
+I want you to keep that in mind.
 
-`PIMAGE_TLS_CALLBACK _tls_callback = TLSCallbacks`
-This line declares a global variable _tls_callback of type PIMAGE_TLS_CALLBACK and initializes it with the address of the TLSCallbacks function. PIMAGE_TLS_CALLBACK is a pointer to a callback function that will be invoked during TLS operations.
+In our case, the ```.CRT$XLB``` section is used for TLS callbacks. Functions in this section are called by the Windows loader when a new thread starts or exits in the process, before any user code is run. These are typically used for thread initialization purposes.
 
-`#pragma const_seg (".CRT$XLB")`
-For 64-bit systems, this directive tells the compiler to place the subsequent data (_tls_callback) into a specific section named .CRT$XLB. This section is used to store TLS callback functions that need to be executed when certain events occur.
+Now the rest of the line has a purpose to define the Callback ```TLS callback PIMAGE_TLS_CALLBACK pTLSCallback = TlsCallback;```
+This is a typedef for a pointer to a function that serves as a TLS callback :
 
-`#pragma data_seg (".CRT$XLB")`
-Now same for 32-bit systems, it tells the compiler to place the subsequent data (_tls_callback) into a section named .CRT$XLB. Unlike 64-bit systems, this section might not be read-only.
-
+```cpp
+typedef VOID (NTAPI *PIMAGE_TLS_CALLBACK)(
+    PVOID DllHandle,
+    DWORD Reason,
+    PVOID Reserved
+);
+```
 - **Injection**
 
 ```cpp
