@@ -17,7 +17,7 @@ import svelte from "@astrojs/svelte"
 import swup from '@swup/astro';
 import sitemap from '@astrojs/sitemap';
 import {parseDirectiveNode} from "./src/plugins/remark-directive-rehype.js";
-
+import * as cheerio from "cheerio"; // Use named import instead of default
 const oklchToHex = (str) => {
   const DEFAULT_HUE = 250
   const regex = /-?\d+(\.\d+)?/g
