@@ -51,13 +51,13 @@ So lets uncover this TLS section to know more.
 Imagiine that the form of .tls section is :
 
 |-----------------------------|
-|  TLS Directory               |
+|  TLS Directory              |
 |-----------------------------|
-|  TLS Callbacks Array         |
+|  TLS Callbacks Array        |
 |-----------------------------|
-|  TLS Data                    |
+|  TLS Data                   |
 |-----------------------------|
-|  Zero-Fill Area (if any)     |
+|  Zero-Fill Area (if any)    |
 |-----------------------------|
 
 
@@ -201,7 +201,7 @@ So now we can start writing our Callback function to trigger the DLL Injection.
 ```cpp
 void NTAPI TlsCallback(PVOID DllHandle, DWORD Reason, PVOID Reserved)
 {
-    int pid = 4288;
+    int pid = 4288; // i put this for notepad
     HANDLE handle_proc = NULL;
 
     if (pid) {
@@ -236,7 +236,6 @@ int injection(HANDLE hProcess) {
         return 0;
     }
 
-    // Get the address of LoadLibraryA
     HMODULE hKernel32 = GetModuleHandleA("kernel32.dll");
     LPTHREAD_START_ROUTINE pLoadLibraryA = (LPTHREAD_START_ROUTINE)GetProcAddress(hKernel32, "LoadLibraryA");
 
@@ -260,7 +259,6 @@ int injection(HANDLE hProcess) {
 feel free to visit the fist blog if you dont understand it. for the DLL it just contain a message box.
 
 ```cpp
-// InjectedDLL.cpp
 #include <windows.h>
 
 extern "C" __declspec(dllexport) void InjectedFunction() {
@@ -274,5 +272,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     return TRUE;
 }
 ```
+to compile this dll use ```g++ -o InjectedDLL.dll InjectedDLL.cpp```
+
 
 
