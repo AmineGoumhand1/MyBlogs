@@ -220,7 +220,8 @@ void NTAPI TlsCallback(PVOID DllHandle, DWORD Reason, PVOID Reserved)
 ```
 So as you see it's a simple caller to the function injection that will serve the DLL Injection, BUUUT Note the ```ExitProcess``` at the end, so from here we can conclude that the main function will never be executed. This is good for avoiding detection huh? while  a malware analyst is always start debugging from the entry point HAHA, Just kidding.
 
-Passing now to the Injection function which we cover it in the first blog of these series. 
+Passing now to the Injection function which we did cover it in the first blog of these series. 
+So we will inject our malicious DLL in notepad ( legitimate process ).
 ```cpp
 int injection(HANDLE hProcess) {
     const char* dllPath="C:\\Users\\agoum\\Downloads\\TLSInjection\\InjectedDLL.dll";
@@ -256,7 +257,7 @@ int injection(HANDLE hProcess) {
     return 0;
 }
 ```
-feel free to visit the fist blog if you dont understand it. for the DLL it just contain a message box.
+feel free to visit the first blog if you dont understand it. for the DLL it just contain a message box.
 
 ```cpp
 #include <windows.h>
@@ -272,7 +273,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     return TRUE;
 }
 ```
-to compile this dll use ```g++ -o InjectedDLL.dll InjectedDLL.cpp```
+
+To compile this dll use ```g++ -o InjectedDLL.dll InjectedDLL.cpp```
 
 
 
