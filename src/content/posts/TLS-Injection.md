@@ -16,7 +16,7 @@ During this blog, we'll follow this plan :
 - **How TLS Injection works ?**
 - **TLS Injection Implementation**
 
-Lets start!
+Lets start.
 
 # What is TLS Injection ?
 
