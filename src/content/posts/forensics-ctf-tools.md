@@ -329,5 +329,6 @@ These tools provides us with such a comprehensive capabilities for timeline anal
 Mastering DFIR tools is crucial for tackling forensic challenges in CTF competitions. These tools not only helps us in solving CTF challenges but also enhance your skills for real-world cybersecurity incidents. Stay tuned for more in-depth guides on using these tools effectively in various scenarios.
 
 Join us in the next post where we will dive deeper into practical applications and advanced techniques in DFIR.
+.
 
 
