@@ -1,6 +1,6 @@
 ---
 title: 'Malwares Development Series | Part 2 : Process Injection | DLL Injection'
-published: 2024-07-19
+published: 2024-07-20
 description: ''
 image: ''
 tags: ['Malwares', 'CTF', 'Forensics', 'DFIR', 'RedTeam', 'BlueTeam', 'APT', 'Threat Hunting']
