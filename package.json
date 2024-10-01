@@ -70,12 +70,4 @@
     }
   }
 }
-     "dependencies": {
-        "astro-icon": "^1.1.0"
-      },
-      "pnpm": {
-        "overrides": {
-          "@iconify/tools": "^4.0.4"
-        }
-      }
-    }
+    
