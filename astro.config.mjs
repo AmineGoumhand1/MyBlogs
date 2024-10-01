@@ -11,12 +11,12 @@ import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs"
 import { GithubCardComponent } from "./src/plugins/rehype-component-github-card.mjs"
 import { AdmonitionComponent } from "./src/plugins/rehype-component-admonition.mjs"
 import remarkDirective from "remark-directive" /* Handle directives */
-import remarkGithubAdmonitionsToDirectives from "remark-github-admonitions-to-directives";
+import remarkGithubAdmonitionsToDirectives from "remark-github-admonitions-to-directives"
 import rehypeComponents from "rehype-components"; /* Render the custom directive content */
 import svelte from "@astrojs/svelte"
-import swup from '@swup/astro';
-import sitemap from '@astrojs/sitemap';
-import {parseDirectiveNode} from "./src/plugins/remark-directive-rehype.js";
+import swup from '@swup/astro'
+import sitemap from '@astrojs/sitemap'
+import {parseDirectiveNode} from "./src/plugins/remark-directive-rehype.js"
 const oklchToHex = (str) => {
   const DEFAULT_HUE = 250
   const regex = /-?\d+(\.\d+)?/g
