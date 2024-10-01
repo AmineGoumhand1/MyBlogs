@@ -67,7 +67,9 @@
     "overrides": {
       "vite-imagetools": "^6.2.7",
       "sharp": "^0.33.0",
-      "@types/cheerio":"https://registry.npmjs.org/cheerio/-/cheerio-1.0.0-rc.12.tgz"
+      "astro-icon": {
+"cheerio": "1.0.0-rc.12"
+}
     }
   }
 }
