@@ -75,17 +75,13 @@ typedef struct _IMAGE_TLS_DIRECTORY {
 ```
 Lets understand what each pointer mean and it purpose:
 
-- **StartAddressOfRawData**
-This field contains !the Relative Virtual Address `RVA` of the beginning of the TLS data in the PE file.
+- **StartAddressOfRawData** is a field that contains the Relative Virtual Address `RVA` of the beginning of the TLS data in the PE file.
 
-- **EndAddressOfRawData**
-This field contains the `RVA` of the end of the TLS data in the PE file.
+- **EndAddressOfRawData** for `RVA` of the end of the TLS data in the PE file.
 
-- **AddressOfIndex**
-This points to a location where the thread-specific TLS index is stored. This index is used by the operating system to reference the TLS data for each thread.
+- **AddressOfIndex** points to a location where the thread-specific TLS index is stored. This index is used by the operating system to reference the TLS data for each thread.
 
-- **AddressOfCallBacks**
-This is the address of an array of pointers to TLS callback functions. These functions are called by the operating system during specific events, such as thread creation or exit.
+- **AddressOfCallBacks** is the address of an array of pointers to TLS callback functions. These functions are called by the operating system during specific events, such as thread creation or exit. ( Interesting )
 
 - **SizeOfZeroFill**
 This field specifies the size of the area to be zeroed out in the TLS data section. It’s used for initializing TLS data with zeros.
