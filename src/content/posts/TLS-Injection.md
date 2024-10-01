@@ -8,6 +8,12 @@ category: 'Malwares'
 draft: false 
 ---
 ![Back](/favicon/malwwware.jpg)
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+    }
+</style>
+
 
 Welcome back to a new Process Injection technique : Thread Local Storage Injection where i'll cover its implementation and how it works.
 During this blog, we'll follow this plan :
