@@ -29,15 +29,15 @@ In this category, I'll cover the following techniques :
 
   - **DLL Injection** 
   - **Process Hollowing**
+  - **TLS Injection**
+  - **Reflective DLL Injection**
   - **PE Injection**
   - **Thread Execution Hijacking**
   - **APC Injection**
-  - **TLS Injection**
   - **Process Doppelgänging**
-  - **Process Hollowing**
   - **VDSO Hijacking**
   - **Window Injection**
-  - **Reflective DLL Injection**
+  
 
 ## Phase 2: Malware Persistence Techniques
 
