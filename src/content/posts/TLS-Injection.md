@@ -7,7 +7,7 @@ tags: ['Malwares', 'CTF', 'Forensics', 'DFIR', 'RedTeam', 'BlueTeam', 'APT', 'Th
 category: 'Malwares'
 draft: false 
 ---
-![Back](/favicon/tlsinj.mp4)
+![Back](/favicon/tlsinj1.gif)
 
 
 Welcome back to a new Process Injection technique : Thread Local Storage Injection where i'll cover its implementation and how it works.
