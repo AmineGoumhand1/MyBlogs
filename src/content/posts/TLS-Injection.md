@@ -8,7 +8,8 @@ category: 'Malwares'
 draft: false 
 ---
 
-<img src="/favicon/tlsinj1.gif" alt="Back Image" style="width: 100vw; height: 100vh; object-fit: cover;">
+![backgr]("/favicon/tlsinj1.gif")
+    
 
 Welcome back to a new Process Injection technique : Thread Local Storage Injection where i'll cover its implementation and how it works.
 During this blog, we'll follow this plan :
