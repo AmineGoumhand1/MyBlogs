@@ -14,13 +14,13 @@ draft: false
 Welcome back to a new Process Injection technique : Thread Local Storage Injection where i'll cover its implementation and how it works.
 During this blog, we'll follow this plan :
 
-- **What is TLS Injection ?**  
+- **What is TLS ?**  
 - **How TLS Injection works ?**
 - **TLS Injection Implementation**
 
 Lets start.
 
-# What is TLS Injection ?
+# What is TLS or Thread Local Storage ?
 
 ## TLS / TLS Callbacks
 
@@ -275,4 +275,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 To compile this dll use ```g++ -o InjectedDLL.dll InjectedDLL.cpp```
 
 
+## Conclusion
 
+Thanks for reading this blog, hope you enjoyed it and see you next blog inchaalah to cover how to make our codes less detectable by EDRs or Anti-Viruses. 
