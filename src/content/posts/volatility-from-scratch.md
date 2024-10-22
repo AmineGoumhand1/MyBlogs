@@ -10,3 +10,5 @@ draft: false
 
 <img src="/favicon/tlsinj1.gif" alt="Back Image" style="width: 100vw;  object-fit: cover;">
     
+Hello, In today's blog i'll cover how to use volatility to investigate in memory dumps and analyse malwares.
+I'll try to do some CTFs challenges too in order to practice what we'll learn.
