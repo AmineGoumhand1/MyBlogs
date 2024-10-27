@@ -14,4 +14,10 @@ Hello, In today's blog i'll cover how to use volatility to investigate in memory
 
 I'll try to do some CTFs challenges too in order to practice what we'll learn with this awesome tool.
 
-As usual I'll follow a detailed plan ( deep dive ) to volatility 
+As usual I'll follow a detailed plan to volatility 
+
+- Introduction to volatility
+- Volatility tool deep dive
+- CTFs practice 
+- Volatility plugins
+- Conclusion 
