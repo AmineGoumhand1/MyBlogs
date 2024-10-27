@@ -10,7 +10,7 @@ draft: false
 
 <img src="/favicon/tlsinj1.gif" alt="Back Image" style="width: 100vw;  object-fit: cover;">
     
-Hello, In today's blog i'll cover how to use volatility to investigate in memory dumps and analyse malwares.
+Hello, In today's blog i'll cover how to use volatility to investigate in memory dumps and analyse malwares, covering also new terms especially in windows architecture for beginners.
 
 I'll try to do some CTFs challenges too in order to practice what we'll learn with this awesome tool.
 
@@ -21,3 +21,7 @@ As usual I'll follow a detailed plan to volatility
 - CTFs practice 
 - Volatility plugins
 - Conclusion 
+
+### what are we waiting, let's discover it !
+
+# Introduction to Volatility 
