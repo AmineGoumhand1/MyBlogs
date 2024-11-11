@@ -116,8 +116,6 @@ def wiener_attack(e, N):
     return None
 recovered_d = wiener_attack(e, N)
 print("d",recovered_d)
-
-
 print(long_to_bytes(pow(c,int(recovered_d),N)))
 
 
@@ -126,23 +124,81 @@ print(long_to_bytes(pow(c,int(recovered_d),N)))
 
 **given files** :  encryptoooo.py | flag.txt.enc
 
-**solution** : This one was a little bit tricky Haha, you should have
+**solution** : This one was a little bit tricky Haha, it's a challenge that serves to encrypt a file using it's length merged with time-based crypto.
+So the winning idea is to try to encrypt a fake file or a text file to conclude that the cipher text file is almost has the same length as the plain text file, with a small error ofc, and the second part of the challenge is to know the current time used which is simple to recover from the given cipher text using **exiftool** for example.
+
+s = 7121293 # cipher text length
+f = open("flag.txt.enc","rb").read()
+enc = int.from_bytes(f, byteorder='big')
+for i in range(s-10,s+10):
+    if enc%(i+1730510418)== 0:
+        s=i+1730510418
+        break
+sol = int(enc//s)
+f = open("sol","wb")
+f.write(sol.to_bytes((sol.bit_length() + 7) // 8, byteorder='big'))
+f.close()
+
 
 ## Cryptic-1
-**description** : 
+**description** : Two disks?, here is one INSECABDFGHJKLMOPQRTUVWXYZ .
+Cipher = WQELORWMRVNYPKSSZSNVDXUYBXAXXKBQDAJWBXLXLLRDVGNZPACTBQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDMXBEGPKQJRLITFVYKQR
 
-**given files** :
+**solution** : In this challenge, as hinted in the description the cipher operating with two disks so searching a bit on dcode.fr you can find the CHAO cipher. using the first given disk for the two needed disks resulting decrypt the cipher. 
+![gg]('Capture d’écran 2024-11-11 173952.png')
 
-**solution** : 
 
 ## Cryptic-2
-**description** : 
+**description** : I heard that vegenere comes with its variants, so i decided to include palindromes utility in their keys .
+Cipher : GIHKJVVCOCWGTRPKVFUOLNHGJVVCOCWRPYYCFCLLJLUUULVOSYKVEZEKSASVVSOSYXOHTUKHOLNNVESVVSASVVGJFSFMUEYHMSMAYKTMPPMUMPPMSZPBRGZIHFMFHDRGFUVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSARZUWWZIWSOGOVVWKEOFLICNGAVXRZBGOUMPVAXLQNCJGAVXRZBRKBVHFXOIOLPXRQVJVVPVZCBPSVVSASJVVCOCWRPHJOKSVZVSASVVSAGEIPKMPHVMMNPXDKOPMUMPPMUMNCMGRBCFMFHIEIRBIRASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVUWZWRCFBSJJLAVRNBTFGLZSGVYUWZWJLZMKYXCLLQZOGVYUWZWUHGVCIUTIJOMCRLYGAVKYWHBKVSASVVGAVXRZBRKKGTKNYWASVVSASVJBNPFPMMVHPKUXYNLUMPPMUMPPKHMBUYHFHIENEDUYNRVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSZWUZOHFWVGOLVYOSBOIDQZNJSDURCTOLUPHDXXOIVZJJSDURCTZHBYZNUOLGTMXUIDGVYHDWCEHASVVSAGVYUWZWUHPGONKDWVVSASVVSOBISCUMHYEUKPAVSLPPMUMPPMUKCPYZYCIENEIHAZYIUSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASUZREOCITAGJOSDONELN
 
-**given files** :
+**solution** : Also in this challenge, a variant of vigenere cipher on the show here, it is Beaufort cipher. So the first thing to do is to apply a kasiski test to know the length of key ( 5 ) and brute force the 2 first characters ( because of the palindrome utility ) and also the forth character and search for INSEC in each iteration.
 
-**solution** : 
+cipher = """GIHKJVVCOCWGTRPKVFUOLNHGJVVCOCWRPYYCFCLLJLUUULVOSYKVEZEKSASVVSOSYXOHTUKHOLNNVESVVSASVVGJFSFMUEYHMSMAYKTMPPMUMPPMSZPBRGZIHFMFHDRGFUVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSARZUWWZIWSOGOVVWKEOF
+LICNGAVXRZBGOUMPVAXLQNCJGAVXRZBRKBVHFXOIOLPXRQVJVVPVZCBPSVVSASJVVCOCWRPHJOKSVZVSASVVSAGEIPKMPHVMMNPXDKOPMUMPPMUMNCMGRBCFMFHIEIRBIRASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVUWZWRCFBSJJLAVRNBTF
+GLZSGVYUWZWJLZMKYXCLLQZOGVYUWZWUHGVCIUTIJOMCRLYGAVKYWHBKVSASVVGAVXRZBRKKGTKNYWASVVSASVJBNPFPMMVHPKUXYNLUMPPMUMPPKHMBUYHFHIENEDUYNRVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSZWUZOHFWVGOLVYOSBOI
+DQZNJSDURCTOLUPHDXXOIVZJJSDURCTZHBYZNUOLGTMXUIDGVYHDWCEHASVVSAGVYUWZWUHPGONKDWVVSASVVSOBISCUMHYEUKPAVSLPPMUMPPMUKCPYZYCIENEIHAZYIUSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASUZREOCITAGJOSDONELN"""
 
+def decrypt_beaufort(ciphertext, key):
+    alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    decrypted_message = ''
 
+    key = key.upper()
+    ciphertext = ciphertext.upper()
+
+    key_length = len(key)
+    key_index = 0
+
+    for char in ciphertext:
+        if char in alphabet:
+            # Find positions in the alphabet (A=0, B=1, ..., Z=25)
+            key_char = key[key_index % key_length]
+            key_pos = alphabet.index(key_char)
+            cipher_pos = alphabet.index(char)
+
+            # Perform Beaufort decryption (Key - Ciphertext) mod 26
+            decrypted_pos = (key_pos - cipher_pos) % 26
+            decrypted_message += alphabet[decrypted_pos]
+
+            # Move to the next letter in the key
+            key_index += 1
+        else:
+            # If it's not in the alphabet, add it unchanged
+            decrypted_message += char
+
+    return decrypted_message
+
+# Example usage:
+alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+for i in alphabet :
+    for j in alphabet :
+      for k in alphabet : 
+        key = i+j+k+j+i
+        plain = decrypt_beaufort(cipher, key)
+        if "INSEC" in  plain :
+              print(plain)
+
+# key = CZHZC
 
 
 # Steganography
