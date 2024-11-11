@@ -1,10 +1,12 @@
+
+
 ---
-title: 'Cyber Security Day CTF'
-published: 2024-11-11
+title: 'Malwares Development Series | Part 4 : Process Injection | TLS Injection'
+published: 2024-08-16
 description: ''
 image: ''
-tags: ['CTF', 'Crypto', 'Forensics', 'Misc', 'INSEC' ,'Steganography','Osint','Reverse','Web']
-category: 'CTF'
+tags: ['Malwares', 'CTF', 'Forensics', 'DFIR', 'RedTeam', 'BlueTeam', 'APT', 'Threat Hunting']
+category: 'Malwares'
 draft: false 
 ---
 
