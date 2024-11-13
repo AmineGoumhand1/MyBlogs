@@ -237,6 +237,32 @@ Here is how :
 
 as you can see the hidden data contains the flag but it's big and scrambled, the idea is to simply do a frequency calculation on the hidden text and recover the flag ( INSEC{n3w_Freq_7£ch_d15€oVRy} ).
 
+```python
+import matplotlib.pyplot as plt
+import random
+unique_text="""hidden text here"""
+freq = {}
+for char in unique_text:
+    if char in freq:
+        freq[char] += 1
+    else:
+        freq[char] = 1
+
+letters, occurrences = zip(*sorted(freq.items(), key=lambda x: x[1], reverse=True))
+
+plt.figure(figsize=(15, 5))
+plt.bar(letters, occurrences)
+plt.xlabel('Characters')
+plt.ylabel('Occurrences')
+plt.title('Character Frequency Analysis')
+flag_indices = [letters.index(char) for char in flag]
+plt.plot(flag_indices, [occurrences[i] for i in flag_indices], 'ro-', markersize=5, label='Flag Characters')
+plt.legend()
+plt.show()
+
+print(unique_text)
+```
+
 ## decentral
 **description** :  What can make a difference is a little bit sticky.
 
@@ -284,23 +310,27 @@ hidden_flag = decode_flag_from_jpg('output.png', flag_length=90)
 print(hidden_flag) 
 ```
 
-
-
-
 # Forensics
 ## QQR
-**description** : 
+**description** : I'm suffering with my broken QR, can you helpppp ?
 
-**given files** :
+**given files** : INSEC.png
 
-**solution** : 
+**solution** : The idea of this challenge was simply replacing The 2 Upper position patterns to solve it, the second hard way is to build it from zero using CrazyBox online tool.
+
+
+
 
 ## Broken-Satellite
-**description** : 
+**description** : Our satellites not doing great up there.
 
-**given files** :
+**given files** : satellitecomm.wav
 
-**solution** : 
+**solution** : This transmission wav is called sstv transmission used for example by NASA to transmit images from space to earth. so as a classic challenge, you should decode it and get the flag using qsstv tool, but the transmission audio containing the image of the flag is merged with a fake flag audio, so the solution is to split the audio to two channels and then decode them to recover the flag.
+
+You can use ffmpeg to split the audio channels, `ffmpeg -i satellitecomm.wav -ac 1 -map_channel 0.0.0 output_left.wav` 
+`ffmpeg -i satellitecomm.wav -ac 1 -map_channel 0.0.1 output_right.wav`.
+
 
 ## freepalestine
 **description** : 
