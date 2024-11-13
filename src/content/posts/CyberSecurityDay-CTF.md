@@ -373,31 +373,58 @@ You can use ffmpeg to split the audio channels, `ffmpeg -i satellitecomm.wav -ac
 
 # Misc
 ## Suspect-Net-007
-**description** : 
+**description** : Have you heard about exfiltration?
 
-**given files** :
+**given files** : netw.pcapng
 
-**solution** : 
+**solution** : In this networking challenge, you are given a pcapng traffic file to exfiltrate. Investigating a little bit in it, you can find weird ICMP packets used to test communication so analysing these packets you can conclude that the first ICMP packet contains 2 bytes of base64 after it is followed by 9 fake packets and so on. Note that the time difference will help you to do that.
+
+so reassemble the base64 bytes will give us SU5TRUN7cDFuOV9wMW45X2QxZF95b3VfbDFrM18zeGYxbDdyNDcxMG59 base64 
 
 ## Suspect-Net-008
-**description** : 
+**description** : Alert! Our SOC team managed to detect some malicious activities on our network. Can you help them figure out what is about?
 
-**given files** :
+**given files** : netw.pcapng
 
-**solution** : 
+**solution** : This challenge also contain ICMP packets exfiltration, This time you should analyse the TTL section of each packet and you'll see something unusuall, TTL contains the ascii code ord of each byte of the flag, so reassemble them give us the flag.
+
 
 ## Resolution
-**description** : 
+**description** : My little brother is trying to learn about barcodes, but he found a different barcode format that he can't recognize. Can you find out what was that?
 
-**given files** :
+**given files** : secreeet.png
 
-**solution** : 
+**solution** : From the image given in this chall, it is a splited barcode to four parts vertically, so the solution is to parse each and merge the four parts together, but multiple concatination possibilities will be there, so we can bruteforce them. So after generating the 16 images you can test them in an online decoder to decode the barcode.
+
+Here is the solution : 
+
+```python
+from PIL import Image
+import itertools
+
+stacked_image = Image.open('secreeet.png')
+stacked_width, stacked_height = stacked_image.size
+part_height = stacked_height // 4
+parts = [stacked_image.crop((0, i * part_height, stacked_width, (i + 1) * part_height)) for i in range(4)]
+parts=list(itertools.permutations(parts))
+
+restored_image = Image.new('RGB', (stacked_width * 4, part_height))
+
+
+for j in range(len(parts)):
+      for i, part in enumerate(parts[j]):
+           restored_image.paste(part, (i * stacked_width, 0))
+
+
+      restored_image.save(f'restored_barcode_{j}.png')
+
+```
 
 # Reverse Enginnering
 ## e_asm
 **description** : 
 
-**given files** :
+**given files** : 
 
 **solution** : 
 
