@@ -158,7 +158,7 @@ f.close()
 Cipher = WQELORWMRVNYPKSSZSNVDXUYBXAXXKBQDAJWBXLXLLRDVGNZPACTBQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDMXBEGPKQJRLITFVYKQR
 
 **solution** : In this challenge, as hinted in the description the cipher operating with two disks so searching a bit on dcode.fr you can find the CHAO cipher. using the first given disk for the two needed disks resulting decrypt the cipher. 
-![gg]('Capture d’écran 2024-11-11 173952.png')
+<img src="/favicon/chall9.png" alt="Back Image" style="width: 100vw;  object-fit: cover;">
 
 
 ## Cryptic-2
@@ -267,6 +267,9 @@ plt.show()
 
 print(unique_text)
 ```
+By executing this you'll visualize the flag.
+<img src="/favicon/chall4.png" alt="Back Image" style="width: 100vw;  object-fit: cover;">
+
 
 ## decentral
 **description** :  What can make a difference is a little bit sticky.
@@ -323,7 +326,7 @@ print(hidden_flag)
 
 **solution** : The idea of this challenge was simply replacing The 2 Upper position patterns to solve it, the second hard way is to build it from zero using CrazyBox online tool.
 
-
+<img src="/favicon/chall5.png" alt="Back Image" style="width: 100vw;  object-fit: cover;">
 
 
 ## Broken-Satellite
@@ -336,6 +339,9 @@ print(hidden_flag)
 You can use ffmpeg to split the audio channels, `ffmpeg -i satellitecomm.wav -ac 1 -map_channel 0.0.0 output_left.wav` 
 `ffmpeg -i satellitecomm.wav -ac 1 -map_channel 0.0.1 output_right.wav`.
 
+So now using qsstv on the each channels, 
+<img src="/favicon/chall8.png" alt="Back Image" style="width: 100vw;  object-fit: cover;">
+The flag is clear now.
 
 ## freepalestine
 **description** : 
@@ -383,6 +389,7 @@ You can use ffmpeg to split the audio channels, `ffmpeg -i satellitecomm.wav -ac
 **given files** : netw.pcapng
 
 **solution** : In this networking challenge, you are given a pcapng traffic file to exfiltrate. Investigating a little bit in it, you can find weird ICMP packets used to test communication so analysing these packets you can conclude that the first ICMP packet contains 2 bytes of base64 after it is followed by 9 fake packets and so on. Note that the time difference will help you to do that.
+<img src="/favicon/chall6.png" alt="Back Image" style="width: 100vw;  object-fit: cover;">
 
 so reassemble the base64 bytes will give us SU5TRUN7cDFuOV9wMW45X2QxZF95b3VfbDFrM18zeGYxbDdyNDcxMG59 base64 
 
@@ -392,6 +399,7 @@ so reassemble the base64 bytes will give us SU5TRUN7cDFuOV9wMW45X2QxZF95b3VfbDFr
 **given files** : netw.pcapng
 
 **solution** : This challenge also contain ICMP packets exfiltration, This time you should analyse the TTL section of each packet and you'll see something unusuall, TTL contains the ascii code ord of each byte of the flag, so reassemble them give us the flag.
+<img src="/favicon/chall7.png" alt="Back Image" style="width: 100vw;  object-fit: cover;">
 
 
 ## Resolution
