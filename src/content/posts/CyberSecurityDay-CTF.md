@@ -226,14 +226,19 @@ for i in alphabet :
 **solution** : Here the image contains a ZLIB file ( you can extract it using steghide ), This zlib file contains compressed base64. So we simply decompress the zlib and get the base64 data, after we can pass it to cyberchef website, the base64 encodes a base45 flag then this last contains brailles code, all can be done in CyberChef.
 
 Here is how :
+<img src="/favicon/chall1.png" alt="Back Image" style="width: 100vw;  object-fit: cover;">
+<img src="/favicon/chall2.png" alt="Back Image" style="width: 100vw;  object-fit: cover;">
 
+The flag is ```INSEC{V3RY_D33P_BR4ILLES}```.
 
 # Scrambled
 **description** : It's clearly not a scrambled file, but my machine tells me the opposite. 
 
 **given files** : bruh
 
-**solution** : This challenge is a text-steganography based challenge, searching a bit on text steganography you can find that we can hide informations in spaces using the Zero width technique. ( another way to do that is to inspect it in vim or a hex editor ). For us let's use this web to reveil hidden data.
+**solution** : This challenge is a text-steganography based challenge, searching a bit on text steganography you can find that we can hide informations in spaces using the Zero width technique. ( another way to do that is to inspect it in vim or a hex editor ). For us let's use this web online tool to reveil hidden data.
+[tool]('https://330k.github.io/misc_tools/unicode_steganography.html')
+<img src="/favicon/chall3.png" alt="Back Image" style="width: 100vw;  object-fit: cover;">
 
 as you can see the hidden data contains the flag but it's big and scrambled, the idea is to simply do a frequency calculation on the hidden text and recover the flag ( INSEC{n3w_Freq_7£ch_d15€oVRy} ).
 
