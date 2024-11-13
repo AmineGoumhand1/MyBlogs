@@ -229,18 +229,60 @@ Here is how :
 
 
 # Scrambled
-**description** : 
+**description** : It's clearly not a scrambled file, but my machine tells me the opposite. 
 
-**given files** :
+**given files** : bruh
 
-**solution** : 
+**solution** : This challenge is a text-steganography based challenge, searching a bit on text steganography you can find that we can hide informations in spaces using the Zero width technique. ( another way to do that is to inspect it in vim or a hex editor ). For us let's use this web to reveil hidden data.
+
+as you can see the hidden data contains the flag but it's big and scrambled, the idea is to simply do a frequency calculation on the hidden text and recover the flag ( INSEC{n3w_Freq_7£ch_d15€oVRy} ).
 
 ## decentral
-**description** : 
+**description** :  What can make a difference is a little bit sticky.
 
-**given files** :
+**given files** : output.png
 
-**solution** : 
+**solution** : As hinted in the description, decentral challenge image encode the flag in it's 4th bit of each pixel. so you can use stegsolve or a python script to get it.
+
+```python
+from PIL import Image
+
+def decode_flag_from_jpg(image_path, flag_length):
+    img = Image.open(image_path)
+    pixels = img.load()
+
+    binary_flag = ''
+    bits_read = 0
+
+    for y in range(img.height):
+        for x in range(img.width):
+            r, g, b = pixels[x, y]
+            
+            for channel in [r, g, b]:
+                # Get the 4th bit directly
+                channel_bits = format(channel, '08b')
+                print(list(channel_bits))
+                bit = channel_bits[3]  
+                
+                binary_flag += bit
+                bits_read += 1
+                
+                if bits_read >= flag_length * 8: 
+                    break
+            if bits_read >= flag_length * 8:
+                break
+        if bits_read >= flag_length * 8:
+            break
+    decoded_flag = ''
+    for i in range(0, len(binary_flag), 8):
+        byte = binary_flag[i:i + 8]
+        if len(byte) == 8:  # Ensure full byte
+            decoded_flag += chr(int(byte, 2))
+
+    return decoded_flag
+hidden_flag = decode_flag_from_jpg('output.png', flag_length=90) 
+print(hidden_flag) 
+```
 
 
 
