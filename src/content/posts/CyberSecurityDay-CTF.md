@@ -218,21 +218,24 @@ for i in alphabet :
 
 # Steganography
 
-## decentral
-**description** : 
-
-**given files** :
-
-**solution** : 
-
-## Scrambled
-**description** : 
-
-**given files** :
-
-**solution** : 
-
 ## Encoded
+**description** : A devoted admirer of the ZORO series once remarked, "ZORO'S HOME LIBRARY"
+
+**given files** : challlevi.jpg
+
+**solution** : Here the image contains a ZLIB file ( you can extract it using steghide ), This zlib file contains compressed base64. So we simply decompress the zlib and get the base64 data, after we can pass it to cyberchef website, the base64 encodes a base45 flag then this last contains brailles code, all can be done in CyberChef.
+
+Here is how :
+
+
+# Scrambled
+**description** : 
+
+**given files** :
+
+**solution** : 
+
+## decentral
 **description** : 
 
 **given files** :
