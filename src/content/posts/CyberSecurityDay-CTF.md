@@ -359,21 +359,21 @@ The flag is clear now.
 
 **given files** :
 
-**solution** : 
+**solution** : The first challenge in Osint category consists of find the location of the given building. By submitting it in Google photos you can recognise the location of the right building to locate the left one.
 
 ## MyCastle-2
 **description** : 
 
 **given files** :
 
-**solution** : 
+**solution** : This one, as described we need to recognise the plane, if you do you can build the flag.
 
-## MyCastle-2
-**description** : 
+So searching about the given plane will lead you to this awesome website of a photographer that has collected tails of several planes.
+[Website](https://airlinersgallery.smugmug.com/Airline-Tails/Airline-Tails)
 
-**given files** :
+So from this website you can conclude that the plane we are looking for is Croatia Airlines.
 
-**solution** : 
+So a small search about this plane and the needed values in the flag you'll get INSEC{}
 
 ## MyCastle-3
 **description** : 
