@@ -156,7 +156,9 @@ f.close()
 
 ## Cryptic-1
 **description** : Two disks?, here is one INSECABDFGHJKLMOPQRTUVWXYZ .
+```
 Cipher = WQELORWMRVNYPKSSZSNVDXUYBXAXXKBQDAJWBXLXLLRDVGNZPACTBQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDGYQXFEAJNMWBUDMXBEGPKQJRLITFVYKQR
+```
 
 **solution** : In this challenge, as hinted in the description the cipher operating with two disks so searching a bit on dcode.fr you can find the CHAO cipher. using the first given disk for the two needed disks resulting decrypt the cipher. 
 <img src="/favicon/chall9.png" alt="Back Image" style="width: 100vw;  object-fit: cover;">
@@ -164,8 +166,9 @@ Cipher = WQELORWMRVNYPKSSZSNVDXUYBXAXXKBQDAJWBXLXLLRDVGNZPACTBQXFEAJNMWBUDGYQXFE
 
 ## Cryptic-2
 **description** : I heard that vegenere comes with its variants, so i decided to include palindromes utility in their keys .
-
+```
 Cipher : GIHKJVVCOCWGTRPKVFUOLNHGJVVCOCWRPYYCFCLLJLUUULVOSYKVEZEKSASVVSOSYXOHTUKHOLNNVESVVSASVVGJFSFMUEYHMSMAYKTMPPMUMPPMSZPBRGZIHFMFHDRGFUVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSARZUWWZIWSOGOVVWKEOFLICNGAVXRZBGOUMPVAXLQNCJGAVXRZBRKBVHFXOIOLPXRQVJVVPVZCBPSVVSASJVVCOCWRPHJOKSVZVSASVVSAGEIPKMPHVMMNPXDKOPMUMPPMUMNCMGRBCFMFHIEIRBIRASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVUWZWRCFBSJJLAVRNBTFGLZSGVYUWZWJLZMKYXCLLQZOGVYUWZWUHGVCIUTIJOMCRLYGAVKYWHBKVSASVVGAVXRZBRKKGTKNYWASVVSASVJBNPFPMMVHPKUXYNLUMPPMUMPPKHMBUYHFHIENEDUYNRVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSZWUZOHFWVGOLVYOSBOIDQZNJSDURCTOLUPHDXXOIVZJJSDURCTZHBYZNUOLGTMXUIDGVYHDWCEHASVVSAGVYUWZWUHPGONKDWVVSASVVSOBISCUMHYEUKPAVSLPPMUMPPMUKCPYZYCIENEIHAZYIUSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASVVSASUZREOCITAGJOSDONELN
+```
 
 **solution** : Also in this challenge, a variant of vigenere cipher on the show here, it is Beaufort cipher. So the first thing to do is to apply a kasiski test to know the length of key ( 5 ) and brute force the 2 first characters ( because of the palindrome utility ) and also the third character and search for INSEC in each iteration.
 
@@ -236,7 +239,7 @@ The flag is ```INSEC{V3RY_D33P_BR4ILLES}```.
 [tool](https://330k.github.io/misc_tools/unicode_steganography.html)
 <img src="/favicon/chall3.png" alt="Back Image" style="width: 100vw;  object-fit: cover;">
 
-as you can see the hidden data contains the flag but it's big and scrambled, the idea is to simply do a frequency calculation on the hidden text and recover the flag ( INSEC{n3w_Freq_7£ch_d15€oVRy} ).
+as you can see the hidden data contains the flag but it's big and scrambled, the idea is to simply do a frequency calculation on the hidden text and recover the flag ```INSEC{n3w_Freq_7£ch_d15€oVRy}``` .
 
 ```python
 import matplotlib.pyplot as plt
