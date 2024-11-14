@@ -186,24 +186,17 @@ def decrypt_beaufort(ciphertext, key):
 
     for char in ciphertext:
         if char in alphabet:
-            # Find positions in the alphabet (A=0, B=1, ..., Z=25)
             key_char = key[key_index % key_length]
             key_pos = alphabet.index(key_char)
             cipher_pos = alphabet.index(char)
-
-            # Perform Beaufort decryption (Key - Ciphertext) mod 26
             decrypted_pos = (key_pos - cipher_pos) % 26
             decrypted_message += alphabet[decrypted_pos]
-
-            # Move to the next letter in the key
             key_index += 1
         else:
-            # If it's not in the alphabet, add it unchanged
             decrypted_message += char
 
     return decrypted_message
 
-# Example usage:
 alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 for i in alphabet :
     for j in alphabet :
