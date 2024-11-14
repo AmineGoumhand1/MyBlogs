@@ -373,7 +373,7 @@ So searching about the given plane will lead you to this awesome website of a ph
 
 So from this website you can conclude that the plane we are looking for is Croatia Airlines.
 
-So a small search about this plane and the needed values in the flag you'll get INSEC{}
+So a small search about this plane and the needed values in the flag you'll get INSEC{croatiaairlines,inc._ou_831_europe}.
 
 ## MyCastle-3
 **description** : 
