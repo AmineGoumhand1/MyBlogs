@@ -348,7 +348,7 @@ The flag is clear now.
 **solution** : As hinted in the description, the freepalestine challenge contains two solutions, The hard way is to use Mersenne random generator vulnerability, the easiest way is to look for repeated sequences that means something. You'll find the seed value for the randomness and recover the image. 
 
 First by passing it to xxd you can recognize that it's a png where it's hex bytes are repeated. 
-<img src="/favicon/chall12.png" alt="Back Image" style="width: 100vw;  object-fit: cover;">
+<img src="/favicon/chall13.png" alt="Back Image" style="width: 100vw;  object-fit: cover;">
 
 You'll recognize the seed value used to double the bytes embedded with exiftool.
 ```
@@ -381,21 +381,23 @@ seed_value = 1234598760
 
 recover_png(file_path, seed_value, output_path)
 ```
+
 After getting the image we can use exiftool on it that give us a hint on using StegSolve to recover the flag.
+<img src="/favicon/chall14.png" alt="Back Image" style="width: 100vw;  object-fit: cover;">
 
 
 # Osint
 ## MyCastle-1
-**description** : 
+**description** : I'm trying to remember the name of the building in my left but it seems that i can't. Can you help. ex INSEC{Maria-Sol}
 
-**given files** :
+**given files** : chall.png
 
 **solution** : The first challenge in Osint category consists of find the location of the given building. By submitting it in Google photos you can recognise the location of the right building to locate the left one.
 
 ## MyCastle-2
-**description** : 
+**description** : Recognize the plane, we need its Legall Airlines name, IATA name, IATA code and Region . ex INSEC{compagnienationaleroyalairmaroc_at_147_africa&middleeast}
 
-**given files** :
+**given files** :  plane.png
 
 **solution** : This one, as described we need to recognise the plane, if you do you can build the flag.
 
