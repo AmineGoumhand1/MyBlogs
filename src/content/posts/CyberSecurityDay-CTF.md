@@ -230,7 +230,7 @@ The flag is ```INSEC{V3RY_D33P_BR4ILLES}```.
 **given files** : bruh
 
 **solution** : This challenge is a text-steganography based challenge, searching a bit on text steganography you can find that we can hide informations in spaces using the Zero width technique. ( another way to do that is to inspect it in vim or a hex editor ). For us let's use this web online tool to reveil hidden data.
-[tool]('https://330k.github.io/misc_tools/unicode_steganography.html')
+[tool](https://330k.github.io/misc_tools/unicode_steganography.html)
 <img src="/favicon/chall3.png" alt="Back Image" style="width: 100vw;  object-fit: cover;">
 
 as you can see the hidden data contains the flag but it's big and scrambled, the idea is to simply do a frequency calculation on the hidden text and recover the flag ( INSEC{n3w_Freq_7£ch_d15€oVRy} ).
@@ -361,7 +361,7 @@ The flag is clear now.
 **solution** : This one, as described we need to recognise the plane, if you do you can build the flag.
 
 So searching about the given plane will lead you to this awesome website of a photographer that has collected tails of several planes.
-[Website]('https://airlinersgallery.smugmug.com/Airline-Tails/Airline-Tails')
+[Website](https://airlinersgallery.smugmug.com/Airline-Tails/Airline-Tails)
 
 So from this website you can conclude that the airline we are looking for is Croatia Airlines.
 
