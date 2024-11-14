@@ -364,7 +364,7 @@ The flag is clear now.
 So searching about the given plane will lead you to this awesome website of a photographer that has collected tails of several planes.
 [Website](https://airlinersgallery.smugmug.com/Airline-Tails/Airline-Tails)
 
-So from this website you can conclude that the plane we are looking for is Croatia Airlines.
+So from this website you can conclude that the airline we are looking for is Croatia Airlines.
 
 So a small search about this plane and the needed values in the flag you'll get INSEC{croatiaairlines,inc._ou_831_europe}.
 
