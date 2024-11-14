@@ -345,7 +345,6 @@ The flag is clear now.
 
 
 
-
 # Osint
 ## MyCastle-1
 **description** : 
@@ -362,7 +361,7 @@ The flag is clear now.
 **solution** : This one, as described we need to recognise the plane, if you do you can build the flag.
 
 So searching about the given plane will lead you to this awesome website of a photographer that has collected tails of several planes.
-[Website](https://airlinersgallery.smugmug.com/Airline-Tails/Airline-Tails)
+[Website]('https://airlinersgallery.smugmug.com/Airline-Tails/Airline-Tails')
 
 So from this website you can conclude that the airline we are looking for is Croatia Airlines.
 
@@ -384,7 +383,7 @@ So a small search about this plane and the needed values in the flag you'll get 
 **solution** : In this networking challenge, you are given a pcapng traffic file to exfiltrate. Investigating a little bit in it, you can find weird ICMP packets used to test communication so analysing these packets you can conclude that the first ICMP packet contains 2 bytes of base64 after it is followed by 9 fake packets and so on. Note that the time difference will help you to do that.
 <img src="/favicon/chall6.png" alt="Back Image" style="width: 100vw;  object-fit: cover;">
 
-so reassemble the base64 bytes will give us SU5TRUN7cDFuOV9wMW45X2QxZF95b3VfbDFrM18zeGYxbDdyNDcxMG59 base64 
+so reassemble the base64 bytes will give us ```SU5TRUN7cDFuOV9wMW45X2QxZF95b3VfbDFrM18zeGYxbDdyNDcxMG59``` base64 
 
 ## Suspect-Net-008
 **description** : Alert! Our SOC team managed to detect some malicious activities on our network. Can you help them figure out what is about?
