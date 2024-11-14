@@ -9,13 +9,14 @@ draft: false
 ---
 
 Hello, I'm happy to share with you the writeups of the Cyber Security Day CTF challenges from the part of INSEC Club in collaboration with CYBERFORCES.
-I am also happy to be a part of this as the author of the challenges except the WEB category.
+I am also happy to be a part of this as the author of the challenges except the WEB category that was created by WisePoo.
 
 The CTF contains several categories like Crypto, Steganography, Forensics, Reverse Engineering, Misc, Web and Osint.
-You can find files in my github repo. 
+
 
 
 # Crypto 
+
 
 ## Primale
 **description** : Math??? 2???
@@ -209,7 +210,9 @@ for i in alphabet :
 # key = CZHZC
 ```
 
+
 # Steganography
+
 
 ## Encoded
 **description** : A devoted admirer of the ZORO series once remarked, "ZORO'S HOME LIBRARY"
@@ -263,7 +266,6 @@ print(unique_text)
 By executing this you'll visualize the flag.
 <img src="/favicon/chall4.png" alt="Back Image" style="width: 100vw;  object-fit: cover;">
 
-
 ## decentral
 **description** :  What can make a difference is a little bit sticky.
 
@@ -311,7 +313,10 @@ hidden_flag = decode_flag_from_jpg('output.png', flag_length=90)
 print(hidden_flag) 
 ```
 
+
 # Forensics
+
+
 ## QQR
 **description** : I'm suffering with my broken QR, can you helpppp ?
 
@@ -320,7 +325,6 @@ print(hidden_flag)
 **solution** : The idea of this challenge was simply replacing The 2 Upper position patterns to solve it, the second hard way is to build it from zero using CrazyBox online tool.
 
 <img src="/favicon/chall5.png" alt="Back Image" style="width: 100vw;  object-fit: cover;">
-
 
 ## Broken-Satellite
 **description** : Our satellites not doing great up there.
@@ -337,12 +341,47 @@ So now using qsstv on the each channels,
 The flag is clear now.
 
 ## freepalestine
-**description** : 
+**description** : random.randint(1,6) tells you : don't even try do it the hard way
 
-**given files** :
+**given files** : freepalestine
 
-**solution** : 
+**solution** : As hinted in the description, the freepalestine challenge contains two solutions, The hard way is to use Mersenne random generator vulnerability, the easiest way is to look for repeated sequences that means something. You'll find the seed value for the randomness and recover the image. 
 
+First by passing it to xxd you can recognize that it's a png where it's hex bytes are repeated. 
+<img src="/favicon/chall12.png" alt="Back Image" style="width: 100vw;  object-fit: cover;">
+
+You'll recognize the seed value used to double the bytes embedded with exiftool.
+```
+000006666677788888899544443332222211111 = EUUULLLLAAAVVVDDDDEEEEESSSS
+```
+Note that it's reversed so after reverse the order you'll find ```seed value = 1234598760```, now we can use this seed to recover our reversed png.
+
+```python
+import random
+def recover_png(file_path, seed_value, output_path):
+    with open(file_path, "rb") as f:
+        file_bytes = f.read()[::-1]
+
+    print(f"pchhhhhh{len(file_bytes)} bytes")
+    len(file_bytes)
+    random.seed(seed_value)
+    unmultipled_bytes = []
+    i=0
+    while i < len(file_bytes):
+        rand_num = random.randint(1, 6)
+        unmultipled_bytes.append(file_bytes[i])
+        i+=rand_num
+    with open(output_path, "wb") as out_f:
+        out_f.write(bytearray(unmultipled_bytes))
+    print(f"bekhhhhhh'{output_path}'")
+
+file_path = "freepalestine" 
+output_path = "recovered_image.png"
+seed_value = 1234598760
+
+recover_png(file_path, seed_value, output_path)
+```
+After getting the image we can use exiftool on it that give us a hint on using StegSolve to recover the flag.
 
 
 # Osint
@@ -394,7 +433,6 @@ so reassemble the base64 bytes will give us ```SU5TRUN7cDFuOV9wMW45X2QxZF95b3Vfb
 **solution** : This challenge also contain ICMP packets exfiltration, This time you should analyse the TTL section of each packet and you'll see something unusuall, TTL contains the ascii code ord of each byte of the flag, so reassemble them give us the flag.
 <img src="/favicon/chall7.png" alt="Back Image" style="width: 100vw;  object-fit: cover;">
 
-
 ## Resolution
 **description** : My little brother is trying to learn about barcodes, but he found a different barcode format that he can't recognize. Can you find out what was that?
 
@@ -425,6 +463,7 @@ for j in range(len(parts)):
       restored_image.save(f'restored_barcode_{j}.png')
 
 ```
+
 
 # Reverse Enginnering
 ## e_asm
